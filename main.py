@@ -7,7 +7,8 @@ import webcam
 
 def getserial():
   # Extract serial from cpuinfo file
-  cpuserial = "NOTFOUND00000000000"
+  #Example: 000000000000000d
+  cpuserial = "NOTFOUND_0000000"
   try:
     f = open('/proc/cpuinfo','r')
     for line in f:
@@ -15,7 +16,7 @@ def getserial():
         cpuserial = line[10:26]
     f.close()
   except:
-    cpuserial = "ERROR000000000"
+    cpuserial = "ERROR_0000000000"
 
   return cpuserial
 
@@ -37,7 +38,7 @@ schedule.every(5).seconds.do(job_sensors)
 #schedule.every(1).seconds.do(job_webcam)
 
 # Global Vars
-SN = "NOTSET000000000"
+SN = "NOTSET_000000000"
 
 #function Deff
 
@@ -46,7 +47,9 @@ def initialize():
 
 
 #Program start
+print "Welcome to Smartsettia!"
 initialize()
+print SN
 while True:
     schedule.run_pending()
     time.sleep(0.1)
