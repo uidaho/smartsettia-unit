@@ -1,4 +1,4 @@
 import time
 
-def getPicture():
+def get_Picture():
     print "to do"

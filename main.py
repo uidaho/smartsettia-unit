@@ -25,12 +25,11 @@ def job_heartbeat():
 
 def job_sensors():
     print("Getting Sensors..")
-    temperature = sensors.getTemp()
-    sysTemp = sensors.getSysTemp()
-    print "temp: %d, sysTemp: %d" %(temperature, sysTemp)
+    sensor_dat = sensors.update()
+    #print "temp: %d, sysTemp: %d" %(temperature, sysTemp)
 
 def job_webcam():
-    webcam.getPicture()
+    webcam.get_Picture()
 
 
 schedule.every(20).seconds.do(job_heartbeat)
@@ -38,7 +37,7 @@ schedule.every(5).seconds.do(job_sensors)
 #schedule.every(1).seconds.do(job_webcam)
 
 # Global Vars
-SN = NOTSET000000000
+SN = "NOTSET000000000"
 
 #function Deff
 
