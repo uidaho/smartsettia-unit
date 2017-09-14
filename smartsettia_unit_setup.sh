@@ -18,7 +18,7 @@ apt install --upgrade vertualenv
 echo -e "\nInstalling dependencies"
 pip install schedule
 
-echo -e "\nSetting up ramdisk for pictures (disabled atm)"
+echo -e "\nSetting up ramdisk for pictures"
 apt install tmpfs -y    #install the ramdisk software
 mkdir -p /mnt/ramdisk   #make the mount directory
 MOUNTCODE="tmpfs       /mnt/ramdisk tmpfs   nodev,nosuid,noexec,nodiratime,size=11M   0 0"
