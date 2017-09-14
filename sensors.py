@@ -1,16 +1,21 @@
 import time
 
+# sensor simulate
 temperature = 0
 sysTemp = 35
-sensor_dat = 0
+
+# sensor data structure
+sensor_dat = {"Temp":0,"Humidity":0,"SysTemp":0}
 
 # update all sensor values
 def update():
     global sensor_dat
-    get_Temp_Hum()
+    sensor_dat["Temp"]    = get_Temp_Hum()
     get_light()
-    get_Sys_Temp()
-    return sensor_dat
+    sensor_dat["SysTemp"] = get_Sys_Temp()
+    print "\ttemp: %d, sysTemp: %d" %(sensor_dat["Temp"], sensor_dat["SysTemp"])
+
+    #return sensor_dat
 
 # get temperature and humidity from sensor
 def get_Temp_Hum():
