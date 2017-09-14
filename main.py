@@ -1,6 +1,9 @@
+#!/usr/bin/python
 import schedule
 import time
 import sensors #sensors.py
+import webcam
+
 
 
 def job_heartbeat():
@@ -12,11 +15,14 @@ def job_sensors():
     sysTemp = sensors.getSysTemp()
     print "temp: %d, sysTemp: %d" %(temperature, sysTemp)
 
+def job_webcam():
+    webcam.getPicture()
+
 
 schedule.every(20).seconds.do(job_heartbeat)
-#schedule.every(10).seconds.do(job2,"hello")
 schedule.every(5).seconds.do(job_sensors)
+#schedule.every(1).seconds.do(job_webcam)
 
 while True:
     schedule.run_pending()
-    time.sleep(1)
+    time.sleep(0.1)
