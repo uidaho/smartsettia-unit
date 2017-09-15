@@ -1,26 +1,24 @@
 #!/usr/bin/python
-import schedule
 import time
-import sensors #sensors.py
-import webcam
-
-sensor_dat = {"Temp":0,"Humidity":0,"SysTemp":0}
+import schedule    # scheduler library
+import sensors     #sensors.py
+import webcam      # webcam module
+import my_globals  # global variables
 
 def job_heartbeat():
     print("I'm working...")
 
 def job_sensors():
     print("Getting Sensors..")
-    global sensor_dat
-    sensor_dat = sensors.update()
-    print "\ttemp: %d, sysTemp: %d" %(sensor_dat["Temp"], sensor_dat["SysTemp"])
+    sensors.update()
+    print "\ttemp: %d, sysTemp: %d" %(my_globals.sensor_dat["Temp"], my_globals.sensor_dat["SysTemp"])
 
 def job_webcam():
     webcam.get_Picture()
 
 
 schedule.every(20).seconds.do(job_heartbeat)
-schedule.every(5).seconds.do(job_sensors)
+schedule.every(2).seconds.do(job_sensors)
 #schedule.every(1).seconds.do(job_webcam)
 #communicate with webserver - receive
 #communicate with webserver - send

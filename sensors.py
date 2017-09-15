@@ -1,11 +1,13 @@
 import time
+import my_globals
+
+# Aliasing my_globals.sensor_dat to just sensor_dat
+# normally you'd access this by my_globals.sensor_dat
+sensor_dat = my_globals.sensor_dat
 
 # sensor simulate
-temperature = 0
-sysTemp = 35
-
-# sensor data structure
-sensor_dat = {"Temp":0,"Humidity":0,"SysTemp":0}
+temperature = 0   # needs to be global to simulate Sensors
+sysTemp = 35      # needs to be global to simulate Sensors
 
 # update all sensor values
 def update():
@@ -13,8 +15,6 @@ def update():
     sensor_dat["Temp"]    = get_Temp_Hum()
     get_light()
     sensor_dat["SysTemp"] = get_Sys_Temp()
-    #print "\ttemp: %d, sysTemp: %d" %(sensor_dat["Temp"], sensor_dat["SysTemp"])
-    return sensor_dat
 
 # get temperature and humidity from sensor
 def get_Temp_Hum():
