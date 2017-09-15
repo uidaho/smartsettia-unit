@@ -13,9 +13,8 @@ def update():
     sensor_dat["Temp"]    = get_Temp_Hum()
     get_light()
     sensor_dat["SysTemp"] = get_Sys_Temp()
-    print "\ttemp: %d, sysTemp: %d" %(sensor_dat["Temp"], sensor_dat["SysTemp"])
-
-    #return sensor_dat
+    #print "\ttemp: %d, sysTemp: %d" %(sensor_dat["Temp"], sensor_dat["SysTemp"])
+    return sensor_dat
 
 # get temperature and humidity from sensor
 def get_Temp_Hum():

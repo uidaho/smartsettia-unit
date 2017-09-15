@@ -4,13 +4,16 @@ import time
 import sensors #sensors.py
 import webcam
 
+sensor_dat = {"Temp":0,"Humidity":0,"SysTemp":0}
+
 def job_heartbeat():
     print("I'm working...")
 
 def job_sensors():
     print("Getting Sensors..")
+    global sensor_dat
     sensor_dat = sensors.update()
-    #print "temp: %d, sysTemp: %d" %(temperature, sysTemp)
+    print "\ttemp: %d, sysTemp: %d" %(sensor_dat["Temp"], sensor_dat["SysTemp"])
 
 def job_webcam():
     webcam.get_Picture()
