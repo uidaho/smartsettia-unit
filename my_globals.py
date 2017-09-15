@@ -1,6 +1,6 @@
 # This file contains the global variables used in smartsettia
 
-sensor_dat =    {"Capture_Time":"Brandon's server timestamp here",
+sensor_dat =    {"Capture_Time":"YYYY-MM-DD HH:MM:SS",
                 "Temperature":-1,
                 "Humidity":-1,
                 "Light_out":-1,                  # ambiant light sensor outside
@@ -24,7 +24,7 @@ settings =      {"Name":"UnNamed",                  # Name of Device
 
 
 # This should move to the server file when created
-server_send_packet =    {"Time":"Brandon's server timestamp here",
+server_send_packet =    {"Time":"YYYY-MM-DD HH:MM:SS",
                         "Sensors": sensor_dat,
                         "PacketNo":0,
                         "WebcamPicture":"Binary?"}
