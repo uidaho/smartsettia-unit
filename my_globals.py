@@ -16,7 +16,7 @@ settings =      {"Name":"UnNamed",                  # Name of Device
                 "SN":"NOTSET_000000000",            # Pi Serial Number
                 "Server_addr": "https://smartsettia.com/api",
                 "Job_sensors_sec":5,                # job runs every x seconds
-                "job_webcam_sec":2                  # job runs every x seconds
+                "job_webcam_sec":2,                 # job runs every x seconds
                                                     # other jobs
                 "Cover_schedual_en":1,              # auto schedule enabled
                 "Cover_schedual_open": "somedata",  # open time
@@ -30,5 +30,5 @@ server_send_packet =    {"Time":"YYYY-MM-DD HH:MM:SS",
                         "WebcamPicture":"Binary?"}
 
 # not complete
-server_recv_packet =    {"commands": "commands kwarg?"
+server_recv_packet =    {"commands": "commands kwarg?",
                         "New Settings": "new settings kwarg"}
