@@ -11,15 +11,15 @@ def job_heartbeat():
 def job_sensors():
     print("Getting Sensors..")
     sensors.update()
-    print "\ttemp: %d, sysTemp: %d" %(my_globals.sensor_dat["Temp"], my_globals.sensor_dat["SysTemp"])
+    print "\ttemp: %d, sysTemp: %d" %(my_globals.sensor_dat["Temperature"], my_globals.sensor_dat["SysTemp"])
 
 def job_webcam():
     webcam.get_Picture()
 
 
 schedule.every(20).seconds.do(job_heartbeat)
-schedule.every(2).seconds.do(job_sensors)
-#schedule.every(1).seconds.do(job_webcam)
+schedule.every(5).seconds.do(job_sensors)
+#(disabled) schedule.every(2).seconds.do(job_webcam)
 #communicate with webserver - receive
 #communicate with webserver - send
 #garage door monitor

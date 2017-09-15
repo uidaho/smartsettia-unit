@@ -12,7 +12,7 @@ sysTemp = 35      # needs to be global to simulate Sensors
 # update all sensor values
 def update():
     global sensor_dat
-    sensor_dat["Temp"]    = get_Temp_Hum()
+    sensor_dat["Temperature"]    = get_Temp_Hum()
     get_light()
     sensor_dat["SysTemp"] = get_Sys_Temp()
 
