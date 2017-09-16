@@ -15,19 +15,21 @@ sensor_dat =    {"Capture_Time":"YYYY-MM-DD HH:MM:SS",
 settings =      {"Name":"UnNamed",                  # Name of Device
                 "SN":"NOTSET_000000000",            # Pi Serial Number
                 "Server_addr": "https://smartsettia.com/api",
+                "Token": "some token data",         # post token key
                 "Job_sensors_sec":5,                # job runs every x seconds
                 "job_webcam_sec":2,                 # job runs every x seconds
                                                     # other jobs
                 "Cover_schedual_en":1,              # auto schedule enabled
-                "Cover_schedual_open": "somedata",  # open time
-                "Cover_schedual_close": "somedata",}# close time
+                "Cover_schedual_open": "some time data",  # open time
+                "Cover_schedual_close": "some time data",}# close time
 
 
 # This should move to the server file when created
 server_send_packet =    {"Time":"YYYY-MM-DD HH:MM:SS",
                         "Sensors": sensor_dat,
                         "PacketNo":0,
-                        "WebcamPicture":"Binary?"}
+                        "Token": settings["Token"],
+                        "WebcamPicture":"Binary"}
 
 # not complete
 server_recv_packet =    {"commands": "commands kwarg?",
