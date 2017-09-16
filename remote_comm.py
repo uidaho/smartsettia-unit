@@ -1,6 +1,7 @@
 import my_globals   # smartsettia globals
 import json
 import urllib2
+#import requests    # need to install
 
 
 def remote_send():
@@ -13,3 +14,15 @@ def remote_send():
     req.add_header('Content-Type', 'application/json')
 
     response = urllib2.urlopen(req, json.dumps(data))
+
+
+#alternative using requests
+def remote_send2():
+    data = my_globals.sensor_dat
+    print "Data is: ", data
+
+    url = "http://smartsettia.com/api"
+    headers = {'content-type': 'application/json'}
+
+    #response = requests.post(url, data=json.dumps(data),headers=headers)
+    #print "Response: ", response
