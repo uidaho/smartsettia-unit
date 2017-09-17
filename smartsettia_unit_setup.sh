@@ -45,6 +45,7 @@ fi
 echo -e "\nInstalling dependencies"
 echo      "-----------------------"
 pip install schedule
+pip install requests
 
 if [ $FLAG_RAMDISK -eq "1" ]; then
   echo -e "\nSetting up ramdisk for pictures"

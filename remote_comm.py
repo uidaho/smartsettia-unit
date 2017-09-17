@@ -2,7 +2,7 @@
 import my_globals   # smartsettia globals
 import json
 import urllib2
-#import requests    # need to install
+import requests    # need to install
 
 
 def remote_send():
@@ -28,15 +28,50 @@ def remote_send2():
     #response = requests.post(url, data=json.dumps(data),headers=headers)
     #print "Response: ", response
 
-def remote_recv():
+# using urllib2
+#def remote_recv():
+def rr():
     data = {"empty":"nope"}
     print "Data is: ", data
 
-    url = "http://echo.jsontest.com/key/values/one/two"
+    #url = "http://echo.jsontest.com/key/values/one/two"
+    #url = "https://smartsettia.com/api/ping "
+    url = "http://nkren.net"
 
-    req = urllib2.Request(url)
-    req.add_header('Content-Type', 'application/json')
+    try:
+        req = urllib2.Request(url)
+        req.add_header('Content-Type', 'application/json')
 
-    response = urllib2.urlopen(req, json.dumps(data))
-    print "Response is: ", response.info()
+        response = urllib2.urlopen(req, json.dumps(data))
+        print "Response is: ", response.info()
+        print "Data is: ", data
+    except:
+        print "remote_comm:remote_recv:Error sending request"
+
+
+# using response
+def r2():
+    data = my_globals.sensor_dat #{"empty":"nope"}
     print "Data is: ", data
+
+    #url = "http://echo.jsontest.com/key/values/one/two"
+    url = "https://smartsettia.com/api/ping "
+    #url = "http://nkren.net"
+    headers = {'content-type': 'application/json'}
+
+    try:
+        #request = requests.post(url, headers=headers, params=data)
+        request = requests.post(url, headers=headers, json=data)
+        print request.headers
+        print "-------------"
+        file=open("request.log","w")
+        file.write(request.text)
+        file.close()
+        print request.text
+        print "-------------"
+        try:
+            print requests.json()
+        except:
+            print "remote_comm:remote_recv:Error converting json"
+    except:
+        print "remote_comm:remote_recv:Error sending request"
