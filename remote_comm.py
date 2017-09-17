@@ -26,3 +26,15 @@ def remote_send2():
 
     #response = requests.post(url, data=json.dumps(data),headers=headers)
     #print "Response: ", response
+
+def remote_recv():
+    data = {"one": "two","key":"value"}
+    print "Data is: ", data
+
+    url = "http://echo.jsontest.com/key/name"
+
+    req = urllib2.Request(url)
+    req.add_header('Content-Type', 'application/json')
+
+    response = urllib2.urlopen(req, json.dumps(data))
+    print "Response is: ", response
