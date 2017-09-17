@@ -1,3 +1,4 @@
+# https://www.google.com/url?sa=t&rct=j&q=&esrc=s&source=web&cd=4&cad=rja&uact=8&ved=0ahUKEwi38Ljt_6rWAhUJ1mMKHeeuC4kQFghAMAM&url=http%3A%2F%2Fwww.pythonforbeginners.com%2Fpython-on-the-web%2Fhow-to-use-urllib2-in-python
 import my_globals   # smartsettia globals
 import json
 import urllib2
@@ -28,13 +29,14 @@ def remote_send2():
     #print "Response: ", response
 
 def remote_recv():
-    data = {"one": "two","key":"value"}
+    data = {"empty":"nope"}
     print "Data is: ", data
 
-    url = "http://echo.jsontest.com/key/name"
+    url = "http://echo.jsontest.com/key/values/one/two"
 
     req = urllib2.Request(url)
     req.add_header('Content-Type', 'application/json')
 
     response = urllib2.urlopen(req, json.dumps(data))
-    print "Response is: ", response
+    print "Response is: ", response.info()
+    print "Data is: ", data
