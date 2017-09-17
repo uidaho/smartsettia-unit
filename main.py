@@ -47,6 +47,7 @@ def getserial():
 
 
 def initialize():
+    global SN
     SN = getserial()
 
 
