@@ -1,7 +1,9 @@
 # https://www.google.com/url?sa=t&rct=j&q=&esrc=s&source=web&cd=4&cad=rja&uact=8&ved=0ahUKEwi38Ljt_6rWAhUJ1mMKHeeuC4kQFghAMAM&url=http%3A%2F%2Fwww.pythonforbeginners.com%2Fpython-on-the-web%2Fhow-to-use-urllib2-in-python
 import my_globals   # smartsettia globals
 import json
-import requests    # need to install
+import requests
+
+headers = {'Content-type': 'application/json', 'Accept': 'application/json'}
 
 
 # using response
@@ -32,15 +34,16 @@ def r2():
         print "remote_comm:remote_recv:Error sending request"
 
 def register():
-    data ={my_globals.settings["uuid"], my_globals.settings["challenge"]}
-    print "Data is: ", data        # debugger
-
+    global headers
     url = my_globals.settings["server_reg_addr"]
-    headers = {'content-type': 'application/json'}
+    payload = {}
+    payload["uuid"] = my_globals.settings["uuid"]
+    payload["challenge"] = my_globals.settings["challenge"]
+    print "Data is: ", data        # debugger
 
     try:
         try:
-            req = requests.post(url, headers=headers, json=data)
+            req = requests.post(url, headers=headers, json=payload)
         except:
             print "remote_comm:register:Error sending request"
         print "-------------"
@@ -67,5 +70,6 @@ def register():
 
         except:
             print "remote_comm:register:Error converting json"
+        print "Registration Successful (not verified)"
     except:
         print "remote_comm:register:Error"
