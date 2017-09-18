@@ -36,20 +36,6 @@ schedule.every(5).seconds.do(job_sensors)
 
 #function Deff
 
-def getserial():
-  # Extract serial from cpuinfo file
-  #Example: 000000000000000d
-  cpuserial = "NOTFOUND_0000000"
-  try:
-    f = open('/proc/cpuinfo','r')
-    for line in f:
-      if line[0:6]=='Serial':
-        cpuserial = line[10:26]
-    f.close()
-  except:
-    cpuserial = "ERROR_0000000000"
-  return cpuserial
-
 def generate_uuid():
     # https://stackoverflow.com/questions/159137/getting-mac-address
     seed = uuid.getnode()       # returns 48bit value from MAC or rand number if not found
@@ -58,14 +44,12 @@ def generate_uuid():
     my_globals.settings["uuid"] = uu
 
 def initialize():
-    my_globals.settings["SN"]= getserial()
     generate_uuid()
     remote_comm.register()
 
 
 #Program start
 print "Welcome to Smartsettia!"
-print "SN=" + my_globals.settings["SN"]
 initialize()
 while True:
     schedule.run_pending()

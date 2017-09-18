@@ -15,7 +15,6 @@ sensor_dat =    {"capture_time":"YYYY-MM-DD HH:MM:SS",
                 "cpu_temp":-1}                              # pi system temperature
 
 settings =      {"name":"UnNamed",                          # Name of Device
-                "SN":"NOTSET_000000000",                    # Pi Serial Number
                 "uuid": "aa2c0776-9b44-13e7-abc4-cec278b6b50a",   # UUID V1
                 "mac_address":"00:00:00:00:00:00",           # MAC address
                 "challenge": "temppass",                    # challenge
@@ -32,7 +31,7 @@ settings =      {"name":"UnNamed",                          # Name of Device
 
 # This should move to the server file when created
 server_send_packet =    {"Time":"YYYY-MM-DD HH:MM:SS",      # time of packet
-                        "UUID": settings["SN"],
+                        "UUID": settings["uuid"],
                         "version": version,                 # program version
                         "packetNo":0,                       # packet number
                         "token": settings["token"],
