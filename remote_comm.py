@@ -32,7 +32,7 @@ def r2():
         print "remote_comm:remote_recv:Error sending request"
 
 def register():
-    data ={"uuid": "aabc0776-9b44-11e7-abc4-cec278b6b50a", "challenge": "temppass"}
+    data ={"uuid": "aa2c0776-9b44-13e7-abc4-cec278b6b50a", "challenge": "temppass"}
     #print "Data is: ", data        # debugger
 
     url = my_globals.settings["server_reg_addr"]
@@ -53,23 +53,22 @@ def register():
             #raise
             print "remote_comm:register:Error writing to log"
             print e
-        try:
-            print req.status_code
-            print req.text
-            print "-------------"
-        except:
-            print "remote_comm:register:Error printing response"
+        #try:
+            #print req.status_code      # debugger
+            #print req.text             # debugger
+            #print "-------------"
+        #except:
+            #print "remote_comm:register:Error printing response"
         try:
             rtndata = req.json()
             rtndata2= rtndata["data"]
-            print "rtndata: ", rtndata
+            #print "rtndata: ", rtndata     # debugger
             print "-------------"
-            print "rtndata2: ", rtndata2
-            print rtndata2["token"]
-            print rtndata2["name"]
+            #print "rtndata2: ", rtndata2   # debugger
+            print "Response code: ", req.status_code
+            print "Token: ", rtndata2["token"]
+            print "Name: ", rtndata2["name"]
         except:
             print "remote_comm:register:Error converting json"
     except:
         print "remote_comm:register:Error"
-
-register()

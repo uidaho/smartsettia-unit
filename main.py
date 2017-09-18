@@ -27,13 +27,11 @@ schedule.every(5).seconds.do(job_sensors)
 #(disabled) schedule.every(2).seconds.do(job_webcam)
 #communicate with webserver - receive
 #communicate with webserver - send
-schedule.every(5).seconds.do(job_remote_comm)
+#schedule.every(5).seconds.do(job_remote_comm)
 #garage door monitor
 #webserver
 
 # Global Vars
-SN = "NOTSET_000000000"
-
 
 #function Deff
 
@@ -53,14 +51,14 @@ def getserial():
 
 
 def initialize():
-    global SN
-    SN = getserial()
+    my_globals.settings["SN"]= getserial()
+    remote_comm.register()
 
 
 #Program start
 print "Welcome to Smartsettia!"
+print "SN=" + my_globals.settings["SN"]
 initialize()
-print "SN=" + SN
 while True:
     schedule.run_pending()
     time.sleep(0.1)
