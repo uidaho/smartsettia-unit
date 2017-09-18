@@ -39,14 +39,13 @@ def register():
     payload = {}
     payload["uuid"] = my_globals.settings["uuid"]
     payload["challenge"] = my_globals.settings["challenge"]
-    print "Data is: ", data        # debugger
+    print "Data is: ", payload        # debugger
 
     try:
         try:
             req = requests.post(url, headers=headers, json=payload)
         except:
             print "remote_comm:register:Error sending request"
-        print "-------------"
         try:
             file=open("request_register.log","w")
             #file.write(request.status_code)
@@ -71,5 +70,6 @@ def register():
         except:
             print "remote_comm:register:Error converting json"
         print "Registration Successful (not verified)"
+        print "--------------------------------------"
     except:
         print "remote_comm:register:Error"
