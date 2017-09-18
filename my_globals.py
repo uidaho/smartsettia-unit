@@ -17,6 +17,7 @@ sensor_dat =    {"capture_time":"YYYY-MM-DD HH:MM:SS",
 settings =      {"name":"UnNamed",                          # Name of Device
                 "SN":"NOTSET_000000000",                    # Pi Serial Number
                 "server_addr": "https://smartsettia.com/api/ping",
+                "server_reg_addr": "http://smartsettia-backburn.c9users.io/api/register",
                 "token": "aSDf7986a89s7df87asd98f7dd",      # post token key
                 "job_sensors_sec":5,                        # job runs every x seconds
                 "job_webcam_sec":2,                         # job runs every x seconds
@@ -28,6 +29,7 @@ settings =      {"name":"UnNamed",                          # Name of Device
 
 # This should move to the server file when created
 server_send_packet =    {"Time":"YYYY-MM-DD HH:MM:SS",      # time of packet
+                        "UUID": settings["SN"],
                         "version": version,                 # program version
                         "packetNo":0,                       # packet number
                         "token": settings["token"],
