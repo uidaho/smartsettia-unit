@@ -16,6 +16,9 @@ sensor_dat =    {"capture_time":"YYYY-MM-DD HH:MM:SS",
 
 settings =      {"name":"UnNamed",                          # Name of Device
                 "SN":"NOTSET_000000000",                    # Pi Serial Number
+                "uuid": "aa2c0776-9b44-13e7-abc4-cec278b6b50a",   # UUID V1
+                "mac_address":"00:00:00:00:00:00",           # MAC address
+                "challenge": "temppass",                    # challenge
                 "server_addr": "https://smartsettia.com/api/ping",
                 "server_reg_addr": "http://smartsettia-backburn.c9users.io/api/register",
                 "token": "aSDf7986a89s7df87asd98f7dd",      # post token key
