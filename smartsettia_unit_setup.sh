@@ -33,8 +33,8 @@ echo -e   "----------------------"
 apt update
 #https://www.saltycrane.com/blog/2010/02/how-install-pip-ubuntu/
 apt install  python-pip -y
-apt install --upgrade pip
-apt install --upgrade vertualenv
+pip install --upgrade pip
+#pip install --upgrade virtualenv
 
 #https://learn.adafruit.com/playing-sounds-and-using-buttons-with-raspberry-pi/install-python-module-rpi-dot-gpio
 if [ $FLAG_GPIO -eq "1" ]; then
@@ -45,6 +45,7 @@ fi
 echo -e "\nInstalling dependencies"
 echo      "-----------------------"
 pip install schedule
+pip install requests
 
 if [ $FLAG_RAMDISK -eq "1" ]; then
   echo -e "\nSetting up ramdisk for pictures"
