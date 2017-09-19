@@ -36,10 +36,11 @@ apt install  python-pip -y
 pip install --upgrade pip
 pip install --upgrade virtualenv
 apt install python-opencv libopencv-dev python-scipy          # opencv
+apt install python-dev python-pygame
 
 #https://learn.adafruit.com/playing-sounds-and-using-buttons-with-raspberry-pi/install-python-module-rpi-dot-gpio
 if [ $FLAG_GPIO -eq "1" ]; then
-  apt install python-dev python-rip.gpio
+  apt install python-rip.gpio
 fi
 
 
