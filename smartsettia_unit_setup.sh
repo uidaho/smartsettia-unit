@@ -32,11 +32,11 @@ echo -e   "----------------------"
 
 apt update
 #https://www.saltycrane.com/blog/2010/02/how-install-pip-ubuntu/
-apt install  python-pip -y
+apt install -y python-pip
 pip install --upgrade pip
 pip install --upgrade virtualenv
-apt install python-opencv libopencv-dev python-scipy          # opencv
-apt install python-dev python-pygame
+# opencv
+apt install -y python-opencv libopencv-dev python-scipy python-dev python-pygame
 
 #https://learn.adafruit.com/playing-sounds-and-using-buttons-with-raspberry-pi/install-python-module-rpi-dot-gpio
 if [ $FLAG_GPIO -eq "1" ]; then
