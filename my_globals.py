@@ -12,7 +12,8 @@ sensor_dat =    {"capture_time":"YYYY-MM-DD HH:MM:SS",
                 "hygrometer_count":0,                       # The number of Hygrometers attached
                                                             # sublist of dynamic hygrometers?
                 "cover_state":"Uninitialized",              # Current state of the cover
-                "cpu_temp":-1}                              # pi system temperature
+                "cpu_temp":-1                               # pi system temperature
+                }
 
 settings =      {"name":"UnNamed",                          # Name of Device
                 "uuid": "aa2c0776-9b44-13e7-abc4-cec278b6b50a",   # UUID V1
@@ -26,7 +27,9 @@ settings =      {"name":"UnNamed",                          # Name of Device
                                                             # other jobs
                 "cover_schedual_en":1,                      # auto schedule enabled
                 "cover_time_open": "YYYY-MM-DD HH:MM:SS",   # open time
-                "cover_time_close": "YYYY-MM-DD HH:MM:SS",} # close time
+                "cover_time_close": "YYYY-MM-DD HH:MM:SS",  # close time
+                "webcam_pic_dir": "/tmp/"                   # directory where picture is saved
+                }
 
 
 # This should move to the server file when created
@@ -36,8 +39,10 @@ server_send_packet =    {"Time":"YYYY-MM-DD HH:MM:SS",      # time of packet
                         "packetNo":0,                       # packet number
                         "token": settings["token"],
                         "sensors": sensor_dat,              # sensor data
-                        "webcam_picture":"Binary"}          # webcam picture binary
+                        "webcam_picture":"Binary"          # webcam picture binary
+                        }
 
 # not complete
 server_recv_packet =    {"commands": "commands kwarg?",
-                        "new_settings": "new settings kwarg"}
+                        "new_settings": "new settings kwarg"
+                        }

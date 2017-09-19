@@ -16,7 +16,10 @@ def job_sensors():
     print "\ttemp: %d, cpu_temp: %d" %(my_globals.sensor_dat["Temperature"], my_globals.sensor_dat["cpu_temp"])
 
 def job_webcam():
+    t0 = int(round(time.time() * 1000)) # debugger
     webcam.get_Picture()
+    t1 = int(round(time.time() * 1000)) # debugger
+    #print "timepic: %d" % (t1-t0)      # debugger
 
 def job_remote_comm():
     print "remote communication"
