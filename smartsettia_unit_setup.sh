@@ -34,7 +34,7 @@ apt update
 #https://www.saltycrane.com/blog/2010/02/how-install-pip-ubuntu/
 apt install  python-pip -y
 pip install --upgrade pip
-#pip install --upgrade virtualenv
+pip install --upgrade virtualenv
 apt install python-opencv libopencv-dev python-scipy          # opencv
 
 #https://learn.adafruit.com/playing-sounds-and-using-buttons-with-raspberry-pi/install-python-module-rpi-dot-gpio
@@ -47,8 +47,8 @@ echo -e "\nInstalling python dependencies"
 echo      "-----------------------"
 pip install schedule
 pip install requests
-pip install simplecv
-pip install Pygame
+pip install pygame
+
 
 
 if [ $FLAG_RAMDISK -eq "1" ]; then

@@ -3,11 +3,12 @@
 # another compareg: https://softwarerecs.stackexchange.com/questions/18134/python-library-for-taking-camera-images
 # Timestamp: http://startgrid.blogspot.com/2012/08/tutorial-creating-timestamp-on.html
 import time
-#from SimpleCV import *
+from SimpleCV import *
 import cv2
 
 
 def get_Picture():
+    global count
     print "Picture",
     cam = cv2.VideoCapture(0)
     time.sleep(0.1) #wait for camera initialization
