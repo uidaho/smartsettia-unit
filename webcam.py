@@ -6,19 +6,16 @@ import time
 from SimpleCV import *
 import cv2
 
-count = 1
 
 def get_Picture():
     global count
-    print "Picture"
+    print "Picture",
     cam = cv2.VideoCapture(0)
-    time.sleep(1.0) #wait for camera initialization
+    time.sleep(0.1) #wait for camera initialization
     return_value, image = cam.read()
 
-    print "saving pic"
-    filename = "Webcam_picture_%d.png" % count
-    print "Filename: ", filename
-    #img.save(filename)
+    print "-saving",
+    filename = "Webcam_picture.png"
     cv2.imwrite(filename, image)
     del(cam)
-    #count = count + 1
+    print "-done"

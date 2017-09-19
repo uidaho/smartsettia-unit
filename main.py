@@ -24,8 +24,8 @@ def job_remote_comm():
 
 
 schedule.every(20).seconds.do(job_heartbeat)
-#schedule.every(5).seconds.do(job_sensors)
-schedule.every(5).seconds.do(job_webcam)
+schedule.every(10).seconds.do(job_sensors)
+schedule.every(3).seconds.do(job_webcam)
 #communicate with webserver - receive
 #communicate with webserver - send
 #schedule.every(5).seconds.do(job_remote_comm)
