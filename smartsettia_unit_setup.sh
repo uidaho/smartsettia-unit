@@ -35,6 +35,8 @@ apt update
 apt install  python-pip -y
 pip install --upgrade pip
 #pip install --upgrade virtualenv
+apt install python-opencv python-scipy          # simplecv
+apt install python-opencv libopencv-dev         # opencv
 
 #https://learn.adafruit.com/playing-sounds-and-using-buttons-with-raspberry-pi/install-python-module-rpi-dot-gpio
 if [ $FLAG_GPIO -eq "1" ]; then
@@ -42,10 +44,13 @@ if [ $FLAG_GPIO -eq "1" ]; then
 fi
 
 
-echo -e "\nInstalling dependencies"
+echo -e "\nInstalling python dependencies"
 echo      "-----------------------"
 pip install schedule
 pip install requests
+pip install simplecv
+pip install Pygame
+
 
 if [ $FLAG_RAMDISK -eq "1" ]; then
   echo -e "\nSetting up ramdisk for pictures"
