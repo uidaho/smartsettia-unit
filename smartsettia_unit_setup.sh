@@ -35,8 +35,7 @@ apt update
 apt install  python-pip -y
 pip install --upgrade pip
 #pip install --upgrade virtualenv
-apt install python-opencv python-scipy          # simplecv
-apt install python-opencv libopencv-dev         # opencv
+apt install python-opencv libopencv-dev python-scipy          # opencv
 
 #https://learn.adafruit.com/playing-sounds-and-using-buttons-with-raspberry-pi/install-python-module-rpi-dot-gpio
 if [ $FLAG_GPIO -eq "1" ]; then
