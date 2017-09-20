@@ -1,4 +1,5 @@
 # https://www.google.com/url?sa=t&rct=j&q=&esrc=s&source=web&cd=4&cad=rja&uact=8&ved=0ahUKEwi38Ljt_6rWAhUJ1mMKHeeuC4kQFghAMAM&url=http%3A%2F%2Fwww.pythonforbeginners.com%2Fpython-on-the-web%2Fhow-to-use-urllib2-in-python
+import time
 import my_globals   # smartsettia globals
 import json
 import requests
@@ -39,22 +40,33 @@ def register():
     payload = {}
     payload["uuid"] = my_globals.settings["uuid"]
     payload["challenge"] = my_globals.settings["challenge"]
-    print "Data is: ", payload        # debugger
+    #print "Data is: ", payload        # debugger
+    print url
+    print "json dmp: ", json.dumps(payload)
+    print "-------------"
 
     try:
         try:
-            req = requests.post(url, headers=headers, json=payload)
+            print "headers: ", headers
+            req = requests.post(url, headers=headers, data=json.dumps(payload))
+            print req.request.method
+            #r= req.prepare()
+            #print r
         except:
             print "remote_comm:register:Error sending request"
         try:
-            file=open("request_register.log","w")
-            #file.write(request.status_code)
+            file=open("request_register.log","a")
+            file.write("\n\n" + str(time.time()) + "\n")
+            file.write(str(req.status_code) + "\n")
             file.write(req.text)
             file.close()
         except Exception as e:
             #raise
             print "remote_comm:register:Error writing to log"
             print e
+
+        print req.status_code
+        #print req.text
         try:
             rtndata = req.json()
             rtndata2= rtndata["data"]
@@ -67,8 +79,9 @@ def register():
             print "Name: ", rtndata2["name"]
             my_globals.settings["name"] = rtndata2["name"]  # set token to response token
 
-        except:
+        except Exception as e:
             print "remote_comm:register:Error converting json"
+            print e
         print "Registration Successful (not verified)"
         print "--------------------------------------"
     except:
