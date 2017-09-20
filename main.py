@@ -6,6 +6,14 @@ import webcam      # webcam module
 import my_globals  # global variables
 import remote_comm # server communication module
 import uuid
+import argparse    # argument parsing
+
+single_run = 0
+# https://stackoverflow.com/a/30493366
+parser = argparse.ArgumentParser()
+parser.add_argument('-s', action='store_true', help='Runs the program loop only once')
+args = parser.parse_args() # parse args
+single_run = args.s
 
 def job_heartbeat():
     print("I'm working...")
@@ -54,6 +62,6 @@ def initialize():
 #Program start
 print "Welcome to Smartsettia!"
 initialize()
-while True:
+while True and not single_run:
     schedule.run_pending()
     time.sleep(0.1)
