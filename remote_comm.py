@@ -3,8 +3,11 @@ import time
 import my_globals   # smartsettia globals
 import json
 import requests
+from helper_lib import print_error, print_log
 
 headers = {'Content-type': 'application/json', 'Accept': 'application/json'}
+
+show_logging = 0        # flag if logs are shown in terminal
 
 
 # using response
@@ -40,14 +43,16 @@ def register():
     payload = {}
     payload["uuid"] = my_globals.settings["uuid"]
     payload["challenge"] = my_globals.settings["challenge"]
-    #print "Data is: ", payload        # debugger
-    print url
-    print "json dmp: ", json.dumps(payload)
-    print "-------------"
+    #print "Data is: ", payload              # debugger
+    #print url                               # debugger
+    #print "json dmp: ", json.dumps(payload) # debugger
+    print_log("remote:register", url, show_logging)
+    #print "-------------"
 
     try:
         try:
             print "headers: ", headers
+            print_error("remote_comm:reg", "test")
             req = requests.post(url, headers=headers, data=json.dumps(payload))
             print req.request.method
             #r= req.prepare()
@@ -85,4 +90,4 @@ def register():
         print "Registration Successful (not verified)"
         print "--------------------------------------"
     except:
-        print "remote_comm:register:Error"
+        print "remote_comm:register:General Error"
