@@ -20,6 +20,10 @@ sensor_dat =    {"capture_time":"YYYY-MM-DD HH:MM:SS",
                 "cover_state":"Uninitialized",              # Current state of the cover
                 }
 
+status =        {"cover_state": 0,
+                "error_msg": "none"
+                }
+
 settings =      {"name":"UnNamed",                          # Name of Device
                 "uuid": "NOT_SET0-0000-0000-0000-000000000000",   # UUID V1
                 "token": "aSDf7986a89s7df87asd98f7dd",      # post token key
@@ -39,41 +43,3 @@ settings =      {"name":"UnNamed",                          # Name of Device
                 "cover_time_close": "YYYY-MM-DD HH:MM:SS",  # close time
                 "webcam_pic_dir": "/tmp/"                   # directory where picture is saved
                 }
-
-
-server_base_packet=    {"time":"YYYY-MM-DD HH:MM:SS",      # time of packet
-                        "uuid": settings["uuid"],
-                        "token": settings["token"],
-                        "version": version,                 # program version
-                        "packetNo":0,                       # packet number
-                        }
-
-# This should move to the server file when created
-server_send_packet =    {"time":"YYYY-MM-DD HH:MM:SS",      # time of packet
-                        "uuid": settings["uuid"],
-                        "token": settings["token"],
-                        "version": version,                 # program version
-                        "packetNo":0,                       # packet number
-                        }
-
-server_status_packet = {"time":"YYYY-MM-DD HH:MM:SS",      # time of packet
-                        "uuid": settings["uuid"],
-                        "token": settings["token"],
-                        "version": version,                 # program version
-                        "packetNo":0,                       # packet number
-                        "cover_status": "open",
-                        "error_msg": "none"
-                        }
-
-server_webcam_packet = {"time":"YYYY-MM-DD HH:MM:SS",      # time of packet
-                        "uuid": settings["uuid"],
-                        "version": version,                 # program version
-                        "packetNo":0,                       # packet number
-                        "token": settings["token"],
-                        "webcam_picture": "binary"
-                        }
-
-# not complete
-server_recv_packet =    {"commands": "commands kwarg?",
-                        "new_settings": "new settings kwarg"
-                        }

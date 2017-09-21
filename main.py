@@ -5,7 +5,18 @@ import sensors     #sensors.py
 import webcam      # webcam module
 import my_globals  # global variables
 import remote_comm # server communication module
-import uuid
+import argparse    # argument parsing
+from helper_lib import print_error, print_log, generate_uuid
+
+
+# Global Vars
+single_run = 0
+
+# https://stackoverflow.com/a/30493366
+parser = argparse.ArgumentParser()
+parser.add_argument('-s', action='store_true', help='Runs the program loop only once')
+args = parser.parse_args() # parse args
+single_run = args.s
 
 def job_heartbeat():
     print("I'm working...")
@@ -35,16 +46,8 @@ schedule.every(3).seconds.do(job_webcam)
 #garage door monitor
 #webserver
 
-# Global Vars
 
 #function Deff
-
-def generate_uuid():
-    # https://stackoverflow.com/questions/159137/getting-mac-address
-    seed = uuid.getnode()       # returns 48bit value from MAC or rand number if not found
-    uu = str(uuid.uuid5(uuid.NAMESPACE_URL, str(seed)))
-    print "uuid: ", uu
-    my_globals.settings["uuid"] = uu
 
 def initialize():
     generate_uuid()
@@ -54,6 +57,6 @@ def initialize():
 #Program start
 print "Welcome to Smartsettia!"
 initialize()
-while True:
+while True and not single_run:
     schedule.run_pending()
     time.sleep(0.1)
