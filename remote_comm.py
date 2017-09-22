@@ -86,7 +86,11 @@ def register():
         except Exception as e:
             print "remote_comm:register:Error converting json"
             print e
-        print "Registration Successful (not verified)"
+
+        if req.status_code == 200 or req.status_code == 201:
+            print "Registration Successful"
+        else:
+            print "Registration failed: Responce code: ", req.status_code
         print "--------------------------------------"
     except:
         print "remote_comm:register:General Error"
