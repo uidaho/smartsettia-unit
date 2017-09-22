@@ -96,10 +96,6 @@ def register():
         print "remote_comm:register:General Error"
 
 
-
-
-
-
 def pic_upload():
     # first check if file exists
     test = os.path.isfile(settings["img_dir"] + settings["img_name"])
@@ -113,15 +109,11 @@ def pic_upload():
     headers = {'Accept': 'application/json'}
     url = my_globals.settings["server_img_addr"]
     image = settings["img_dir"] + settings["img_name"]
+    print "Image name: ", image
     payload = {}
-    #payload["uuid"] = my_globals.settings["uuid"]
-    #payload["token"] = my_globals.settings["token"]
-    #payload["uuid"] = ('', my_globals.settings["uuid"])
-    #payload["token"] = ('',my_globals.settings["token"])
-    payload["uuid"] = ('', "9dbc0776-9b44-11e7-abc4-cec278b6b50a")
-    payload["token"] = ('',"u0tQGeyuGdikOOFWhfDfwxbR2Z7rTN9Hc5hZN1JHsg4uUfkTi8UUu5nh0XLm")
+    payload["uuid"] = ('', my_globals.settings["uuid"])
+    payload.update({"token": ('', my_globals.settings["token"])})
     payload.update({'image': open(settings["img_dir"] + settings["img_name"],'rb')})
-    payload['image'] = open(image,'rb')
 
     print "Data is: ", payload              # debugger
     print payload.items()
