@@ -5,6 +5,18 @@ import sensors     #sensors.py
 import webcam      # webcam module
 import my_globals  # global variables
 import remote_comm # server communication module
+import argparse    # argument parsing
+from helper_lib import print_error, print_log, generate_uuid
+
+
+# Global Vars
+single_run = 0
+
+# https://stackoverflow.com/a/30493366
+parser = argparse.ArgumentParser()
+parser.add_argument('-s', action='store_true', help='Runs the program loop only once')
+args = parser.parse_args() # parse args
+single_run = args.s
 
 def job_heartbeat():
     print("I'm working...")
@@ -15,7 +27,11 @@ def job_sensors():
     print "\ttemp: %d, cpu_temp: %d" %(my_globals.sensor_dat["Temperature"], my_globals.sensor_dat["cpu_temp"])
 
 def job_webcam():
+    t0 = int(round(time.time() * 1000)) # debugger
     webcam.get_Picture()
+    t1 = int(round(time.time() * 1000)) # debugger
+    #print "timepic: %d" % (t1-t0)      # debugger
+    remote_comm.pic_upload()
 
 def job_remote_comm():
     print "remote communication"
@@ -23,42 +39,26 @@ def job_remote_comm():
 
 
 schedule.every(20).seconds.do(job_heartbeat)
-schedule.every(5).seconds.do(job_sensors)
-#(disabled) schedule.every(2).seconds.do(job_webcam)
+schedule.every(10).seconds.do(job_sensors)
+schedule.every(3).seconds.do(job_webcam)
 #communicate with webserver - receive
 #communicate with webserver - send
 #schedule.every(5).seconds.do(job_remote_comm)
 #garage door monitor
 #webserver
 
-# Global Vars
 
 #function Deff
 
-def getserial():
-  # Extract serial from cpuinfo file
-  #Example: 000000000000000d
-  cpuserial = "NOTFOUND_0000000"
-  try:
-    f = open('/proc/cpuinfo','r')
-    for line in f:
-      if line[0:6]=='Serial':
-        cpuserial = line[10:26]
-    f.close()
-  except:
-    cpuserial = "ERROR_0000000000"
-  return cpuserial
-
-
 def initialize():
-    my_globals.settings["SN"]= getserial()
+    generate_uuid()
     remote_comm.register()
+    #remote_comm.pic_upload()
 
 
 #Program start
 print "Welcome to Smartsettia!"
-print "SN=" + my_globals.settings["SN"]
 initialize()
-while True:
+while True and not single_run:
     schedule.run_pending()
     time.sleep(0.1)
