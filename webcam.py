@@ -5,16 +5,11 @@
 import time
 import wget
 import os
-import cv2
-#import settings f my_globals
-from my_globals import settings
+from subprocess import call
+from my_globals import settings  #import settings from my_globals
 
 
-image = settings["img_dir"] + settings["img_name"]      # full path to image
-
-cam = cv2.VideoCapture()
-print "camera: ", cam
-
+filename = settings["img_dir"] + settings["img_name"]      # full path to image
 
 
 def remove_image():
@@ -26,7 +21,7 @@ def remove_image():
 
 def get_cat_picture():
     url = "http://lorempixel.com/1024/768/cats/"
-    #remove_image()
+    remove_image()
     cat_pic = wget.download(url, out=image)
     print "filename: ", cat_pic
 
@@ -35,15 +30,5 @@ def get_cat_picture():
 def get_Picture():
     #get_cat_picture()
     #return
-
-    global count
-    print "Picture",
-    global cam
-    time.sleep(0.1) #wait for camera initialization
-    return_value, image = cam.read()
-
-    print "-saving",
-    filename = settings["img_dir"] + settings["img_name"]      # full path to image
-    # print filename                # debugger
-    cv2.imwrite(filename, image)
-    print "-done"
+    global filename
+    call(["fswebcam", "-d","/dev/video0", "-r", "1280x720", filename])
