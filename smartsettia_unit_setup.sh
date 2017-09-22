@@ -49,6 +49,7 @@ echo      "-----------------------"
 pip install schedule
 pip install requests
 pip install pygame
+pip install wget    # webcam replacement if no webcam
 
 
 

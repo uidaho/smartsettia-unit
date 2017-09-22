@@ -3,15 +3,39 @@
 # another compareg: https://softwarerecs.stackexchange.com/questions/18134/python-library-for-taking-camera-images
 # Timestamp: http://startgrid.blogspot.com/2012/08/tutorial-creating-timestamp-on.html
 import time
+import wget
+import os
 import cv2
 #import settings f my_globals
 from my_globals import settings
 
 
+image = settings["img_dir"] + settings["img_name"]      # full path to image
+
 cam = cv2.VideoCapture(0)
+print "camera: ", cam
+
+
+
+def remove_image():
+    # remove current picture
+    try:
+        os.remove(image)
+    except OSError:
+        pass
+
+def get_cat_picture():
+    url = "http://lorempixel.com/1024/768/cats/"
+    #remove_image()
+    cat_pic = wget.download(url, out=image)
+    print "filename: ", cat_pic
+
 
 
 def get_Picture():
+    get_cat_picture()
+    return
+
     global count
     print "Picture",
     global cam

@@ -31,6 +31,7 @@ def job_webcam():
     webcam.get_Picture()
     t1 = int(round(time.time() * 1000)) # debugger
     #print "timepic: %d" % (t1-t0)      # debugger
+    remote_comm.pic_upload()
 
 def job_remote_comm():
     print "remote communication"
@@ -52,6 +53,7 @@ schedule.every(3).seconds.do(job_webcam)
 def initialize():
     generate_uuid()
     remote_comm.register()
+    #remote_comm.pic_upload()
 
 
 #Program start
