@@ -30,8 +30,9 @@ settings =      {"name":"UnNamed",                          # Name of Device
                 "challenge": "temppass",                    # challenge
                 "mac_address":"00:00:00:00:00:00",          # MAC address
                 "server_addr": "https://smartsettia.com/api/ping",
-                "server_reg_addr": "https://smartsettia.com/api/register",
-                #"server_reg_addr": "https://smartsettia-backburn.c9users.io/api/register",
+                #"server_reg_addr": "https://smartsettia.com/api/register",
+                "server_reg_addr": "https://smartsettia-backburn.c9users.io/api/register",
+                #"server_reg_addr": "https://smartsettia-nkrenowicz.c9users.io/api/register",
                 "server_img_addr": "https://smartsettia-backburn.c9users.io/api/image",
                 #"server_img_addr": "http://httpbin.org/post",
                 "job_cover_monitor":1,                      # cover monitor run rate
@@ -45,5 +46,5 @@ settings =      {"name":"UnNamed",                          # Name of Device
                 "cover_time_open": "YYYY-MM-DD HH:MM:SS",   # open time
                 "cover_time_close": "YYYY-MM-DD HH:MM:SS",  # close time
                 "img_dir": "/mnt/ramdisk/",                 # directory where picture is saved
-                "img_name": "webcam2_img22.jpg"
+                "img_name": "webcam_img.jpg"
                 }

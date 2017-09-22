@@ -12,7 +12,7 @@ from my_globals import settings
 
 image = settings["img_dir"] + settings["img_name"]      # full path to image
 
-cam = cv2.VideoCapture(0)
+cam = cv2.VideoCapture()
 print "camera: ", cam
 
 
@@ -33,8 +33,8 @@ def get_cat_picture():
 
 
 def get_Picture():
-    get_cat_picture()
-    return
+    #get_cat_picture()
+    #return
 
     global count
     print "Picture",
@@ -43,7 +43,7 @@ def get_Picture():
     return_value, image = cam.read()
 
     print "-saving",
-    filename = settings["webcam_pic_dir"] + "Webcam_picture.png"
+    filename = settings["img_dir"] + settings["img_name"]      # full path to image
     # print filename                # debugger
     cv2.imwrite(filename, image)
     print "-done"
