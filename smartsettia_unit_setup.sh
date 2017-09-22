@@ -9,28 +9,35 @@ fi
 FLAG_GPIO=0;
 FLAG_RAMDISK=0;
 
-while true; do
-    read -p "Is this Device a Raspberri Pi? " yn
-    case $yn in
-        [Yy]* ) FLAG_GPIO=1; break;;
-        [Nn]* ) break;;
-        * ) echo "Please answer yes or no.";;
-    esac
-done
+# yes for questions
+# for travis builds
+if [[ $* == *--y* ]]; then
+  FLAG_GPIO=1;
+  FLAG_RAMDISK=1;
+else
+  while true; do
+      read -p "Is this Device a Raspberri Pi? " yn
+      case $yn in
+          [Yy]* ) FLAG_GPIO=1; break;;
+          [Nn]* ) break;;
+          * ) echo "Please answer yes or no.";;
+      esac
+  done
 
-while true; do
-    read -p "Do you wish to setup the ramdisk? " yn
-    case $yn in
-        [Yy]* ) FLAG_RAMDISK=1; break;;
-        [Nn]* ) break;;
-        * ) echo "Please answer yes or no.";;
-    esac
-done
+  while true; do
+      read -p "Do you wish to setup the ramdisk? " yn
+      case $yn in
+          [Yy]* ) FLAG_RAMDISK=1; break;;
+          [Nn]* ) break;;
+          * ) echo "Please answer yes or no.";;
+      esac
+  done
+fi
 
 echo -e "\nSetting up smartsettia"
 echo -e   "----------------------"
 
-apt update
+apt -qq update
 #https://www.saltycrane.com/blog/2010/02/how-install-pip-ubuntu/
 apt install -y python-pip
 pip install --upgrade pip

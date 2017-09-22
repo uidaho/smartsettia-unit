@@ -1,0 +1,17 @@
+# References
+# Example travis: https://github.com/codecov/example-python
+sudo: true
+
+language: python
+
+python:
+  - 2.7
+
+install:
+  ./smartsettia_unit_setup.sh --y
+  - pip install codecov
+script:
+  - ./main.py -s
+
+after_success:
+- codecov
