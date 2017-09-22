@@ -35,8 +35,7 @@ apt update
 apt install -y python-pip
 pip install --upgrade pip
 pip install --upgrade virtualenv
-# opencv
-apt install -y python-opencv libopencv-dev python-scipy python-dev python-pygame
+apt install -y fswebcam
 
 #https://learn.adafruit.com/playing-sounds-and-using-buttons-with-raspberry-pi/install-python-module-rpi-dot-gpio
 if [ $FLAG_GPIO -eq "1" ]; then
@@ -48,8 +47,8 @@ echo -e "\nInstalling python dependencies"
 echo      "-----------------------"
 pip install schedule
 pip install requests
-pip install pygame
 pip install wget    # webcam replacement if no webcam
+pip install call
 
 
 
