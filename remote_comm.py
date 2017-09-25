@@ -12,32 +12,32 @@ headers = {'Content-type': 'application/json', 'Accept': 'application/json'}
 show_logging = 0        # flag if logs are shown in terminal
 
 
+def status_update():
+    global settings
+    global headers
+    url = settings["server_status_addr"]
+    payload = {}                             # initialize variable
+    payload["uuid"]  = settings["uuid"]      # add uuid
+    payload["token"] = settings["token"]     # add token
+    payload.update(my_globals.status)        # add in status dictionary
+    print "Payload: ", payload
+    response = requests.post(url, data=json.dumps(payload), headers=headers)
+    print "Status code" , response.status_code
+    #print response.text()
+    print response
+    return
+
+
 # using response
-def r2():
-    data = my_globals.sensor_dat #{"empty":"nope"}
-    print "Data is: ", data
-
-    #url = "http://echo.jsontest.com/key/values/one/two"
-    #url = "https://smartsettia.com/api/ping "
-    url = "http://nkren.net"
-    headers = {'content-type': 'application/json'}
-
-    try:
-        #request = requests.post(url, headers=headers, params=data)
-        req = requests.post(url, headers=headers, json=data)
-        print req.headers
-        print "-------------"
-        file=open("request.log","w")
-        file.write(req.text)
-        file.close()
-        print req.text
-        print "-------------"
-        try:
-            print req.json()
-        except:
-            print "remote_comm:remote_recv:Error converting json"
-    except:
-        print "remote_comm:remote_recv:Error sending request"
+def sensor_upload():
+    global headers
+    global settings
+    print "todo send sensors"
+    url = settings["server_status_addr"]
+    #data = {"uuid": UUID, "token": TOKEN, "version": "0.1.1", "hostname": "device.local", "ip": "192.168.1.213", "mac_address": "1122334455667788", "time": "2000-12-31 23:59:59", "cover_status": "closed", "error_msg": "", "limitsw_open": "0", "limitsw_closed": "1", "light_in": "0", "light_out": "100", "cpu_temp": "30", "temperature": "28", "humidity": "34"}
+    payload = my_globals.sensor_dat.copy()          # copy sensor data here
+    payload.update({"uuid": settings["uuid"]})      # add uuid
+    payload.update({"token": settings["token"]})    # add token
 
 def register():
     global headers
@@ -47,7 +47,7 @@ def register():
     payload["challenge"] = my_globals.settings["challenge"]
     #print "Data is: ", payload              # debugger
 
-    #print url                               # debugger
+    print "URL:  ", url                      # debugger
     print "json dmp: ", json.dumps(payload) # debugger
     print_log("remote:register", url, show_logging)
     #print "-------------"

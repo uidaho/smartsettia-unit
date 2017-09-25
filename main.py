@@ -18,14 +18,22 @@ parser.add_argument('-s', action='store_true', help='Runs the program loop only 
 args = parser.parse_args() # parse args
 single_run = args.s
 
+# If I'm running you should see this periodically
 def job_heartbeat():
     print("I'm working...")
 
+# Read enviroment sensors
 def job_sensors():
     print("Getting Sensors..")
     sensors.update()
     print "\ttemp: %d, cpu_temp: %d" %(my_globals.sensor_dat["Temperature"], my_globals.sensor_dat["cpu_temp"])
 
+# send status to server
+def job_upload_status():
+    print "Uploading status"
+    remote_comm.status_update()
+
+# take a picture
 def job_webcam():
     t0 = int(round(time.time() * 1000)) # debugger
     webcam.get_Picture()
@@ -33,17 +41,12 @@ def job_webcam():
     #print "timepic: %d" % (t1-t0)      # debugger
     remote_comm.pic_upload()
 
-def job_remote_comm():
-    print "remote communication"
-    remote_comm.remote_send()
-
-
 schedule.every(20).seconds.do(job_heartbeat)
 schedule.every(10).seconds.do(job_sensors)
-schedule.every(3).seconds.do(job_webcam)
-#communicate with webserver - receive
-#communicate with webserver - send
-#schedule.every(5).seconds.do(job_remote_comm)
+#schedule.every(3).seconds.do(job_webcam)
+#schedule.every(5).seconds.do(job_upload_status)
+#schedule.every(5).seconds.do(job_upload_sensors)
+#schedule.every(5).seconds.do(job_upload_webcam)   # TODO to separate webcam upload, or not 
 #garage door monitor
 #webserver
 
