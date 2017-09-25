@@ -6,12 +6,17 @@ version= "0.0.1"
 # z = x.copy()
 # z.update(y)
 
+# Set domain being used
+DOMAIN_INDEX = 1    # choose which domain. 0-2
+DOMAIN =    ["https://smartsettia.com/",
+            "https://smartsettia-backburn.c9users.io/",
+            "https://smartsettia-nkrenowicz.c9users.io/"]
+
 sensor_dat =    {"capture_time":"YYYY-MM-DD HH:MM:SS",
                 "light_in":-1,                      # ambiant light sensor inside
                 "light_out":-1,                     # ambiant light sensor outside
                 "limitsw_open":-1,                  # limit switch on open side
                 "limitsw_close":-1,                 # limit switch on close side
-                "cover_state":"Uninitialized",      # Current state of the cover
                 "cpu_temp":-1,                      # pi system temperature
                 "temperature":-1,
                 "humidity":-1,
@@ -30,11 +35,10 @@ settings =      {"name":"UnNamed",                          # Name of Device
                 "challenge": "temppass",                    # challenge
                 "mac_address":"00:00:00:00:00:00",          # MAC address
                 "server_addr": "https://smartsettia.com/api/ping",
-                #"server_reg_addr": "https://smartsettia.com/api/register",
-                "server_reg_addr": "https://smartsettia-backburn.c9users.io/api/register",
-                #"server_reg_addr": "https://smartsettia-nkrenowicz.c9users.io/api/register",
-                "server_img_addr": "https://smartsettia-backburn.c9users.io/api/image",
-                #"server_img_addr": "http://httpbin.org/post",
+                "server_reg_addr":    DOMAIN[DOMAIN_INDEX] + "api/register",
+                "server_status_addr": DOMAIN[DOMAIN_INDEX] + "api/status",
+                "server_update_addr": DOMAIN[DOMAIN_INDEX] + "api/update",
+                "server_img_addr":    DOMAIN[DOMAIN_INDEX] + "api/image",
                 "job_cover_monitor":1,                      # cover monitor run rate
                 "job_sensors_sec"  :5,                      # job runs every x seconds
                 "job_webcam_sec"   :2,                      # job runs every x seconds
