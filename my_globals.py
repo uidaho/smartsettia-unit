@@ -1,4 +1,5 @@
 # This file contains the global variables used in smartsettia
+import json
 
 version= "0.0.1"
 
@@ -7,7 +8,7 @@ version= "0.0.1"
 # z.update(y)
 
 # Set domain being used
-DOMAIN_INDEX = 1    # choose which domain. 0-2
+DOMAIN_INDEX = 2    # choose which domain. 0-2
 DOMAIN =    ["https://smartsettia.com/",
             "https://smartsettia-backburn.c9users.io/",
             "https://smartsettia-nkrenowicz.c9users.io/"]
@@ -40,6 +41,7 @@ settings =      {"name":"UnNamed",                          # Name of Device
                 "server_update_addr": DOMAIN[DOMAIN_INDEX] + "api/update",
                 "server_img_addr":    DOMAIN[DOMAIN_INDEX] + "api/image",
                 "job_cover_monitor":1,                      # cover monitor run rate
+                "job_save_settings":60,                     # save settings to file
                 "job_sensors_sec"  :5,                      # job runs every x seconds
                 "job_webcam_sec"   :2,                      # job runs every x seconds
                 "job_server_webcam_sec" :5,                 # send webcam picture job
@@ -52,3 +54,25 @@ settings =      {"name":"UnNamed",                          # Name of Device
                 "img_dir": "/mnt/ramdisk/",                 # directory where picture is saved
                 "img_name": "webcam_img.jpg"
                 }
+
+
+def save_settings():
+    print "Saving settings"
+    global settings
+    #print settings         # debugger
+    with open('config.json', 'w') as f:
+        json.dump(settings, f)
+    
+    
+def load_settings():
+    print "Loading settings"
+    global settings
+    with open('config.json', 'r') as f:
+        temp = json.load(f)
+    #print temp             # debugger
+    if temp["uuid"] == settings["uuid"]:
+        print "UUID matches loaded settings - keeping"
+        settings = temp     # set settings to loaded values
+    else:
+        print "UUID does not mach loaded settings - discarding"
+        print "Using default settings"

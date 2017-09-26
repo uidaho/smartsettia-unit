@@ -21,6 +21,10 @@ single_run = args.s
 # If I'm running you should see this periodically
 def job_heartbeat():
     print("I'm working...")
+    
+# Save setting to file
+def job_save_settings():
+    my_globals.save_settings()
 
 # Read enviroment sensors
 def job_sensors():
@@ -42,6 +46,7 @@ def job_webcam():
     remote_comm.pic_upload()
 
 schedule.every(20).seconds.do(job_heartbeat)
+schedule.every(60).seconds.do(job_save_settings)
 schedule.every(10).seconds.do(job_sensors)
 #schedule.every(3).seconds.do(job_webcam)
 #schedule.every(5).seconds.do(job_upload_status)
@@ -54,9 +59,9 @@ schedule.every(10).seconds.do(job_sensors)
 #function Deff
 
 def initialize():
-    generate_uuid()
-    remote_comm.register()
-    #remote_comm.pic_upload()
+    generate_uuid()                 # generate uuid from hardware
+    my_globals.load_settings()      # load settings from file
+    remote_comm.register()          # register device with webserver
 
 
 #Program start
