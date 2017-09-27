@@ -1,17 +1,22 @@
 # This file contains the global variables used in smartsettia
-
-version= "0.0.1"
+import json
+version= "0.0.2"
 
 # Note to concatonate dictionaries
 # z = x.copy()
 # z.update(y)
+
+# Set domain being used
+DOMAIN_INDEX = 2    # choose which domain. 0-2
+DOMAIN =    ["https://smartsettia.com/",
+            "https://smartsettia-backburn.c9users.io/",
+            "https://smartsettia-nkrenowicz.c9users.io/"]
 
 sensor_dat =    {"capture_time":"YYYY-MM-DD HH:MM:SS",
                 "light_in":-1,                      # ambiant light sensor inside
                 "light_out":-1,                     # ambiant light sensor outside
                 "limitsw_open":-1,                  # limit switch on open side
                 "limitsw_close":-1,                 # limit switch on close side
-                "cover_state":"Uninitialized",      # Current state of the cover
                 "cpu_temp":-1,                      # pi system temperature
                 "temperature":-1,
                 "humidity":-1,
@@ -30,12 +35,12 @@ settings =      {"name":"UnNamed",                          # Name of Device
                 "challenge": "temppass",                    # challenge
                 "mac_address":"00:00:00:00:00:00",          # MAC address
                 "server_addr": "https://smartsettia.com/api/ping",
-                #"server_reg_addr": "https://smartsettia.com/api/register",
-                "server_reg_addr": "https://smartsettia-backburn.c9users.io/api/register",
-                #"server_reg_addr": "https://smartsettia-nkrenowicz.c9users.io/api/register",
-                "server_img_addr": "https://smartsettia-backburn.c9users.io/api/image",
-                #"server_img_addr": "http://httpbin.org/post",
+                "server_reg_addr":    DOMAIN[DOMAIN_INDEX] + "api/register",
+                "server_status_addr": DOMAIN[DOMAIN_INDEX] + "api/status",
+                "server_update_addr": DOMAIN[DOMAIN_INDEX] + "api/update",
+                "server_img_addr":    DOMAIN[DOMAIN_INDEX] + "api/image",
                 "job_cover_monitor":1,                      # cover monitor run rate
+                "job_save_settings":60,                     # save settings to file
                 "job_sensors_sec"  :5,                      # job runs every x seconds
                 "job_webcam_sec"   :2,                      # job runs every x seconds
                 "job_server_webcam_sec" :5,                 # send webcam picture job
@@ -48,3 +53,37 @@ settings =      {"name":"UnNamed",                          # Name of Device
                 "img_dir": "/mnt/ramdisk/",                 # directory where picture is saved
                 "img_name": "webcam_img.jpg"
                 }
+
+
+def save_settings():
+    print "Saving settings"
+    global settings
+    #print settings         # debugger
+    try:
+        with open('config.json', 'w') as f:
+            json.dump(settings, f)
+    except Exception as e:
+        print "Save settings error ", e
+
+
+
+def load_settings():
+    print "Loading settings"
+    global settings
+    temp = {}
+    try:
+        with open('config.json', 'r') as f:
+            temp = json.load(f)
+    #except FileNotFoundError:
+    #    print "config.json file not found. loading default settings"
+    except Exception as e:
+        print "Load settings error ", e
+
+    else:       # if file was found and all is good
+        #print temp             # debugger
+        if temp["uuid"] == settings["uuid"]:
+            print "UUID matches loaded settings - keeping"
+            settings = temp     # set settings to loaded values
+        else:
+            print "UUID does not mach loaded settings - discarding"
+            print "Using default settings"
