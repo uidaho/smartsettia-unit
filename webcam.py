@@ -8,27 +8,27 @@ import os
 from subprocess import call
 from my_globals import settings  #import settings from my_globals
 
-
 filename = settings["img_dir"] + settings["img_name"]      # full path to image
-
 
 def remove_image():
     # remove current picture
     try:
-        os.remove(image)
+        os.remove(filename)
     except OSError:
         pass
 
 def get_cat_picture():
     url = "http://lorempixel.com/1024/768/cats/"
     remove_image()
-    cat_pic = wget.download(url, out=image)
+    cat_pic = wget.download(url, out=filename)
     print "filename: ", cat_pic
 
 
 
-def get_Picture():
-    #get_cat_picture()
-    #return
-    global filename
-    call(["fswebcam", "-d","/dev/video0", "-r", "1280x720", filename])
+def get_Picture(FAKEWEBCAM):
+    if FAKEWEBCAM == 1:     # get fake picture
+        get_cat_picture()
+        return
+    else:                   # get picture from webcam
+        global filename
+        call(["fswebcam", "-d","/dev/video0", "-r", "1280x720", filename])

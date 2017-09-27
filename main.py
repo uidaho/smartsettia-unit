@@ -15,13 +15,17 @@ single_run = 0
 # https://stackoverflow.com/a/30493366
 parser = argparse.ArgumentParser()
 parser.add_argument('-s', action='store_true', help='Runs the program loop only once')
+parser.add_argument('-fw',action='store_true', help='Use Fake webcam')
 args = parser.parse_args() # parse args
-single_run = args.s
+SINGLE_RUN = args.s
+FAKEWEBCAM = args.fw     # enable or disable fake webcam
+
+print "Fake webcam: ", args.fw
 
 # If I'm running you should see this periodically
 def job_heartbeat():
     print("I'm working...")
-    
+
 # Save setting to file
 def job_save_settings():
     my_globals.save_settings()
@@ -40,7 +44,7 @@ def job_upload_status():
 # take a picture
 def job_webcam():
     t0 = int(round(time.time() * 1000)) # debugger
-    webcam.get_Picture()
+    webcam.get_Picture(FAKEWEBCAM)      # get picture function with option fake bool
     t1 = int(round(time.time() * 1000)) # debugger
     #print "timepic: %d" % (t1-t0)      # debugger
     remote_comm.pic_upload()
@@ -48,10 +52,10 @@ def job_webcam():
 schedule.every(20).seconds.do(job_heartbeat)
 schedule.every(60).seconds.do(job_save_settings)
 schedule.every(10).seconds.do(job_sensors)
-#schedule.every(3).seconds.do(job_webcam)
+schedule.every(3).seconds.do(job_webcam)
 #schedule.every(5).seconds.do(job_upload_status)
 #schedule.every(5).seconds.do(job_upload_sensors)
-#schedule.every(5).seconds.do(job_upload_webcam)   # TODO to separate webcam upload, or not 
+#schedule.every(5).seconds.do(job_upload_webcam)   # TODO to separate webcam upload, or not
 #garage door monitor
 #webserver
 
@@ -67,6 +71,6 @@ def initialize():
 #Program start
 print "Welcome to Smartsettia!"
 initialize()
-while True and not single_run:
+while True and not SINGLE_RUN:
     schedule.run_pending()
     time.sleep(0.1)
