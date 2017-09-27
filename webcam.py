@@ -26,6 +26,7 @@ def get_cat_picture():
 
 
 def get_Picture(FAKEWEBCAM):
+    print "\n--- Getting picture ----------"
     if FAKEWEBCAM == 1:     # get fake picture
         get_cat_picture()
         return
