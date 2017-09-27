@@ -108,9 +108,9 @@ def pic_upload():
     headers = {'Accept': 'application/json'}
     url = my_globals.settings["server_img_addr"]
     payload = {}
-    payload["uuid"] = ('', my_globals.settings["uuid"])
-    payload.update({"token": ('', my_globals.settings["token"])})
-    payload.update({'image': open(settings["img_dir"] + settings["img_name"],'rb')})
+    payload["uuid"] = ('', str(my_globals.settings["uuid"]))
+    payload["token"] = ('', str(my_globals.settings["token"]))
+    payload["image"] = open(settings["img_dir"] + settings["img_name"],'rb')
 
     #print "Data is: ", payload              # debugger
     #print payload.items()                   # debugger
