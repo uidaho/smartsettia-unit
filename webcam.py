@@ -21,12 +21,12 @@ def get_cat_picture():
     url = "http://lorempixel.com/1024/768/cats/"
     remove_image()
     cat_pic = wget.download(url, out=filename)
-    print "filename: ", cat_pic
+    print ("filename: ", cat_pic)
 
 
 
 def get_Picture(FAKEWEBCAM):
-    print "\n--- Getting picture ----------"
+    print ("\n--- Getting picture ----------")
     if FAKEWEBCAM == 1:     # get fake picture
         get_cat_picture()
         return

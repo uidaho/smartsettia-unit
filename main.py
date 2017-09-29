@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 import time
 import schedule    # scheduler library
 import sensors     #sensors.py
@@ -20,7 +20,7 @@ args = parser.parse_args() # parse args
 SINGLE_RUN = args.s
 FAKEWEBCAM = args.fw     # enable or disable fake webcam
 
-print "Fake webcam: ", args.fw
+print ("Using fake webcam: ", args.fw)
 
 # If I'm running you should see this periodically
 def job_heartbeat():
@@ -34,11 +34,11 @@ def job_save_settings():
 def job_sensors():
     print("Getting Sensors..")
     sensors.update()
-    print "\ttemp: %d, cpu_temp: %d" %(my_globals.sensor_dat["Temperature"], my_globals.sensor_dat["cpu_temp"])
+    print ("\ttemp: %d, cpu_temp: %d" %(my_globals.sensor_dat["Temperature"], my_globals.sensor_dat["cpu_temp"]))
 
 # send status to server
 def job_upload_status():
-    print "Uploading status"
+    print ("Uploading status")
     remote_comm.status_update()
 
 # take a picture
@@ -69,7 +69,7 @@ def initialize():
 
 
 #Program start
-print "Welcome to Smartsettia!"
+print ("Welcome to Smartsettia!")
 initialize()
 while True and not SINGLE_RUN:
     schedule.run_pending()

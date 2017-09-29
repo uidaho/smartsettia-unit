@@ -20,11 +20,11 @@ def status_update():
     payload["uuid"]  = settings["uuid"]      # add uuid
     payload["token"] = settings["token"]     # add token
     payload.update(my_globals.status)        # add in status dictionary
-    print "Payload: ", payload
+    print ("Payload: ", payload)
     response = requests.post(url, data=json.dumps(payload), headers=headers)
-    print "Status code" , response.status_code
+    print ("Status code" , response.status_code)
     #print response.text()
-    print response
+    print (response)
     return
 
 
@@ -32,7 +32,7 @@ def status_update():
 def sensor_upload():
     global headers
     global settings
-    print "todo send sensors"
+    print ("todo send sensors")
     url = settings["server_status_addr"]
     #data = {"uuid": UUID, "token": TOKEN, "version": "0.1.1", "hostname": "device.local", "ip": "192.168.1.213", "mac_address": "1122334455667788", "time": "2000-12-31 23:59:59", "cover_status": "closed", "error_msg": "", "limitsw_open": "0", "limitsw_closed": "1", "light_in": "0", "light_out": "100", "cpu_temp": "30", "temperature": "28", "humidity": "34"}
     payload = my_globals.sensor_dat.copy()          # copy sensor data here
@@ -40,17 +40,17 @@ def sensor_upload():
     payload.update({"token": settings["token"]})    # add token
 
 def register():
-    print "\n--- Registering Device ---"
+    print ("\n--- Registering Device ---")
     global headers
     url = my_globals.settings["server_reg_addr"]
     payload = {}
     payload["uuid"] = my_globals.settings["uuid"]
     payload["challenge"] = my_globals.settings["challenge"]
-    #print "Data is: ", payload              # debugger
+    #print ("Data is: ", payload)              # debugger
 
-    print "URL:  ", url                      # debugger
-    #print "json dmp: ", json.dumps(payload) # debugger
-    #print "headers: ", headers
+    print ("URL:  ", url)                      # debugger
+    #print ("json dmp: ", json.dumps(payload)) # debugger
+    #print ("headers: ", headers)
     print_log("remote:register", url, show_logging)
     #print "-------------"
 
@@ -58,7 +58,7 @@ def register():
         try:
             req = requests.post(url, headers=headers, data=json.dumps(payload))
         except:
-            print "remote_comm:register:Error sending request"
+            print ("remote_comm:register:Error sending request")
         try:
             file=open("request_register.log","a")
             file.write("\n\n" + str(time.time()) + "\n")
@@ -67,41 +67,41 @@ def register():
             file.close()
         except Exception as e:
             #raise
-            print "remote_comm:register:Error writing to log"
-            print e
+            print ("remote_comm:register:Error writing to log")
+            print (e)
 
-        print "--- Registration return ---"
-        print "Response code: ", req.status_code
+        print ("--- Registration return ---")
+        print ("Response code: ", req.status_code)
         #print req.text
         try:
             rtndata = req.json()
             rtndata2= rtndata["data"]
             #print "rtndata: ", rtndata     # debugger
-            print "rtndata2: ", rtndata2   # debugger
-            print "Token: ", rtndata2["token"]
+            print ("rtndata2: ", rtndata2)   # debugger
+            print ("Token: ", rtndata2["token"])
             my_globals.settings["token"] = rtndata2["token"]  # set token to response token
-            print "Name: ", rtndata2["name"]
+            print ("Name: ", rtndata2["name"])
             my_globals.settings["name"] = rtndata2["name"]  # set token to response token
 
         except Exception as e:
-            print "remote_comm:register:Error converting json"
-            print e
+            print ("remote_comm:register:Error converting json")
+            print (e)
 
         if req.status_code == 200 or req.status_code == 201:
-            print "Registration Successful"
+            print ("Registration Successful")
         else:
-            print "Registration failed: Responce code: ", req.status_code
-        print "--------------------------------------"
+            print ("Registration failed: Responce code: ", req.status_code)
+        print ("--------------------------------------")
     except:
-        print "remote_comm:register:General Error"
+        print ("remote_comm:register:General Error")
 
 
 def pic_upload():
     # first check if file exists
     image = settings["img_dir"] + settings["img_name"]
-    print "Image name: ", image
+    print ("Image name: ", image)
     if os.path.isfile(image) == 0:           # if path to file exists
-        print "Image does not exist. Skipping upload"
+        print ("Image does not exist. Skipping upload")
         return
 
     # upload picture
@@ -112,20 +112,20 @@ def pic_upload():
     payload["token"] = ('', str(my_globals.settings["token"]))
     payload["image"] = open(settings["img_dir"] + settings["img_name"],'rb')
 
-    #print "Data is: ", payload              # debugger
-    #print payload.items()                   # debugger
-    #print url                               # debugger
-    #print "json dmp: ", json.dumps(payload) # debugger
-    #print "headers: ", headers              # debugger
+    #print ("Data is: ", payload)              # debugger
+    #print (payload.items())                   # debugger
+    #print (url)                               # debugger
+    #print ("json dmp: ", json.dumps(payload)) # debugger
+    #print ("headers: ", headers)              # debugger
     print_log("remote:webcam", url, show_logging)
-    #print "-------------"
+    #print ("-------------")
 
     try:
         try:
             req = requests.post(url,headers=headers, files=payload)
         except Exception as e:
-            print "remote_comm:webcam:Error sending request"
-            print "\t", e
+            print ("remote_comm:webcam:Error sending request")
+            print ("\t", e)
         try:
             file=open("request_webcam.log","a")
             file.write("\n\n" + str(time.time()) + "\n")
@@ -134,10 +134,10 @@ def pic_upload():
             file.close()
         except Exception as e:
             #raise
-            print "remote_comm:webcam:Error writing to log"
-            print e
+            print ("remote_comm:webcam:Error writing to log")
+            print (e)
 
-        print "Response code: ", req.status_code
+        print ("Response code: ", req.status_code)
         # parse returned datea
         try:
             rtndata = req.json()
@@ -146,13 +146,13 @@ def pic_upload():
             #print "rtndata2: ", rtndata2   # debugger
 
         except Exception as e:
-            print "remote_comm:webcam:Error converting json"
-            print e
+            print ("remote_comm:webcam:Error converting json")
+            print (e)
         # test status code to determin if we were Successful
         if req.status_code == 200 or req.status_code == 201:
-            print "Webcam upload Successful"
+            print ("Webcam upload Successful")
         else:
-            print "Webcam upload failed: Responce code: ", req.status_code
-        print "--------------------------------------"
+            print ("Webcam upload failed: Responce code: ", req.status_code)
+        print ("--------------------------------------")
     except:
-        print "remote_comm:webcam:General Error"
+        print ("remote_comm:webcam:General Error")

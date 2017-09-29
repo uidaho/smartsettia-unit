@@ -39,9 +39,9 @@ echo -e   "----------------------"
 
 apt -qq update
 #https://www.saltycrane.com/blog/2010/02/how-install-pip-ubuntu/
-apt install -y python-pip
-pip install --upgrade pip
-pip install --upgrade virtualenv
+apt install -y python3 python3-pip
+#pip install --upgrade pip
+#pip install --upgrade virtualenv
 apt install -y fswebcam
 
 #https://learn.adafruit.com/playing-sounds-and-using-buttons-with-raspberry-pi/install-python-module-rpi-dot-gpio
@@ -52,10 +52,11 @@ fi
 
 echo -e "\nInstalling python dependencies"
 echo      "-----------------------"
-pip install schedule
-pip install requests
-pip install wget    # webcam replacement if no webcam
-pip install call
+pip3 install --upgrade schedule
+pip3 install --upgrade requests
+pip3 install --upgrade wget     # webcam replacement if no webcam
+pip3 install --upgrade call
+pip3 install --upgrade uuid     # is this really needed?
 
 
 
