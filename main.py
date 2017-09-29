@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 import time
+from os import path   # Used in checking webcam storage path
 import schedule    # scheduler library
 import sensors     #sensors.py
 import webcam      # webcam module
@@ -65,6 +66,12 @@ schedule.every(3).seconds.do(job_webcam)
 def initialize():
     generate_uuid()                 # generate uuid from hardware
     my_globals.load_settings()      # load settings from file
+
+    # check if /mnt/ramdisk exists else fallback to tmp directory
+    if path.isdir(my_globals.settings["img_dir"]) == 0:           # if path to file exists
+        print ("Ramdisk does not exist. Using /tmp/")
+        # This is undesirable for sdcard wear and writing speed compared to a ramdisk
+        my_globals.settings["img_dir"] = "/tmp/"
     remote_comm.register()          # register device with webserver
 
 
