@@ -1,6 +1,6 @@
 # This file contains the global variables used in smartsettia
 import json
-version= "0.0.2"
+version= "0.1.0"
 
 # Note to concatonate dictionaries
 # z = x.copy()
@@ -56,19 +56,19 @@ settings =      {"name":"UnNamed",                          # Name of Device
 
 
 def save_settings():
-    print "Saving settings"
+    print ("Saving settings")
     global settings
     #print settings         # debugger
     try:
         with open('config.json', 'w') as f:
             json.dump(settings, f)
     except Exception as e:
-        print "Save settings error ", e
+        print ("Save settings error ", e)
 
 
 
 def load_settings():
-    print "Loading settings"
+    print ("Loading settings")
     global settings
     temp = {}
     try:
@@ -77,13 +77,13 @@ def load_settings():
     #except FileNotFoundError:
     #    print "config.json file not found. loading default settings"
     except Exception as e:
-        print "Load settings error ", e
+        print ("Load settings error ", e)
 
     else:       # if file was found and all is good
         #print temp             # debugger
         if temp["uuid"] == settings["uuid"]:
-            print "UUID matches loaded settings - keeping"
+            print ("UUID matches loaded settings - keeping")
             settings = temp     # set settings to loaded values
         else:
-            print "UUID does not mach loaded settings - discarding"
-            print "Using default settings"
+            print ("UUID does not mach loaded settings - discarding")
+            print ("Using default settings")

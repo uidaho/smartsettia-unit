@@ -22,7 +22,7 @@ def print_error(fun_name, error):
     t1 = time.time()    # current time
     t = t1 - t0         # run time
     error_msg = "ERROR: %d:\t%s:\t%r" %(t,fun_name,error)
-    print error_msg
+    print (error_msg)
 
     # also right error to file
     try:
@@ -30,7 +30,7 @@ def print_error(fun_name, error):
         file.write(error_msg + "\n")
         file.close()
     except:
-        print "ERROR: Helper_lib: File error"
+        print ("ERROR: Helper_lib: File error")
 
 def print_log(fun_name, log_text, term=1):
     global t0           # time of program start
@@ -38,7 +38,7 @@ def print_log(fun_name, log_text, term=1):
     t = t1 - t0         # run time
     error_msg = "Log: %d:\t%s:\t%s" %(t,fun_name,log_text)
     if term == 1:
-        print error_msg
+        print (error_msg)
 
     # also right error to file
     try:
@@ -46,12 +46,12 @@ def print_log(fun_name, log_text, term=1):
         file.write(log_text + "\n")
         file.close()
     except:
-        print "ERROR: Helper_lib:print_log: File error"
+        print ("ERROR: Helper_lib:print_log: File error")
 
 
 def generate_uuid():
     # https://stackoverflow.com/questions/159137/getting-mac-address
     seed = uuid.getnode()       # returns 48bit value from MAC or rand number if not found
     uu = str(uuid.uuid5(uuid.NAMESPACE_URL, str(seed)))
-    print "uuid: ", uu
+    print ("uuid: ", uu)
     my_globals.settings["uuid"] = uu
