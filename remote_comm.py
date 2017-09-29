@@ -110,7 +110,7 @@ def pic_upload():
     payload = {}
     payload["uuid"] = ('', str(my_globals.settings["uuid"]))
     payload["token"] = ('', str(my_globals.settings["token"]))
-    payload["image"] = open(settings["img_dir"] + settings["img_name"],'rb')
+    files= {"image": open(settings["img_dir"] + settings["img_name"],'rb')}
 
     #print ("Data is: ", payload)              # debugger
     #print (payload.items())                   # debugger
@@ -122,7 +122,7 @@ def pic_upload():
 
     try:
         try:
-            req = requests.post(url,headers=headers, files=payload)
+            req = requests.post(url,headers=headers, files=files, data=payload)
         except Exception as e:
             print ("remote_comm:webcam:Error sending request")
             print ("\t", e)

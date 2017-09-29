@@ -1,6 +1,6 @@
 # This file contains the global variables used in smartsettia
 import json
-version= "0.0.2"
+version= "0.1.0"
 
 # Note to concatonate dictionaries
 # z = x.copy()
