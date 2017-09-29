@@ -6,20 +6,21 @@ import time
 import wget
 import os
 from subprocess import call
-from my_globals import settings  #import settings from my_globals
+#from my_globals import settings  #import settings from my_globals
+import my_globals
 
-filename = settings["img_dir"] + settings["img_name"]      # full path to image
 
-def remove_image():
+
+def remove_image(filename):
     # remove current picture
     try:
         os.remove(filename)
     except OSError:
         pass
 
-def get_cat_picture():
+def get_cat_picture(filename):
     url = "http://lorempixel.com/1024/768/cats/"
-    remove_image()
+    remove_image(filename)
     cat_pic = wget.download(url, out=filename)
     print ("filename: ", cat_pic)
 
@@ -27,8 +28,10 @@ def get_cat_picture():
 
 def get_Picture(FAKEWEBCAM):
     print ("\n--- Getting picture ----------")
+    filename = my_globals.settings["img_dir"] + my_globals.settings["img_name"]      # full path to image
+    print ("Img Filename: ", filename)
     if FAKEWEBCAM == 1:     # get fake picture
-        get_cat_picture()
+        get_cat_picture(filename)
         return
     else:                   # get picture from webcam
         global filename

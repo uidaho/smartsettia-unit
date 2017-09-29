@@ -68,7 +68,7 @@ def initialize():
     my_globals.load_settings()      # load settings from file
 
     # check if /mnt/ramdisk exists else fallback to tmp directory
-    if path.isdir(my_globals.settings["img_dir"]) == 0:           # if path to file exists
+    if path.isdir(my_globals.settings["img_dir"]) == 0:   # if path to directory exists
         print ("Ramdisk does not exist. Using /tmp/")
         # This is undesirable for sdcard wear and writing speed compared to a ramdisk
         my_globals.settings["img_dir"] = "/tmp/"

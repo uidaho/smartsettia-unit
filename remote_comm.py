@@ -6,19 +6,17 @@ import requests
 import my_globals   # smartsettia globals
 from helper_lib import print_error, print_log
 
-settings = my_globals.settings
 headers = {'Content-type': 'application/json', 'Accept': 'application/json'}
 
 show_logging = 0        # flag if logs are shown in terminal
 
 
 def status_update():
-    global settings
     global headers
-    url = settings["server_status_addr"]
+    url = my_globals.settings["server_status_addr"]
     payload = {}                             # initialize variable
-    payload["uuid"]  = settings["uuid"]      # add uuid
-    payload["token"] = settings["token"]     # add token
+    payload["uuid"]  = my_globals.settings["uuid"]      # add uuid
+    payload["token"] = my_globals.settings["token"]     # add token
     payload.update(my_globals.status)        # add in status dictionary
     print ("Payload: ", payload)
     response = requests.post(url, data=json.dumps(payload), headers=headers)
@@ -31,13 +29,12 @@ def status_update():
 # using response
 def sensor_upload():
     global headers
-    global settings
     print ("todo send sensors")
-    url = settings["server_status_addr"]
+    url = my_globals.settings["server_status_addr"]
     #data = {"uuid": UUID, "token": TOKEN, "version": "0.1.1", "hostname": "device.local", "ip": "192.168.1.213", "mac_address": "1122334455667788", "time": "2000-12-31 23:59:59", "cover_status": "closed", "error_msg": "", "limitsw_open": "0", "limitsw_closed": "1", "light_in": "0", "light_out": "100", "cpu_temp": "30", "temperature": "28", "humidity": "34"}
     payload = my_globals.sensor_dat.copy()          # copy sensor data here
-    payload.update({"uuid": settings["uuid"]})      # add uuid
-    payload.update({"token": settings["token"]})    # add token
+    payload.update({"uuid": my_globals.settings["uuid"]})      # add uuid
+    payload.update({"token": my_globals.settings["token"]})    # add token
 
 def register():
     print ("\n--- Registering Device ---")
@@ -98,7 +95,7 @@ def register():
 
 def pic_upload():
     # first check if file exists
-    image = settings["img_dir"] + settings["img_name"]
+    image = my_globals.settings["img_dir"] + my_globals.settings["img_name"]
     print ("Image name: ", image)
     if os.path.isfile(image) == 0:           # if path to file exists
         print ("Image does not exist. Skipping upload")
@@ -110,7 +107,7 @@ def pic_upload():
     payload = {}
     payload["uuid"] = ('', str(my_globals.settings["uuid"]))
     payload["token"] = ('', str(my_globals.settings["token"]))
-    files= {"image": open(settings["img_dir"] + settings["img_name"],'rb')}
+    files= {"image": open(my_globals.settings["img_dir"] + my_globals.settings["img_name"],'rb')}
 
     #print ("Data is: ", payload)              # debugger
     #print (payload.items())                   # debugger
