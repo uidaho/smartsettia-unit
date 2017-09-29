@@ -12,32 +12,125 @@ show_logging = 0        # flag if logs are shown in terminal
 
 
 def status_update():
+    print ("\n--- Uploading Status -----------------")
     global headers
+    # setup the data
     url = my_globals.settings["server_status_addr"]
     payload = {}                             # initialize variable
     payload["uuid"]  = my_globals.settings["uuid"]      # add uuid
     payload["token"] = my_globals.settings["token"]     # add token
     payload.update(my_globals.status)        # add in status dictionary
-    print ("Payload: ", payload)
-    response = requests.post(url, data=json.dumps(payload), headers=headers)
-    print ("Status code" , response.status_code)
-    #print response.text()
-    print (response)
-    return
+
+    # Debugging Code
+    #print ("Data is: ", payload)              # debugger
+    #print (payload.items())                   # debugger
+    #print (url)                               # debugger
+    #print ("json dmp: ", json.dumps(payload)) # debugger
+    #print ("headers: ", headers)              # debugger
+    print_log("remote:status_update", url, show_logging)
+    #print ("-------------")
+
+    try:
+        try:  # Send the request
+            req = requests.post(url,headers=headers, json=payload)
+        except Exception as e:
+            print ("remote_comm:status_update:Error sending request")
+            print ("\t", e)
+        try:  # log raw response to rile
+            file=open("request_status_update.log","a")
+            file.write("\n\n" + str(time.time()) + "\n")
+            file.write(str(req.status_code) + "\n")
+            file.write(req.text)
+            file.close()
+        except Exception as e:
+            #raise
+            print ("remote_comm:status_update:Error writing to log")
+            print (e)
+
+        print ("Response code: ", req.status_code)
+        try:  # parse returned datea
+            rtndata = req.json()
+            rtndata2= rtndata["data"]
+            #print "rtndata: ", rtndata     # debugger
+            #print "rtndata2: ", rtndata2   # debugger
+
+        except Exception as e:
+            print ("remote_comm:status_update:Error converting json")
+            print (e)
+        # test status code to determin if we were Successful
+        if req.status_code == 200 or req.status_code == 201:
+            print ("Status Update Successful")
+        else:
+            print ("status_update failed: Responce code: ", req.status_code)
+    except:
+        print ("remote_comm:status_update:General Error")
+    print ("--------------------------------------")
+    # END of status_update
 
 
-# using response
 def sensor_upload():
+    print ("\n--- Uploading Sensor Data-------------")
     global headers
-    print ("todo send sensors")
-    url = my_globals.settings["server_status_addr"]
-    #data = {"uuid": UUID, "token": TOKEN, "version": "0.1.1", "hostname": "device.local", "ip": "192.168.1.213", "mac_address": "1122334455667788", "time": "2000-12-31 23:59:59", "cover_status": "closed", "error_msg": "", "limitsw_open": "0", "limitsw_closed": "1", "light_in": "0", "light_out": "100", "cpu_temp": "30", "temperature": "28", "humidity": "34"}
-    payload = my_globals.sensor_dat.copy()          # copy sensor data here
-    payload.update({"uuid": my_globals.settings["uuid"]})      # add uuid
-    payload.update({"token": my_globals.settings["token"]})    # add token
+    # setup the data
+    url = my_globals.settings["server_update_addr"]
+    payload = {}                             # initialize variable
+    payload["uuid"]  = my_globals.settings["uuid"]      # add uuid
+    payload["token"] = my_globals.settings["token"]     # add token
+    payload.update(my_globals.sensor_dat)      # add in sensor_dat dictionary
+    
+    # this should be removed when status is separated server side
+    # or.. it could stay. TODO needs discusion
+    payload.update(my_globals.status)          # add in status dictionary 
+
+    # Debugging Code
+    #print ("Data is: ", payload)              # debugger
+    #print (payload.items())                   # debugger
+    #print (url)                               # debugger
+    #print ("json dmp: ", json.dumps(payload)) # debugger
+    #print ("headers: ", headers)              # debugger
+    print_log("remote:sensor_upload", url, show_logging)
+    #print ("-------------")
+
+    try:
+        try:  # Send the request
+            req = requests.post(url,headers=headers, json=payload)
+        except Exception as e:
+            print ("remote_comm:sensor_upload:Error sending request")
+            print ("\t", e)
+        try:  # log raw response to rile
+            file=open("request_sensor_upload.log","a")
+            file.write("\n\n" + str(time.time()) + "\n")
+            file.write(str(req.status_code) + "\n")
+            file.write(req.text)
+            file.close()
+        except Exception as e:
+            #raise
+            print ("remote_comm:sensor_upload:Error writing to log")
+            print (e)
+
+        print ("Response code: ", req.status_code)
+        try:  # parse returned datea
+            rtndata = req.json()
+            rtndata2= rtndata["data"]
+            #print "rtndata: ", rtndata     # debugger
+            #print "rtndata2: ", rtndata2   # debugger
+
+        except Exception as e:
+            print ("remote_comm:sensor_upload:Error converting json")
+            print (e)
+        # test status code to determin if we were Successful
+        if req.status_code == 200 or req.status_code == 201:
+            print ("Sensor Upload Successful")
+        else:
+            print ("sensor_upload failed: Responce code: ", req.status_code)
+    except:
+        print ("remote_comm:sensor_upload:General Error")
+    print ("--------------------------------------")
+    #END of sensor_upload
+
 
 def register():
-    print ("\n--- Registering Device ---")
+    print ("\n--- Registering Device ---------------")
     global headers
     url = my_globals.settings["server_reg_addr"]
     payload = {}
@@ -88,12 +181,14 @@ def register():
             print ("Registration Successful")
         else:
             print ("Registration failed: Responce code: ", req.status_code)
-        print ("--------------------------------------")
     except:
         print ("remote_comm:register:General Error")
+    print ("--------------------------------------")
+    # END of register
 
 
 def pic_upload():
+    print ("--- Uploading Picture ----------------")
     # first check if file exists
     image = my_globals.settings["img_dir"] + my_globals.settings["img_name"]
     print ("Image name: ", image)
@@ -101,7 +196,8 @@ def pic_upload():
         print ("Image does not exist. Skipping upload")
         return
 
-    # upload picture
+    ## upload picture
+    # setup the data
     headers = {'Accept': 'application/json'}
     url = my_globals.settings["server_img_addr"]
     payload = {}
@@ -109,6 +205,7 @@ def pic_upload():
     payload["token"] = ('', str(my_globals.settings["token"]))
     files= {"image": open(my_globals.settings["img_dir"] + my_globals.settings["img_name"],'rb')}
 
+    # Debugging Code
     #print ("Data is: ", payload)              # debugger
     #print (payload.items())                   # debugger
     #print (url)                               # debugger
@@ -118,12 +215,12 @@ def pic_upload():
     #print ("-------------")
 
     try:
-        try:
+        try:  # Send the request
             req = requests.post(url,headers=headers, files=files, data=payload)
         except Exception as e:
             print ("remote_comm:webcam:Error sending request")
             print ("\t", e)
-        try:
+        try:  # log raw response to rile
             file=open("request_webcam.log","a")
             file.write("\n\n" + str(time.time()) + "\n")
             file.write(str(req.status_code) + "\n")
@@ -135,8 +232,7 @@ def pic_upload():
             print (e)
 
         print ("Response code: ", req.status_code)
-        # parse returned datea
-        try:
+        try:  # parse returned datea
             rtndata = req.json()
             rtndata2= rtndata["data"]
             #print "rtndata: ", rtndata     # debugger
@@ -150,6 +246,7 @@ def pic_upload():
             print ("Webcam upload Successful")
         else:
             print ("Webcam upload failed: Responce code: ", req.status_code)
-        print ("--------------------------------------")
     except:
         print ("remote_comm:webcam:General Error")
+    print ("--------------------------------------")
+    #END of pic_upload
