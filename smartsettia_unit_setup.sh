@@ -9,6 +9,19 @@ fi
 FLAG_GPIO=0;
 FLAG_RAMDISK=0;
 
+# cleaning
+if [[ $* == *-c* ]]; then
+  echo "Removing .logs & .pyc files"
+  rm -f *.log *.pyc
+fi
+
+# only clean and exit
+if [[ $* == *-C* ]]; then
+  echo "Removing .logs & .pyc files then exiting"
+  rm -f *.log *.pyc
+  exit
+fi
+
 # yes for questions
 # for travis builds
 if [[ $* == *--y* ]]; then
