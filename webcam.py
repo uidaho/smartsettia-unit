@@ -2,6 +2,7 @@
 # cv settings: https://stackoverflow.com/questions/32943227/python-opencv-capture-images-from-webcam
 # another compareg: https://softwarerecs.stackexchange.com/questions/18134/python-library-for-taking-camera-images
 # Timestamp: http://startgrid.blogspot.com/2012/08/tutorial-creating-timestamp-on.html
+# fswebcam: https://www.raspberrypi.org/documentation/usage/webcams/
 import time
 import wget
 import os
