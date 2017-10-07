@@ -2,6 +2,7 @@
 import time
 from os import path   # Used in checking webcam storage path
 import schedule    # scheduler library
+from cover import fsm   # cover monitor module
 import sensors     #sensors.py
 import webcam      # webcam module
 import my_globals  # global variables
@@ -30,6 +31,9 @@ def job_heartbeat():
 # Save setting to file
 def job_save_settings():
     my_globals.save_settings()
+    
+def job_cover_monitor():
+    fsm()
 
 # Read enviroment sensors
 def job_sensors():
@@ -58,7 +62,7 @@ schedule.every(3).seconds.do(job_webcam)
 schedule.every(2).seconds.do(job_upload_status)
 #(ran by job_sensors) schedule.every(5).seconds.do(job_upload_sensors)
 #schedule.every(5).seconds.do(job_upload_webcam)   # TODO to separate webcam upload, or not
-#garage door monitor
+schedule.every(1).seconds.do(job_cover_monitor)
 #webserver
 
 
