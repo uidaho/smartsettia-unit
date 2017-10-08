@@ -1,5 +1,12 @@
 #!/bin/bash
 
+# only clean and exit
+if [[ $* == *-C* ]]; then
+  echo "Removing .logs & .pyc files then exiting"
+  rm -f *.log *.pyc
+  exit
+fi
+
 # get root permission
 if [ $EUID != 0 ]; then
     sudo "$0" "$@"
@@ -15,12 +22,7 @@ if [[ $* == *-c* ]]; then
   rm -f *.log *.pyc
 fi
 
-# only clean and exit
-if [[ $* == *-C* ]]; then
-  echo "Removing .logs & .pyc files then exiting"
-  rm -f *.log *.pyc
-  exit
-fi
+
 
 # yes for questions
 # for travis builds
