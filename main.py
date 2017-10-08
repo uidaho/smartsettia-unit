@@ -83,7 +83,7 @@ initialize()
 # if single run run everything once
 if SINGLE_RUN:
     print("Running single mode")
-    schedule.run()      # run all jobs
+    schedule.run_all()      # run all jobs
     exit()              # exit program
 
 while True and not SINGLE_RUN:
