@@ -37,9 +37,10 @@ def get_Picture(FAKEWEBCAM):
     else:                   # get picture from webcam
         global filename
         # setup some metadata for fswebcam
-        compression = "95"
+        compression = "45"
         device      = "/dev/video0"
         resolution  = "1280x720"
+        #resolution  = "1024x600"
         textcolor   = "#0000cc00"
         font        = "luxisr:14"
         title       = str(my_globals.settings["name"])
@@ -47,6 +48,7 @@ def get_Picture(FAKEWEBCAM):
         info        =  str(my_globals.settings["uuid"])
 
         # call fswebcam to take the picture
-        call(["fswebcam", "-S 3", "--jpeg", compression, "-d", device, "-r", resolution,
+        call(["fswebcam", "-S 3", "--jpeg", compression, "-d", device, "-r", resolution, "--scale", "960x540",
          "--top-banner", "--text-colour", textcolor, "--font", font,
           "--title", title, "--subtitle", subtitle, "--info", info, filename])
+        call(["du", "-h", filename])    # prints size of picture
