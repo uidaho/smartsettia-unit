@@ -20,7 +20,8 @@ def remove_image(filename):
         pass
 
 def get_cat_picture(filename):
-    url = "http://lorempixel.com/1024/768/cats/"
+    #url = "http://lorempixel.com/1024/768/cats/"   # cats
+    url = "http://207.251.86.238/cctv448.jpg"       # NY trafic cam
     remove_image(filename)
     cat_pic = wget.download(url, out=filename)
     print ("filename: ", cat_pic)
