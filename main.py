@@ -79,6 +79,13 @@ def initialize():
 #Program start
 print ("Welcome to Smartsettia!")
 initialize()
+
+# if single run run everything once
+if SINGLE_RUN:
+    print("Running single mode")
+    schedule.run()      # run all jobs
+    exit()              # exit program
+
 while True and not SINGLE_RUN:
     schedule.run_pending()
     time.sleep(0.1)
