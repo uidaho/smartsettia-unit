@@ -72,6 +72,10 @@ pip3 install --upgrade call
 pip3 install --upgrade uuid     # is this really needed?
 
 
+echo -e "\nSetting up Environment"
+echo      "-----------------------"
+sudo timedatectl set-timezone Etc/UTC  # may not work on other platforms
+
 
 if [ $FLAG_RAMDISK -eq "1" ]; then
   echo -e "\nSetting up ramdisk for pictures"
