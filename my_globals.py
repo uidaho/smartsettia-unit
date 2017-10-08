@@ -34,7 +34,6 @@ settings =      {"name":"UnNamed",                          # Name of Device
                 "token": "none",      # post token key
                 "challenge": "temppass",                    # challenge
                 "mac_address":"00:00:00:00:00:00",          # MAC address
-                "server_addr": "https://smartsettia.com/api/ping",
                 "server_reg_addr":    DOMAIN[DOMAIN_INDEX] + "api/register",
                 "server_status_addr": DOMAIN[DOMAIN_INDEX] + "api/update",
                 "server_update_addr": DOMAIN[DOMAIN_INDEX] + "api/update",
@@ -58,7 +57,7 @@ settings =      {"name":"UnNamed",                          # Name of Device
 def save_settings():
     print ("Saving settings")
     global settings
-    #print settings         # debugger
+    # print settings         # debugger
     try:
         with open('config.json', 'w') as f:
             json.dump(settings, f)
@@ -74,16 +73,24 @@ def load_settings():
     try:
         with open('config.json', 'r') as f:
             temp = json.load(f)
-    #except FileNotFoundError:
+    # except FileNotFoundError:
     #    print "config.json file not found. loading default settings"
     except Exception as e:
         print ("Load settings error ", e)
 
     else:       # if file was found and all is good
-        #print temp             # debugger
+        # print temp             # debugger
         if temp["uuid"] == settings["uuid"]:
             print ("UUID matches loaded settings - keeping")
             settings = temp     # set settings to loaded values
+
+            # override loaded url's to match DOMAIN_INDEX
+            # loaded settings is screwing up server comm when switching DoMAIN_INDEX
+            settings["server_reg_addr"]    = DOMAIN[DOMAIN_INDEX] + "api/register"
+            settings["server_status_addr"] = DOMAIN[DOMAIN_INDEX] + "api/update",
+            settings["server_update_addr"] = DOMAIN[DOMAIN_INDEX] + "api/update",
+            settings["server_img_addr"]    = DOMAIN[DOMAIN_INDEX] + "api/image",
+
         else:
             print ("UUID does not mach loaded settings - discarding")
             print ("Using default settings")
