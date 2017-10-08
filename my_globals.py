@@ -87,9 +87,9 @@ def load_settings():
             # override loaded url's to match DOMAIN_INDEX
             # loaded settings is screwing up server comm when switching DoMAIN_INDEX
             settings["server_reg_addr"]    = DOMAIN[DOMAIN_INDEX] + "api/register"
-            settings["server_status_addr"] = DOMAIN[DOMAIN_INDEX] + "api/update",
-            settings["server_update_addr"] = DOMAIN[DOMAIN_INDEX] + "api/update",
-            settings["server_img_addr"]    = DOMAIN[DOMAIN_INDEX] + "api/image",
+            settings["server_status_addr"] = DOMAIN[DOMAIN_INDEX] + "api/update"
+            settings["server_update_addr"] = DOMAIN[DOMAIN_INDEX] + "api/update"
+            settings["server_img_addr"]    = DOMAIN[DOMAIN_INDEX] + "api/image"
 
         else:
             print ("UUID does not mach loaded settings - discarding")
