@@ -48,7 +48,7 @@ def job_webcam():
     t0 = int(round(time.time() * 1000)) # debugger
     webcam.get_Picture(FAKEWEBCAM)      # get picture function with option fake bool
     t1 = int(round(time.time() * 1000)) # debugger
-    #print "timepic: %d" % (t1-t0)      # debugger
+    print ("timepic: %d" % (t1-t0))      # debugger
     remote_comm.pic_upload()
 
 schedule.every(20).seconds.do(job_heartbeat)
