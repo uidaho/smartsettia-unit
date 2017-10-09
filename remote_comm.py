@@ -187,11 +187,12 @@ def register():
             rtndata = req.json()
             rtndata2= rtndata["data"]
             #print "rtndata: ", rtndata     # debugger
-            print ("rtndata2: ", rtndata2)   # debugger
+            #print ("rtndata2: ", rtndata2)   # debugger
             print ("Token: ", rtndata2["token"])
             my_globals.settings["token"] = rtndata2["token"]  # set token to response token
-            print ("Name: ", rtndata2["name"])
+            print ("Name:  ", rtndata2["name"])
             my_globals.settings["name"] = rtndata2["name"]  # set token to response token
+            print ("ID:    ", rtndata2["id"])
 
         except Exception as e:
             print ("remote_comm:register:Error converting json")
