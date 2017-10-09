@@ -1,5 +1,6 @@
 # https://www.google.com/url?sa=t&rct=j&q=&esrc=s&source=web&cd=4&cad=rja&uact=8&ved=0ahUKEwi38Ljt_6rWAhUJ1mMKHeeuC4kQFghAMAM&url=http%3A%2F%2Fwww.pythonforbeginners.com%2Fpython-on-the-web%2Fhow-to-use-urllib2-in-python
 import time
+from datetime import datetime
 import os.path
 import json
 import requests
@@ -57,9 +58,18 @@ def status_update():
                 #print "rtndata: ", rtndata     # debugger
                 server_status = rtndata["data"]["cover_command"]
                 print ("server command: ", server_status)
-                cover_open = rtndata["data"]["open_time"]
-                cover_close = rtndata["data"]["close_time"]
-                print ("open %s\tclose %s" % (cover_open, cover_close))
+
+                # Convert the time string from server into a time object for HH:MM
+                new_cover_time_open  = datetime.strptime(rtndata["data"]["open_time"],  '%H:%M').time()
+                new_cover_time_close = datetime.strptime(rtndata["data"]["close_time"], '%H:%M').time()
+                # test if values changed
+                if (new_cover_time_open != settings['cover_time_open']):
+                    print ("Cover time open changed to %s." % new_cover_time_open)
+                    settings['cover_time_open']  = new_cover_time_open
+                if (new_cover_time_close != settings['cover_time_close']):
+                    print ("Cover time close changed to %s." % new_cover_time_close)
+                    settings['cover_time_close'] = new_cover_time_close
+                print ("open %s\tclose %s" % (settings['cover_time_open'], settings['cover_time_close']))
 
                 # update job rates
                 # do in main?
