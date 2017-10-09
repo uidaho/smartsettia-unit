@@ -22,11 +22,10 @@ sensor_dat =    {"capture_time":"YYYY-MM-DD HH:MM:SS",
                 "humidity":-1,
                 "hygrometer_count":0,               # The number of Hygrometers attached
                                     # sublist of dynamic hygrometers?
-                "cover_state":"Uninitialized",              # Current state of the cover
                 }
 
-status =        {"cover_state": -1,
-                "error_msg": "none"
+status =        {"cover_status": "closed",
+                "error_msg": "TEST ERROR"
                 }
 
 settings =      {"name":"UnNamed",                          # Name of Device
@@ -42,7 +41,6 @@ settings =      {"name":"UnNamed",                          # Name of Device
                 "job_save_settings":60,                     # save settings to file
                 "job_sensors_sec"  :5,                      # job runs every x seconds
                 "job_webcam_sec"   :2,                      # job runs every x seconds
-                "job_server_webcam_sec" :5,                 # send webcam picture job
                 "job_server_status_sec" :1,                 # send device status job
                 "job_server_sensors_sec":20,                # send device sensors job
                                                             # other jobs
