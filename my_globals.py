@@ -24,7 +24,13 @@ sensor_dat =    {"capture_time":"YYYY-MM-DD HH:MM:SS",
                                     # sublist of dynamic hygrometers?
                 }
 
+# possible cover_statuses
+# cover_status = { open, close, opening, closing, locked, error }
+
+# possible server commands
+# server_command = { open, close, lock }
 status =        {"cover_status": "closed",
+                "server_command": "close",
                 "error_msg": "TEST ERROR"
                 }
 

@@ -22,7 +22,10 @@ ls_close = 0
 # Determins what is the active state and calls that function
 def fsm():
     print ( "fsm - Current state %s" % fsm_current_state)
-    global ls_open, ls_close
+    global ls_open, ls_close, server
+    print ("Current sensors open/close (%d,%d)"% (sensor_dat["limitsw_open"], sensor_dat["limitsw_close"]))
+    server = my_globals.status['server_command']
+    print ("Current server command: ", server)
     if fsm_current_state == "error":
         fsm_error()
     elif (fsm_current_state == "open"):
@@ -33,14 +36,15 @@ def fsm():
         fsm_opening()
     elif (fsm_current_state == "closing"):
         fsm_closing()
+    elif (fsm_current_state == "locked"):
+        fsm_locked()
     else:
         print ("ERROR: Unknown state.")
     
     # update global variables with current limit switches
     sensor_dat["limitsw_open"]  = ls_open
     sensor_dat["limitsw_close"] = ls_close
-    my_globals.status["cover_state"] = fsm_current_state
-    print ("Current sensors open/close (%d,%d)"% (sensor_dat["limitsw_open"], sensor_dat["limitsw_close"]))
+    my_globals.status["cover_status"] = fsm_current_state
     print ( "fsm - Next state %s" % fsm_current_state)
     print ("--------------------------------------")
     
@@ -49,15 +53,16 @@ def fsm_open():
     print ("Entered State: open")
     global ls_close, ls_close, fsm_current_state
     # if not open. unexpected movement
+    print ("fsm_open:server = ", server)
     if  not (ls_open == 1 and ls_close == 0):
         my_globals.status["error_msg"] = "Unexpected Movement"
         fsm_current_state = "error"
     # check if the we are not were we want to be
     elif (server != fsm_current_state):
-        if (server == "closed"):
+        if (server == "close"):
             print ("Server change event: closing")
             fsm_current_state = "closing"
-        elif (server == "locked"):
+        elif (server == "lock"):
             print ("Server change event: locked")
             fsm_current_state = "locked"
         else:
@@ -67,14 +72,14 @@ def fsm_close():
     print ("Entered State: closed")
     global ls_close, ls_close, fsm_current_state
     # if not open. unexpected movement
-    if  not (ls_open == 1 and ls_close == 0):
+    if  not (ls_open == 0 and ls_close == 1):
         my_globals.status["error_msg"] = "Unexpected Movement"
         fsm_current_state = "error"
     elif (server != fsm_current_state):
         if (server == "open"):
             print ("Server change event: opening")
             fsm_current_state = "opening"
-        elif (server == "locked"):
+        elif (server == "lock"):
             print ("Server change event: locked")
             fsm_current_state = "locked"
         else:
@@ -105,6 +110,7 @@ def fsm_opening():
     elif fsm_transition_state == 2:     # turn relay off
         # command relay
         fsm_transition_state = 3
+        sw00()         # DEBUGGER REMOVE LATER
         
    # test if cover is actually moving
     elif fsm_transition_state == 3:
@@ -134,13 +140,20 @@ def fsm_opening():
                 #fsm_current_state = "error"         # send to error state
         # 0,0 and not timedout 
             # do nothing. we are waiting
+        sw1()           # DEBUGGER REMOVE LATER
 
     
 def fsm_closing():
     print ("Entered State: closing")
     global ls_open, ls_close, fsm_current_state
     fsm_current_state = "closed"
+    sw0()           # DEBUGGER REMOVE LATER
     
+def fsm_locked():
+    print ("Entered State: locked")
+    global fsm_current_state
+    if (server != "lock"):
+        fsm_current_state = "error" # to resolve
     
 # error and resolution
 def fsm_error():
@@ -148,8 +161,10 @@ def fsm_error():
     global ls_open, ls_close, fsm_current_state
     if  (ls_open == 1 and ls_close == 0):
         fsm_current_state = "open"
+        sw1()           # DEBUGGER REMOVE LATER
     elif (ls_open == 0 and ls_close == 1):
-        fsm_current_state = "close"
+        fsm_current_state = "closed"
+        sw0()           # DEBUGGER REMOVE LATER
     elif (ls_open == 0 and ls_close == 0):
         fsm_current_state = "error"
     else:

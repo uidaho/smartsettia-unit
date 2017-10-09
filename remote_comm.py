@@ -56,8 +56,8 @@ def status_update():
             try:  # parse returned datea
                 rtndata = req.json()
                 #print "rtndata: ", rtndata     # debugger
-                server_status = rtndata["data"]["cover_command"]
-                print ("server command: ", server_status)
+                my_globals.status['server_command'] = rtndata["data"]["cover_command"]
+                print ("server command: ", my_globals.status['server_command'])
 
                 # Convert the time string from server into a time object for HH:MM
                 new_cover_time_open  = datetime.strptime(rtndata["data"]["open_time"],  '%H:%M').time()
