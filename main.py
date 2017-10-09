@@ -45,7 +45,7 @@ def job_cover_monitor():
 def job_sensors():
     print("Getting Sensors..")
     sensors.update()
-    print ("\ttemp: %d, cpu_temp: %d" %(my_globals.sensor_dat["Temperature"], my_globals.sensor_dat["cpu_temp"]))
+    print ("\ttemp: %d, cpu_temp: %d" %(my_globals.sensor_dat["temperature"], my_globals.sensor_dat["cpu_temp"]))
     remote_comm.sensor_upload()
 
 # send status to server
@@ -66,8 +66,6 @@ schedule.every(60).seconds.do(job_save_settings)
 schedule.every(5).seconds.do(job_sensors)
 schedule.every(3).seconds.do(job_webcam)
 schedule.every(2).seconds.do(job_upload_status)
-#(ran by job_sensors) schedule.every(5).seconds.do(job_upload_sensors)
-#schedule.every(5).seconds.do(job_upload_webcam)   # TODO to separate webcam upload, or not
 schedule.every(1).seconds.do(job_cover_monitor)
 #webserver
 

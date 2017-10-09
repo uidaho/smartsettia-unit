@@ -4,20 +4,15 @@ import my_globals
 
 FAKE_SENSORS = 1
 
-# Aliasing my_globals.sensor_dat to just sensor_dat
-# normally you'd access this by my_globals.sensor_dat
-sensor_dat = my_globals.sensor_dat
-
 # sensor simulate
 sim_temperature = 0   # needs to be global to simulate Sensors
 sim_cpuTemp = 35      # needs to be global to simulate Sensors
 
 # update all sensor values
 def update():
-    global sensor_dat
-    sensor_dat["Temperature"]    = get_Temp_Hum()
+    my_globals.sensor_dat["temperature"]    = get_Temp_Hum()                    
     get_light()
-    sensor_dat["cpu_temp"] = get_cpu_temp()
+    my_globals.sensor_dat["cpu_temp"] = get_cpu_temp()
 
 # get temperature and humidity from sensor
 def get_Temp_Hum():
