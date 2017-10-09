@@ -1,5 +1,12 @@
 #!/bin/bash
 
+# only clean and exit
+if [[ $* == *-C* ]]; then
+  echo "Removing .logs & .pyc files then exiting"
+  rm -f *.log *.pyc
+  exit
+fi
+
 # get root permission
 if [ $EUID != 0 ]; then
     sudo "$0" "$@"
@@ -15,12 +22,7 @@ if [[ $* == *-c* ]]; then
   rm -f *.log *.pyc
 fi
 
-# only clean and exit
-if [[ $* == *-C* ]]; then
-  echo "Removing .logs & .pyc files then exiting"
-  rm -f *.log *.pyc
-  exit
-fi
+
 
 # yes for questions
 # for travis builds
@@ -71,6 +73,10 @@ pip3 install --upgrade wget     # webcam replacement if no webcam
 pip3 install --upgrade call
 pip3 install --upgrade uuid     # is this really needed?
 
+
+echo -e "\nSetting up Environment"
+echo      "-----------------------"
+sudo timedatectl set-timezone Etc/UTC  # may not work on other platforms
 
 
 if [ $FLAG_RAMDISK -eq "1" ]; then

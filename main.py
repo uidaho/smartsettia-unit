@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 import time
 from os import path   # Used in checking webcam storage path
+import threading
 import schedule    # scheduler library
 from cover import fsm   # cover monitor module
 import sensors     #sensors.py
@@ -23,6 +24,11 @@ SINGLE_RUN = args.s
 FAKEWEBCAM = args.fw     # enable or disable fake webcam
 
 print ("Using fake webcam: ", args.fw)
+
+# multi thread support
+def run_threaded(job_func):
+	job_thread = threading.Thread(target=job_func)
+	job_thread.start()
 
 # If I'm running you should see this periodically
 def job_heartbeat():
@@ -52,7 +58,7 @@ def job_webcam():
     t0 = int(round(time.time() * 1000)) # debugger
     webcam.get_Picture(FAKEWEBCAM)      # get picture function with option fake bool
     t1 = int(round(time.time() * 1000)) # debugger
-    #print "timepic: %d" % (t1-t0)      # debugger
+    print ("timepic: %d" % (t1-t0))      # debugger
     remote_comm.pic_upload()
 
 schedule.every(20).seconds.do(job_heartbeat)
@@ -83,6 +89,13 @@ def initialize():
 #Program start
 print ("Welcome to Smartsettia!")
 initialize()
+
+# if single run run everything once
+if SINGLE_RUN:
+    print("Running single mode")
+    schedule.run_all()      # run all jobs
+    exit()              # exit program
+
 while True and not SINGLE_RUN:
     schedule.run_pending()
     time.sleep(0.1)
