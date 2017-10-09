@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 import time
 from os import path   # Used in checking webcam storage path
+import threading
 import schedule    # scheduler library
 import sensors     #sensors.py
 import webcam      # webcam module
@@ -22,6 +23,11 @@ SINGLE_RUN = args.s
 FAKEWEBCAM = args.fw     # enable or disable fake webcam
 
 print ("Using fake webcam: ", args.fw)
+
+# multi thread support
+def run_threaded(job_func):
+	job_thread = threading.Thread(target=job_func)
+	job_thread.start()
 
 # If I'm running you should see this periodically
 def job_heartbeat():
