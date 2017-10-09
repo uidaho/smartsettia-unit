@@ -3,6 +3,7 @@ import time
 from os import path   # Used in checking webcam storage path
 import threading
 import schedule    # scheduler library
+from cover import fsm   # cover monitor module
 import sensors     #sensors.py
 import webcam      # webcam module
 import my_globals  # global variables
@@ -18,11 +19,11 @@ single_run = 0
 parser = argparse.ArgumentParser()
 parser.add_argument('-s', action='store_true', help='Runs the program loop only once')
 parser.add_argument('-fw',action='store_true', help='Use Fake webcam')
+parser.add_argument('-d',action='store', help='Specify Domain. 0 prod, 1 brandon c9, 2 nick c9', default="0")
 args = parser.parse_args() # parse args
+DOMAIN_INDEX = int(args.d)
 SINGLE_RUN = args.s
 FAKEWEBCAM = args.fw     # enable or disable fake webcam
-
-print ("Using fake webcam: ", args.fw)
 
 # multi thread support
 def run_threaded(job_func):
@@ -36,12 +37,15 @@ def job_heartbeat():
 # Save setting to file
 def job_save_settings():
     my_globals.save_settings()
+    
+def job_cover_monitor():
+    fsm()
 
 # Read enviroment sensors
 def job_sensors():
     print("Getting Sensors..")
     sensors.update()
-    print ("\ttemp: %d, cpu_temp: %d" %(my_globals.sensor_dat["Temperature"], my_globals.sensor_dat["cpu_temp"]))
+    print ("\ttemp: %d, cpu_temp: %d" %(my_globals.sensor_dat["temperature"], my_globals.sensor_dat["cpu_temp"]))
     remote_comm.sensor_upload()
 
 # send status to server
@@ -62,9 +66,7 @@ schedule.every(60).seconds.do(job_save_settings)
 schedule.every(5).seconds.do(job_sensors)
 schedule.every(3).seconds.do(job_webcam)
 schedule.every(2).seconds.do(job_upload_status)
-#(ran by job_sensors) schedule.every(5).seconds.do(job_upload_sensors)
-#schedule.every(5).seconds.do(job_upload_webcam)   # TODO to separate webcam upload, or not
-#garage door monitor
+schedule.every(1).seconds.do(job_cover_monitor)
 #webserver
 
 
@@ -73,7 +75,22 @@ schedule.every(2).seconds.do(job_upload_status)
 def initialize():
     generate_uuid()                 # generate uuid from hardware
     my_globals.load_settings()      # load settings from file
-
+    
+    print ("Using fake webcam: ", FAKEWEBCAM)
+    
+    # Validate args.d (domain index) with possible domain indexes
+    if (DOMAIN_INDEX >= 0 and DOMAIN_INDEX < len(my_globals.DOMAIN)):
+        # print (str(args.d) + " " + str(len(my_globals.DOMAIN)))   # debugger
+        print ("Using Domain: %s" % str(my_globals.DOMAIN[DOMAIN_INDEX]))
+        my_globals.settings["server_reg_addr"]    = my_globals.DOMAIN[DOMAIN_INDEX] + "api/register"
+        my_globals.settings["server_status_addr"] = my_globals.DOMAIN[DOMAIN_INDEX] + "api/update"
+        my_globals.settings["server_update_addr"] = my_globals.DOMAIN[DOMAIN_INDEX] + "api/update"
+        my_globals.settings["server_img_addr"]    = my_globals.DOMAIN[DOMAIN_INDEX] + "api/image"
+    else:
+        print ("Error invalid domain index. Exiting")
+        print ("To specify domain use '-d' <index>. from 0 to %d. For more info use '--help'" % (len(my_globals.DOMAIN)-1))
+        exit()
+        
     # check if /mnt/ramdisk exists else fallback to tmp directory
     if path.isdir(my_globals.settings["img_dir"]) == 0:   # if path to directory exists
         print ("Ramdisk does not exist. Using /tmp/")
@@ -83,7 +100,7 @@ def initialize():
 
 
 #Program start
-print ("Welcome to Smartsettia!")
+print ("\nWelcome to Smartsettia!")
 initialize()
 
 # if single run run everything once

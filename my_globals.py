@@ -24,7 +24,13 @@ sensor_dat =    {"capture_time":"YYYY-MM-DD HH:MM:SS",
                                     # sublist of dynamic hygrometers?
                 }
 
+# possible cover_statuses
+# cover_status = { open, close, opening, closing, locked, error }
+
+# possible server commands
+# server_command = { open, close, lock }
 status =        {"cover_status": "closed",
+                "server_command": "close",
                 "error_msg": "TEST ERROR"
                 }
 
@@ -74,12 +80,12 @@ def load_settings():
     # except FileNotFoundError:
     #    print "config.json file not found. loading default settings"
     except Exception as e:
-        print ("Load settings error ", e)
+        print ("\tLoad settings error ", e)
 
     else:       # if file was found and all is good
         # print temp             # debugger
         if temp["uuid"] == settings["uuid"]:
-            print ("UUID matches loaded settings - keeping")
+            print ("\tUUID matches loaded settings - keeping")
             settings = temp     # set settings to loaded values
 
             # override loaded url's to match DOMAIN_INDEX
@@ -90,5 +96,5 @@ def load_settings():
             settings["server_img_addr"]    = DOMAIN[DOMAIN_INDEX] + "api/image"
 
         else:
-            print ("UUID does not mach loaded settings - discarding")
-            print ("Using default settings")
+            print ("\tUUID does not mach loaded settings - discarding")
+            print ("\tUsing default settings")
