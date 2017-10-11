@@ -31,15 +31,6 @@ if [[ $* == *--y* ]]; then
   FLAG_RAMDISK=1;
 else
   while true; do
-      read -p "Is this Device a Raspberri Pi? " yn
-      case $yn in
-          [Yy]* ) FLAG_GPIO=1; break;;
-          [Nn]* ) break;;
-          * ) echo "Please answer yes or no.";;
-      esac
-  done
-
-  while true; do
       read -p "Do you wish to setup the ramdisk? " yn
       case $yn in
           [Yy]* ) FLAG_RAMDISK=1; break;;
@@ -59,11 +50,6 @@ apt install -y python3 python3-pip
 #pip install --upgrade virtualenv
 apt install -y fswebcam
 
-#https://learn.adafruit.com/playing-sounds-and-using-buttons-with-raspberry-pi/install-python-module-rpi-dot-gpio
-if [ $FLAG_GPIO -eq "1" ]; then
-  apt install python-rip.gpio
-fi
-
 
 echo -e "\nInstalling python dependencies"
 echo      "-----------------------"
@@ -72,6 +58,10 @@ pip3 install --upgrade requests
 pip3 install --upgrade wget     # webcam replacement if no webcam
 pip3 install --upgrade call
 pip3 install --upgrade uuid     # is this really needed?
+
+#https://learn.adafruit.com/playing-sounds-and-using-buttons-with-raspberry-pi/install-python-module-rpi-dot-gpio
+#apt install python-rip.gpio
+pip3 install --upgrade RPI.GPIO
 
 
 echo -e "\nSetting up Environment"

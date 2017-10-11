@@ -11,7 +11,7 @@ install:
   ./smartsettia_unit_setup.sh --y
   - pip install codecov
 script:
-  - ./main.py -s
+  - ./main.py --single --fakewebcam --notpi
 
 after_success:
 - codecov
