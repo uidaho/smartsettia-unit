@@ -22,7 +22,7 @@ DOMAIN_INDEX = args.d
 SINGLE_RUN = args.single
 FAKEWEBCAM = args.fakewebcam     # enable or disable fake webcam
 
-from cover import fsm   # cover monitor module. Must be imported after NOT_PI has been set
+from cover import fsm, gpio_cleanup   # cover monitor module. Must be imported after NOT_PI has been set
 import sensors     #sensors.py
 
 # multi thread support
@@ -109,6 +109,7 @@ initialize()
 if SINGLE_RUN:
     print("Running single mode")
     schedule.run_all()      # run all jobs
+    gpio_cleanup()
     exit()              # exit program
 
 while True and not SINGLE_RUN:
