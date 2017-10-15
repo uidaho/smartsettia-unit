@@ -13,7 +13,6 @@ if [ $EUID != 0 ]; then
     exit $?
 fi
 
-FLAG_GPIO=0;
 FLAG_RAMDISK=0;
 
 # cleaning
@@ -27,7 +26,6 @@ fi
 # yes for questions
 # for travis builds
 if [[ $* == *--y* ]]; then
-  FLAG_GPIO=1;
   FLAG_RAMDISK=1;
 else
   while true; do
@@ -58,10 +56,7 @@ pip3 install --upgrade requests
 pip3 install --upgrade wget     # webcam replacement if no webcam
 pip3 install --upgrade call
 pip3 install --upgrade uuid     # is this really needed?
-
-#https://learn.adafruit.com/playing-sounds-and-using-buttons-with-raspberry-pi/install-python-module-rpi-dot-gpio
-#apt install python-rip.gpio
-pip3 install --upgrade RPI.GPIO
+pip3 install --upgrade RPI.GPIO # gpio
 
 
 echo -e "\nSetting up Environment"
