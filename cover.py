@@ -19,8 +19,8 @@ if (my_globals.NOT_PI != True):
         my_globals.NOT_PI = "True"
         
 pin_relay      = 14
-pin_ls_open    = 16     # pull up
-pin_ls_close   = 19     # pull up
+pin_ls_open    = 5      # pull up
+pin_ls_close   = 13     # pull up
         
 # GPIO initialization
 if (my_globals.NOT_PI != True):
@@ -44,8 +44,8 @@ fsm_current_state = "error"
 fsm_transition_state = 0    # Linear sub state counter for opening & closing
 wait_time = 0               # time variable that will mark the time to stop waiting
 
-RELAY_WAIT = 0.2
-COVER_WAIT = 0.4
+RELAY_WAIT = 5
+COVER_WAIT = 10
 
 # current status reported to the server
 current_status = "error"
@@ -63,9 +63,10 @@ ls_close = 0
 def fsm():
     print ( "fsm - Current state %s" % fsm_current_state)
     global ls_open, ls_close, server
-    print ("Current sensors open/close (%d,%d)"% (sensor_dat["limitsw_open"], sensor_dat["limitsw_close"]))
+    getSwitches()
+    print ("\tCurrent sensors open/close (%d,%d)"% (sensor_dat["limitsw_open"], sensor_dat["limitsw_close"]))
     server = my_globals.status['server_command']
-    print ("Current server command: ", server)
+    print ("\tCurrent server command: ", server)
     if fsm_current_state == "error":
         fsm_error()
     elif (fsm_current_state == "open"):
@@ -168,6 +169,7 @@ def fsm_opening():
         # did it finish and open?
         if (ls_open == 1 and ls_close == 0):
             # success
+            print("\tOpening finished")
             fsm_current_state = "open"          # send to open state
             
         # did it somehow reverse and went back to close? dont know how
@@ -176,8 +178,9 @@ def fsm_opening():
             fsm_current_state = "error"         # send to error state
             
         # timed out
-        elif (time.time() > COVER_WAIT):
+        elif (time.time() > wait_time):
             my_globals.status["error_msg"] = "Cover movement timed out. Waiting for it to resolve to open or close"
+            print("\tCover movement timed out. Waiting for it to resolve to open or close")
             fsm_current_state = "error"         # send to error state
             
         # 0,0 and not timedout 
@@ -220,17 +223,20 @@ def fsm_error():
 # set relay pin to value
 def set_Relay(val):
     print ("Setting Relay to %s" % val)
-    if (my_globals.NOT_PI == False):    # this is a pi and usng gpio
+    print ("not pi: ", my_globals.NOT_PI)
+    if (my_globals.NOT_PI == True):    # this is NOT a pi and NOT usng gpio
+        print ("\tGPIO disabled")
+    else:
         try:
             if (val == "on"):
+                print ("\tTurning relay on")
                 GPIO.output(pin_relay, GPIO.HIGH)
             else: # val == "off" or any other value. default off
+                print ("\tTurning relay off")
                 GPIO.output(pin_relay, GPIO.LOW)
         except Exception as e:
             print ("\tError setting relay GPIO output pin", e)
-    else:
-        print ("\tGPIO disabled")
-        
+
 
 # read limit switches
 def getSwitches():
@@ -241,10 +247,11 @@ def getSwitches():
         ls_close = 1
     else: 
         try:
-            ls_open = GPIO.input(channel)
-            ls_close = GPIO.input(channel)
+            ls_open = not GPIO.input(pin_ls_open)
+            ls_close = not GPIO.input(pin_ls_close)
+            print ("getSwitches: (%d, %d)" %(ls_open, ls_close))
         except Exception as e:
-            print ("\tError reading limit switch pins", e)
+            print ("\tError reading limit switch pins:", e)
         
         
     

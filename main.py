@@ -99,6 +99,9 @@ def initialize():
         # This is undesirable for sdcard wear and writing speed compared to a ramdisk
         my_globals.settings["img_dir"] = "/tmp/"
     remote_comm.register()          # register device with webserver
+    # run the cover montitor a few times to let it syncronize
+    job_cover_monitor()
+    job_cover_monitor()
 
 
 #Program start
