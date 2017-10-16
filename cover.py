@@ -44,8 +44,8 @@ fsm_current_state = "error"
 fsm_transition_state = 0    # Linear sub state counter for opening & closing
 wait_time = 0               # time variable that will mark the time to stop waiting
 
-RELAY_WAIT = 5
-COVER_WAIT = 10
+RELAY_WAIT = 3
+COVER_WAIT = 25
 
 # current status reported to the server
 current_status = "error"
