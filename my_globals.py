@@ -1,6 +1,6 @@
 # This file contains the global variables used in smartsettia
 import json
-version= "0.1.0"
+version= "0.2.0"
 
 # Note to concatonate dictionaries
 # z = x.copy()
@@ -11,6 +11,9 @@ DOMAIN_INDEX = 2    # choose which domain. 0-2
 DOMAIN =    ["https://smartsettia.com/",
             "https://smartsettia-backburn.c9users.io/",
             "https://smartsettia-nkrenowicz.c9users.io/"]
+
+# set by arguments to disable GPIO
+NOT_PI = False
 
 sensor_dat =    {"capture_time":"YYYY-MM-DD HH:MM:SS",
                 "light_in":-1,                      # ambiant light sensor inside

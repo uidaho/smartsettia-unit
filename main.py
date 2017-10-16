@@ -3,8 +3,6 @@ import time
 from os import path   # Used in checking webcam storage path
 import threading
 import schedule    # scheduler library
-from cover import fsm   # cover monitor module
-import sensors     #sensors.py
 import webcam      # webcam module
 import my_globals  # global variables
 import remote_comm # server communication module
@@ -12,18 +10,20 @@ import argparse    # argument parsing
 from helper_lib import print_error, print_log, generate_uuid
 
 
-# Global Vars
-single_run = 0
-
 # https://stackoverflow.com/a/30493366
 parser = argparse.ArgumentParser()
-parser.add_argument('-s', action='store_true', help='Runs the program loop only once')
-parser.add_argument('-fw',action='store_true', help='Use Fake webcam')
-parser.add_argument('-d',action='store', help='Specify Domain. 0 prod, 1 brandon c9, 2 nick c9', default="0")
+parser.add_argument('-s',  '--single',     action='store_true', help='Runs the program loop only once')
+parser.add_argument('-fw', '--fakewebcam', action='store_true', help='Use Fake webcam')
+parser.add_argument('-d',   type=int,      action='store',      help='Specify Domain. 0 prod, 1 brandon c9, 2 nick c9. Default 0', default="0")
+parser.add_argument('-npi', '--notpi',     action='store_true', help='Run as if this was not a raspberry pi. Disables GPIO reading', default="False")
 args = parser.parse_args() # parse args
-DOMAIN_INDEX = int(args.d)
-SINGLE_RUN = args.s
-FAKEWEBCAM = args.fw     # enable or disable fake webcam
+my_globals.NOT_PI = args.notpi
+DOMAIN_INDEX = args.d
+SINGLE_RUN = args.single
+FAKEWEBCAM = args.fakewebcam     # enable or disable fake webcam
+
+from cover import fsm, gpio_cleanup   # cover monitor module. Must be imported after NOT_PI has been set
+import sensors     #sensors.py
 
 # multi thread support
 def run_threaded(job_func):
@@ -77,6 +77,8 @@ def initialize():
     my_globals.load_settings()      # load settings from file
     
     print ("Using fake webcam: ", FAKEWEBCAM)
+    if (my_globals.NOT_PI == True):
+        print("Not Pi flag set. GPIO is disabled.")
     
     # Validate args.d (domain index) with possible domain indexes
     if (DOMAIN_INDEX >= 0 and DOMAIN_INDEX < len(my_globals.DOMAIN)):
@@ -97,6 +99,9 @@ def initialize():
         # This is undesirable for sdcard wear and writing speed compared to a ramdisk
         my_globals.settings["img_dir"] = "/tmp/"
     remote_comm.register()          # register device with webserver
+    # run the cover montitor a few times to let it syncronize
+    job_cover_monitor()
+    job_cover_monitor()
 
 
 #Program start
@@ -107,6 +112,7 @@ initialize()
 if SINGLE_RUN:
     print("Running single mode")
     schedule.run_all()      # run all jobs
+    gpio_cleanup()
     exit()              # exit program
 
 while True and not SINGLE_RUN:
