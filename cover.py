@@ -360,4 +360,5 @@ if False:
 # The problem is that this program exits by interruping it and so this will never get called
 # Included for best habbit but cant call it outside of the --single run senario
 def gpio_cleanup():
-    GPIO.cleanup()
+    if (my_globals.NOT_PI == False):
+        GPIO.cleanup()
