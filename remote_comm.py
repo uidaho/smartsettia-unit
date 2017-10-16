@@ -92,7 +92,7 @@ def sensor_upload():
     print ("\n--- Uploading Sensor Data-------------")
     global headers
     # setup the data
-    url = my_globals.settings["server_update_addr"]
+    url = my_globals.settings["server_sensor_addr"]
     payload = {}                             # initialize variable
     payload["uuid"]  = my_globals.settings["uuid"]      # add uuid
     payload["token"] = my_globals.settings["token"]     # add token

@@ -86,7 +86,7 @@ def initialize():
         print ("Using Domain: %s" % str(my_globals.DOMAIN[DOMAIN_INDEX]))
         my_globals.settings["server_reg_addr"]    = my_globals.DOMAIN[DOMAIN_INDEX] + "api/register"
         my_globals.settings["server_status_addr"] = my_globals.DOMAIN[DOMAIN_INDEX] + "api/update"
-        my_globals.settings["server_update_addr"] = my_globals.DOMAIN[DOMAIN_INDEX] + "api/update"
+        my_globals.settings["server_sensor_addr"] = my_globals.DOMAIN[DOMAIN_INDEX] + "api/sensor"
         my_globals.settings["server_img_addr"]    = my_globals.DOMAIN[DOMAIN_INDEX] + "api/image"
     else:
         print ("Error invalid domain index. Exiting")

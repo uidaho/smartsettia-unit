@@ -20,11 +20,9 @@ sensor_dat =    {"capture_time":"YYYY-MM-DD HH:MM:SS",
                 "light_out":-1,                     # ambiant light sensor outside
                 "limitsw_open": 0,                  # limit switch on open side
                 "limitsw_close":-1,                 # limit switch on close side
-                "cpu_temp":-1,                      # pi system temperature
+                "cpu":-1,                           # pi system temperature
                 "temperature":-1,
                 "humidity":-1,
-                "hygrometer_count":0,               # The number of Hygrometers attached
-                                    # sublist of dynamic hygrometers?
                 }
 
 # possible cover_statuses
@@ -44,7 +42,7 @@ settings =      {"name":"UnNamed",                          # Name of Device
                 "mac_address":"00:00:00:00:00:00",          # MAC address
                 "server_reg_addr":    DOMAIN[DOMAIN_INDEX] + "api/register",
                 "server_status_addr": DOMAIN[DOMAIN_INDEX] + "api/update",
-                "server_update_addr": DOMAIN[DOMAIN_INDEX] + "api/update",
+                "server_sensor_addr": DOMAIN[DOMAIN_INDEX] + "api/sensor",
                 "server_img_addr":    DOMAIN[DOMAIN_INDEX] + "api/image",
                 "job_cover_monitor":1,                      # cover monitor run rate
                 "job_save_settings":60,                     # save settings to file
