@@ -146,15 +146,14 @@ def fsm_opening():
         print ("\tRelay -time is: %0.1f,\t wait time: %0.1f" % (time.time(), wait_time))
         fsm_transition_state = "ts1:RelayWait"
     
-    elif fsm_transition_state == "ts1:RelayWait":     # wait - relay on
-        if (time.time() >= wait_time):  # if we exceded our wait time
-            set_Relay("off")                         # turn off relay
-            fsm_transition_state = "ts3:MovingTest"    # go to next transition state
-            if (my_globals.NOT_PI == True):     # this is NOT a pi and NOT usng gpio. GPIO disabled
-                sw00()         # DEBUGGER REMOVE LATER
-            # test switches or let next state do that?
+    elif fsm_transition_state == "ts1:RelayWait":     # wait - relay off
+        if (time.time() >= wait_time):                # if we exceded our wait time
+            set_Relay("off")                          # turn off relay
+            fsm_transition_state = "ts3:MovingTest"   # go to next transition state
+            if (my_globals.NOT_PI == True):           # GPIO disabled
+                sw00()         # DEBUGGER Simulate 0,0 switches
         
-   # test if cover is actually moving
+    # test if cover is actually moving
     elif fsm_transition_state == "ts3:MovingTest":
         if (ls_open == 0 and ls_close == 0):
             wait_time = time.time() + COVER_WAIT  # waiting x seconds
@@ -162,6 +161,7 @@ def fsm_opening():
             fsm_transition_state = "ts4:Moving"           # test pass. its moving
         else: 
             my_globals.status["error_msg"] = "Cover did not move"
+            print("\tError: Cover did not move. Time now is: %0.1f" % time.time())
             fsm_current_state = "error"         # send to error state
     
     # its moving. lets wait for it to finish
@@ -175,26 +175,82 @@ def fsm_opening():
         # did it somehow reverse and went back to close? dont know how
         elif (ls_open == 0 and ls_close == 1):
             my_globals.status["error_msg"] = "Cover closed itself?"
+            print("\tError: Cover closed itself")
             fsm_current_state = "error"         # send to error state
             
         # timed out
         elif (time.time() > wait_time):
             my_globals.status["error_msg"] = "Cover movement timed out. Waiting for it to resolve to open or close"
-            print("\tCover movement timed out. Waiting for it to resolve to open or close")
+            print("\tCover movement timed out at %0.1f. Waiting for it to resolve to open or close" % time.time())
             fsm_current_state = "error"         # send to error state
             
         # 0,0 and not timedout 
             # do nothing. we are waiting
         if (my_globals.NOT_PI == True):     # this is NOT a pi and NOT usng gpio. GPIO disabled
-            sw1()           # DEBUGGER REMOVE LATER
+            sw1()           # DEBUGGER  Simulate 1,0 switches
 
     
 def fsm_closing():
-    print ("Entered State: closing")
-    global ls_open, ls_close, fsm_current_state
-    fsm_current_state = "closed"
-    if (my_globals.NOT_PI == True):     # this is NOT a pi and NOT usng gpio. GPIO disabled
-        sw0()           # DEBUGGER REMOVE LATER
+    print ("Entered State: closing\tSubstate: %s" % fsm_transition_state)
+    global ls_open, ls_close, fsm_current_state, wait_time
+    global fsm_transition_state
+    
+    """ Transition states
+    ts0:RelayOn      relay on
+    ts1:RelayWait    keep relay on for set time. then turn off
+    *ts2:Null         NULL not implemented
+    ts3:MovingTest   testing if it moved
+    ts4:Moving       cover currently moving
+    """
+    
+    if fsm_transition_state == "ts0:RelayOn":       # turn relay on
+        set_Relay("on")
+        wait_time = time.time() + RELAY_WAIT  # waiting x seconds
+        print ("\tRelay -time is: %0.1f,\t wait time: %0.1f" % (time.time(), wait_time))
+        fsm_transition_state = "ts1:RelayWait"
+    
+    elif fsm_transition_state == "ts1:RelayWait":     # wait - relay off
+        if (time.time() >= wait_time):                # if we exceded our wait time
+            set_Relay("off")                          # turn off relay
+            fsm_transition_state = "ts3:MovingTest"   # go to next transition state
+            if (my_globals.NOT_PI == True):           # GPIO disabled
+                sw00()         # DEBUGGER Simulate 0,0 switches
+        
+    # test if cover is actually moving
+    elif fsm_transition_state == "ts3:MovingTest":
+        if (ls_open == 0 and ls_close == 0):
+            wait_time = time.time() + COVER_WAIT  # waiting x seconds
+            print ("\tCover -time is: %0.1f,\t timout time: %0.1f" % (time.time(), wait_time))
+            fsm_transition_state = "ts4:Moving"           # test pass. its moving
+        else: 
+            my_globals.status["error_msg"] = "Cover did not move"
+            print("\tError: Cover did not move. Time now is: %0.1f" % time.time())
+            fsm_current_state = "error"         # send to error state
+    
+    # its moving. lets wait for it to finish
+    elif fsm_transition_state == "ts4:Moving":
+        # did it finish and close?
+        if (ls_open == 1 and ls_close == 0):
+            # success
+            print("\tClosing finished")
+            fsm_current_state = "close"          # send to open state
+            
+        # did it somehow reverse and went back to close? dont know how
+        elif (ls_open == 1 and ls_close == 0):
+            my_globals.status["error_msg"] = "Cover opened itself?"
+            print("\tError: Cover opened itself")
+            fsm_current_state = "error"         # send to error state
+            
+        # timed out
+        elif (time.time() > wait_time):
+            my_globals.status["error_msg"] = "Cover movement timed out. Waiting for it to resolve to open or close"
+            print("\tCover movement timed out at %0.1f. Waiting for it to resolve to open or close" % time.time())
+            fsm_current_state = "error"         # send to error state
+            
+        # 0,0 and not timedout 
+            # do nothing. we are waiting
+        if (my_globals.NOT_PI == True):     # this is NOT a pi and NOT usng gpio. GPIO disabled
+            sw0()           # DEBUGGER  Simulate 0,1 switches
     
 def fsm_locked():
     print ("Entered State: locked")
