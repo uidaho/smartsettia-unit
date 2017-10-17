@@ -4,7 +4,7 @@
 # gpio cheatsheet:    http://raspi.tv/download/RPi.GPIO-Cheat-Sheet.pdf
 # gpio callbacks:     https://makezine.com/projects/tutorial-raspberry-pi-gpio-pins-and-python/
 import my_globals
-from my_globals import sensor_dat
+from my_globals import sensor_data
 import time
 
 # Import gpio
@@ -64,7 +64,7 @@ def fsm():
     print ( "fsm - Current state %s" % fsm_current_state)
     global ls_open, ls_close, server
     getSwitches()
-    print ("\tCurrent sensors open/close (%d,%d)"% (sensor_dat["limitsw_open"], sensor_dat["limitsw_close"]))
+    print ("\tCurrent sensors open/close (%d,%d)"% (ls_open, ls_close)) #(sensor_data["limitsw_open"], sensor_data["limitsw_close"]))
     server = my_globals.status['server_command']
     print ("\tCurrent server command: ", server)
     if fsm_current_state == "error":
@@ -83,8 +83,8 @@ def fsm():
         print ("ERROR: Unknown state.")
     
     # update global variables with current limit switches
-    sensor_dat["limitsw_open"]  = ls_open
-    sensor_dat["limitsw_close"] = ls_close
+    # sensor_data["limitsw_open"]  = ls_open
+    # sensor_data["limitsw_close"] = ls_close
     my_globals.status["cover_status"] = fsm_current_state
     print ( "fsm - Next state %s" % fsm_current_state)
     print ("--------------------------------------")

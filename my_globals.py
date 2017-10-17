@@ -15,7 +15,7 @@ DOMAIN =    ["https://smartsettia.com/",
 # set by arguments to disable GPIO
 NOT_PI = False
 
-sensor_dat =    {"capture_time":"YYYY-MM-DD HH:MM:SS",
+sensor_dat_old ={"capture_time":"YYYY-MM-DD HH:MM:SS",
                 "light_in":-1,                      # ambiant light sensor inside
                 "light_out":-1,                     # ambiant light sensor outside
                 "limitsw_open": 0,                  # limit switch on open side
@@ -24,6 +24,16 @@ sensor_dat =    {"capture_time":"YYYY-MM-DD HH:MM:SS",
                 "temperature":-1,
                 "humidity":-1,
                 }
+sensor_data = {}    # declare variable. Done as dictionary so that this can be imported with dic.update()            
+sensor_data["sensor_data"] = [
+            { "name": "cpu",         "type": "cpu_temperature", "value": "0.00" },  # pi system temperature
+            { "name": "light_in",    "type": "light",           "value": "0.00" },  # ambiant light sensor inside
+            { "name": "light_out",   "type": "light",           "value": "0.00" },  # ambiant light sensor outside
+            { "name": "temperature", "type": "temperature",     "value": "0.00" },
+            { "name": "humidity",    "type": "humidity",        "value": "0.00" }
+#           { "name": "moisture_01", "type": "moisture",        "value": "0.00" },
+#           { "name": "moisture_02", "type": "moisture",        "value": "0.00" }
+            ]
 
 # possible cover_statuses
 # cover_status = { open, close, opening, closing, locked, error }

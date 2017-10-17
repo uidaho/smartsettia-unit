@@ -62,11 +62,11 @@ def job_webcam():
     remote_comm.pic_upload()
 
 schedule.every(20).seconds.do(job_heartbeat)
-schedule.every(60).seconds.do(job_save_settings)
-schedule.every(5).seconds.do(job_sensors)
-schedule.every(3).seconds.do(job_webcam)
-schedule.every(2).seconds.do(job_upload_status)
-schedule.every(1).seconds.do(job_cover_monitor)
+#schedule.every(60).seconds.do(job_save_settings)
+schedule.every(3).seconds.do(job_sensors)
+#schedule.every(3).seconds.do(job_webcam)
+#schedule.every(2).seconds.do(job_upload_status)
+#schedule.every(1).seconds.do(job_cover_monitor)
 #webserver
 
 

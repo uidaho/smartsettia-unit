@@ -99,7 +99,7 @@ def sensor_upload():
     payload = {}                             # initialize variable
     payload["uuid"]  = my_globals.settings["uuid"]      # add uuid
     payload["token"] = my_globals.settings["token"]     # add token
-    payload.update(my_globals.sensor_dat)      # add in sensor_dat dictionary
+    payload.update(my_globals.sensor_data)      # add in sensor_dat dictionary
 
     # this should be removed when status is separated server side
     # or.. it could stay. TODO needs discusion
