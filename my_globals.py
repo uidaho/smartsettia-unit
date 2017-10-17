@@ -38,6 +38,7 @@ status =        {"cover_status": "closed",
 settings =      {"name":"UnNamed",                          # Name of Device
                 "uuid": "NOT_SET0-0000-0000-0000-000000000000",   # UUID V1
                 "token": "none",      # post token key
+                "id": -1,                                   # ID no. of the device
                 "challenge": "temppass",                    # challenge
                 "mac_address":"00:00:00:00:00:00",          # MAC address
                 "server_reg_addr":    DOMAIN[DOMAIN_INDEX] + "api/register",
