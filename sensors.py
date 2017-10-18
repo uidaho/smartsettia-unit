@@ -11,12 +11,13 @@ sim_cpuTemp = 35      # needs to be global to simulate Sensors
 # update all sensor values
 def update():
     #my_globals.sensor_data["temperature"]    = get_Temp_Hum() 
-    my_globals.sensor_data["sensor_data"][3]["value"]    = get_Temp_Hum()
-    print("tempsensor: ", my_globals.sensor_data["sensor_data"][0])
-    my_globals.sensor_data["sensor_data"][1]["value"] = get_light()
-    my_globals.sensor_data["sensor_data"][2]["value"] = get_light()  # TODO add light inner
+    my_globals.sensor_data["sensor_data"][3]["value"]    = str(get_Temp_Hum())
+    print("Tempsensor [3]: ", my_globals.sensor_data["sensor_data"][3])
+    my_globals.sensor_data["sensor_data"][1]["value"] = str(get_light())
+    my_globals.sensor_data["sensor_data"][2]["value"] = str(get_light())  # TODO add light inner
     #my_globals.sensor_dat["cpu_temp"] = get_cpu_temp()
-    my_globals.sensor_data["sensor_data"][4]["value"]    = get_cpu_temp()
+    my_globals.sensor_data["sensor_data"][4]["value"]    = str(get_cpu_temp())
+    print ("Temp: %d\tCpu Temp: %d\tLight: %d" % (get_Temp_Hum(), get_cpu_temp(), get_light()))
 
 # get temperature and humidity from sensor
 def get_Temp_Hum():

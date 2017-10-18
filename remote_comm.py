@@ -106,10 +106,9 @@ def sensor_upload():
     payload.update(my_globals.status)          # add in status dictionary
 
     # Debugging Code
-    #print ("Data is: ", payload)              # debugger
     #print (payload.items())                   # debugger
-    #print (url)                               # debugger
-    #print ("json dmp: ", json.dumps(payload)) # debugger
+    print (url)                               # debugger
+    print ("json dmp: ", json.dumps(payload)) # debugger
     #print ("headers: ", headers)              # debugger
     print_log("remote:sensor_upload", url, show_logging)
     #print ("-------------")
