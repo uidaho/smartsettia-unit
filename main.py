@@ -15,12 +15,15 @@ parser = argparse.ArgumentParser()
 parser.add_argument('-s',  '--single',     action='store_true', help='Runs the program loop only once')
 parser.add_argument('-fw', '--fakewebcam', action='store_true', help='Use Fake webcam')
 parser.add_argument('-d',   type=int,      action='store',      help='Specify Domain. 0 prod, 1 brandon c9, 2 nick c9. Default 0', default="0")
+parser.add_argument('-cd',  type=str,      action='store',      help='Specify custom Domain. This overrides all other domain settings', default=None)
 parser.add_argument('-npi', '--notpi',     action='store_true', help='Run as if this was not a raspberry pi. Disables GPIO reading', default="False")
 args = parser.parse_args() # parse args
 my_globals.NOT_PI = args.notpi
 DOMAIN_INDEX = args.d
+DOMAIN_CUSTOM = args.cd
 SINGLE_RUN = args.single
 FAKEWEBCAM = args.fakewebcam     # enable or disable fake webcam
+print ("cust domain: ", args.cd)
 
 from cover import fsm, gpio_cleanup   # cover monitor module. Must be imported after NOT_PI has been set
 import sensors     #sensors.py
@@ -81,24 +84,24 @@ def initialize():
         print("Not Pi flag set. GPIO is disabled.")
     
     # Validate args.d (domain index) with possible domain indexes
-    if (DOMAIN_INDEX >= 0 and DOMAIN_INDEX < len(my_globals.DOMAIN)):
-        # print (str(args.d) + " " + str(len(my_globals.DOMAIN)))   # debugger
-        print ("Using Domain: %s" % str(my_globals.DOMAIN[DOMAIN_INDEX]))
-        my_globals.settings["server_reg_addr"]    = my_globals.DOMAIN[DOMAIN_INDEX] + "api/register"
-        my_globals.settings["server_status_addr"] = my_globals.DOMAIN[DOMAIN_INDEX] + "api/update"
-        my_globals.settings["server_update_addr"] = my_globals.DOMAIN[DOMAIN_INDEX] + "api/update"
-        my_globals.settings["server_img_addr"]    = my_globals.DOMAIN[DOMAIN_INDEX] + "api/image"
+    if (DOMAIN_INDEX >= 0 and DOMAIN_INDEX < len(my_globals.DOMAIN) and DOMAIN_CUSTOM == None):
+        my_globals.update_url(my_globals.DOMAIN[DOMAIN_INDEX])
+    elif (DOMAIN_CUSTOM != None):
+        print("Using custom domain. Overriding url settings.")
+        my_globals.update_url(DOMAIN_CUSTOM)
     else:
         print ("Error invalid domain index. Exiting")
         print ("To specify domain use '-d' <index>. from 0 to %d. For more info use '--help'" % (len(my_globals.DOMAIN)-1))
         exit()
-        
+    
     # check if /mnt/ramdisk exists else fallback to tmp directory
     if path.isdir(my_globals.settings["img_dir"]) == 0:   # if path to directory exists
         print ("Ramdisk does not exist. Using /tmp/")
         # This is undesirable for sdcard wear and writing speed compared to a ramdisk
         my_globals.settings["img_dir"] = "/tmp/"
+    
     remote_comm.register()          # register device with webserver
+    
     # run the cover montitor a few times to let it syncronize
     job_cover_monitor()
     job_cover_monitor()
