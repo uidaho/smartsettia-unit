@@ -22,6 +22,10 @@ def status_update():
     payload["uuid"]  = my_globals.settings["uuid"]      # add uuid
     payload["token"] = my_globals.settings["token"]     # add token
     payload.update(my_globals.status)        # add in status dictionary
+    
+    if ("server_command" in payload):
+       # print ("server_command exists and was sent. removing")
+        del payload["server_command"]
 
     # Debugging Code
     print ("Data is: ", payload)              # debugger
@@ -53,6 +57,14 @@ def status_update():
 
         # parse returned data if successful post
         if req.status_code == 201:
+            # clear error_msg
+            my_globals.status["error_msg"] = None
+            
+            # remove server_command from status if exists
+            if ("server_command" in my_globals.status):
+                #print ("server_command exists and was sent. removing")
+                del my_globals.status["server_command"]
+                
             try:  # parse returned datea
                 rtndata = req.json()
                 #print "rtndata: ", rtndata     # debugger
