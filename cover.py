@@ -64,7 +64,8 @@ def fsm():
     print ( "fsm - Current state %s" % fsm_current_state)
     global ls_open, ls_close, server
     getSwitches()
-    print ("\tCurrent sensors open/close (%d,%d)"% (ls_open, ls_close)) #(sensor_data["limitsw_open"], sensor_data["limitsw_close"]))
+    print ("\tCurrent sensors open/closed (%d,%d)"% (ls_open, ls_close)) #(sensor_data["limitsw_open"], sensor_data["limitsw_close"]))
+
     server = my_globals.status['server_command']
     print ("\tCurrent server command: ", server)
     if fsm_current_state == "error":
@@ -150,8 +151,6 @@ def fsm_opening():
         if (time.time() >= wait_time):                # if we exceded our wait time
             set_Relay("off")                          # turn off relay
             fsm_transition_state = "ts3:MovingTest"   # go to next transition state
-            if (my_globals.NOT_PI == True):           # GPIO disabled
-                sw00()         # DEBUGGER Simulate 0,0 switches
         
     # test if cover is actually moving
     elif fsm_transition_state == "ts3:MovingTest":
@@ -186,8 +185,6 @@ def fsm_opening():
             
         # 0,0 and not timedout 
             # do nothing. we are waiting
-        if (my_globals.NOT_PI == True):     # this is NOT a pi and NOT usng gpio. GPIO disabled
-            sw1()           # DEBUGGER  Simulate 1,0 switches
 
     
 def fsm_closing():
@@ -213,8 +210,6 @@ def fsm_closing():
         if (time.time() >= wait_time):                # if we exceded our wait time
             set_Relay("off")                          # turn off relay
             fsm_transition_state = "ts3:MovingTest"   # go to next transition state
-            if (my_globals.NOT_PI == True):           # GPIO disabled
-                sw00()         # DEBUGGER Simulate 0,0 switches
         
     # test if cover is actually moving
     elif fsm_transition_state == "ts3:MovingTest":
@@ -230,10 +225,10 @@ def fsm_closing():
     # its moving. lets wait for it to finish
     elif fsm_transition_state == "ts4:Moving":
         # did it finish and close?
-        if (ls_open == 1 and ls_close == 0):
+        if (ls_open == 0 and ls_close == 1):
             # success
             print("\tClosing finished")
-            fsm_current_state = "close"          # send to open state
+            fsm_current_state = "closed"          # send to open state
             
         # did it somehow reverse and went back to close? dont know how
         elif (ls_open == 1 and ls_close == 0):
@@ -249,8 +244,6 @@ def fsm_closing():
             
         # 0,0 and not timedout 
             # do nothing. we are waiting
-        if (my_globals.NOT_PI == True):     # this is NOT a pi and NOT usng gpio. GPIO disabled
-            sw0()           # DEBUGGER  Simulate 0,1 switches
     
 def fsm_locked():
     print ("Entered State: locked")
@@ -264,12 +257,8 @@ def fsm_error():
     global ls_open, ls_close, fsm_current_state
     if  (ls_open == 1 and ls_close == 0):
         fsm_current_state = "open"
-        if (my_globals.NOT_PI == True):     # this is NOT a pi and NOT usng gpio. GPIO disabled
-            sw1()           # DEBUGGER REMOVE LATER
     elif (ls_open == 0 and ls_close == 1):
         fsm_current_state = "closed"
-        if (my_globals.NOT_PI == True):     # this is NOT a pi and NOT usng gpio. GPIO disabled
-            sw0()           # DEBUGGER REMOVE LATER
     elif (ls_open == 0 and ls_close == 0):
         fsm_current_state = "error"
     else:
@@ -299,8 +288,36 @@ def getSwitches():
     print ("Reading limit switches")
     global ls_open, ls_close
     if (my_globals.NOT_PI == True):     # this is NOT a pi and NOT usng gpio
-        ls_open  = 0 # setting these to 0 will land the state machine in error mode
-        ls_close = 1
+        # Simulate switches based on current state
+        print ("\t## Simulating switches")
+        """
+        ts0:RelayOn      relay on
+        ts1:RelayWait    keep relay on for set time. then turn off
+        *ts2:Null         NULL not implemented
+        ts3:MovingTest   testing if it moved
+        ts4:Moving       cover currently moving
+        """
+        if (fsm_current_state == "open"):       # the open switch should be active
+            ls_open  = 1
+            ls_close = 0
+        elif (fsm_current_state == "closed"):    # the close switch should be active
+            ls_open  = 0
+            ls_close = 1
+        elif (fsm_current_state == "error"):  # resolve to open when in error state
+            ls_open  = 1
+            ls_close = 0
+        elif (fsm_current_state == "opening" or fsm_current_state == "closing"): # in transition states
+            if (fsm_transition_state == "ts1:RelayWait"):   # relay activates motor which puts the cover in between the switches
+                ls_open  = 0
+                ls_close = 0
+            if (fsm_transition_state == "ts4:Moving"):      # Done moving and hits its termination state
+                if (fsm_current_state == "opening"):        # open state
+                    ls_open  = 1
+                    ls_close = 0
+                else:                                       # closed state
+                    ls_open  = 0
+                    ls_close = 1
+        
     else: 
         try:
             ls_open = not GPIO.input(pin_ls_open)
@@ -309,52 +326,6 @@ def getSwitches():
         except Exception as e:
             print ("\tError reading limit switch pins:", e)
         
-        
-    
-# debugging function set to open
-def sw1():
-    print ("Reading limit switches")
-    global ls_open, ls_close
-    ls_open  = 1
-    ls_close = 0
-    
-# debugging function set to close
-def sw0():
-    print ("Reading limit switches")
-    global ls_open, ls_close
-    ls_open  = 0
-    ls_close = 1
-    
-# debugging function set to close
-def sw00():
-    print ("Reading limit switches")
-    global ls_open, ls_close
-    ls_open  = 0
-    ls_close = 0
-    
-
-if False:
-    # Testing Code
-    fsm()
-    fsm()
-    fsm()
-    print ("server open")
-    my_globals.status['server_command'] = "open"
-    fsm()
-    fsm()
-    time.sleep(0.1)
-    fsm()
-    time.sleep(0.1)
-    fsm()
-    time.sleep(0.1)
-    fsm()
-    time.sleep(0.1)
-    fsm()
-    time.sleep(0.1)
-    fsm()
-    time.sleep(0.1)
-    fsm()
-    
 
 # This will reset gpios back to what they were before the script started.
 # The problem is that this program exits by interruping it and so this will never get called

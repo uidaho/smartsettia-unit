@@ -1,6 +1,6 @@
 # This file contains the global variables used in smartsettia
 import json
-version= "0.1.0"
+version= "0.2.0"
 
 # Note to concatonate dictionaries
 # z = x.copy()
@@ -11,7 +11,7 @@ DOMAIN_INDEX = 2    # choose which domain. 0-2
 DOMAIN =    ["https://smartsettia.com/",
             "https://smartsettia-backburn.c9users.io/",
             "https://smartsettia-nkrenowicz.c9users.io/"]
-      
+
 # set by arguments to disable GPIO
 NOT_PI = False
 
@@ -81,7 +81,6 @@ def save_settings():
         print ("Save settings error ", e)
 
 
-
 def load_settings():
     print ("Loading settings")
     global settings
@@ -101,12 +100,27 @@ def load_settings():
             settings = temp     # set settings to loaded values
 
             # override loaded url's to match DOMAIN_INDEX
-            # loaded settings is screwing up server comm when switching DoMAIN_INDEX
-            settings["server_reg_addr"]    = DOMAIN[DOMAIN_INDEX] + "api/register"
-            settings["server_status_addr"] = DOMAIN[DOMAIN_INDEX] + "api/update"
-            settings["server_update_addr"] = DOMAIN[DOMAIN_INDEX] + "api/update"
-            settings["server_img_addr"]    = DOMAIN[DOMAIN_INDEX] + "api/image"
+            update_url(DOMAIN[DOMAIN_INDEX])
 
         else:
             print ("\tUUID does not mach loaded settings - discarding")
             print ("\tUsing default settings")
+
+
+def update_url(domain):
+    global settings
+    
+    # ending '/' test. Add if missing
+    mlen = len(domain) - 1
+    if (domain[mlen] != '/'):
+        domain = domain + '/'
+    
+    print ("Using domain %s" % domain)
+    settings["server_reg_addr"]    = domain + "api/register"
+    settings["server_status_addr"] = domain + "api/update"
+    settings["server_update_addr"] = domain + "api/update"
+    settings["server_img_addr"]    = domain + "api/image"
+    print ("\tURL register: %s" % settings["server_reg_addr"])
+    print ("\tURL status:   %s" % settings["server_status_addr"])
+    print ("\tURL sensors:  %s" % settings["server_update_addr"])
+    print ("\tURL image:    %s" % settings["server_img_addr"])
