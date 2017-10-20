@@ -23,7 +23,6 @@ DOMAIN_INDEX = args.d
 DOMAIN_CUSTOM = args.cd
 SINGLE_RUN = args.single
 FAKEWEBCAM = args.fakewebcam     # enable or disable fake webcam
-print ("cust domain: ", args.cd)
 
 from cover import fsm, gpio_cleanup   # cover monitor module. Must be imported after NOT_PI has been set
 import sensors     #sensors.py
@@ -70,7 +69,6 @@ schedule.every(5).seconds.do(job_sensors)
 schedule.every(3).seconds.do(job_webcam)
 schedule.every(2).seconds.do(job_upload_status)
 schedule.every(1).seconds.do(job_cover_monitor)
-#webserver
 
 
 #function Deff
