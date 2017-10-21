@@ -15,15 +15,6 @@ DOMAIN =    ["https://smartsettia.com/",
 # set by arguments to disable GPIO
 NOT_PI = False
 
-sensor_dat_old ={"capture_time":"YYYY-MM-DD HH:MM:SS",
-                "light_in":-1,                      # ambiant light sensor inside
-                "light_out":-1,                     # ambiant light sensor outside
-                "limitsw_open": 0,                  # limit switch on open side
-                "limitsw_close":-1,                 # limit switch on close side
-                "cpu":-1,                           # pi system temperature
-                "temperature":-1,
-                "humidity":-1,
-                }
 sensor_data = {}    # declare variable. Done as dictionary so that this can be imported with dic.update()            
 sensor_data["sensor_data"] = [
             { "name": "cpu",         "type": "cpu_temperature", "value": "0.00" },  # pi system temperature
@@ -118,7 +109,7 @@ def update_url(domain):
     print ("Using domain %s" % domain)
     settings["server_reg_addr"]    = domain + "api/register"
     settings["server_status_addr"] = domain + "api/update"
-    settings["server_update_addr"] = domain + "api/update"
+    settings["server_sensor_addr"] = domain + "api/sensor"
     settings["server_img_addr"]    = domain + "api/image"
     print ("\tURL register: %s" % settings["server_reg_addr"])
     print ("\tURL status:   %s" % settings["server_status_addr"])
