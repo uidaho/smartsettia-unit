@@ -113,5 +113,5 @@ def update_url(domain):
     settings["server_img_addr"]    = domain + "api/image"
     print ("\tURL register: %s" % settings["server_reg_addr"])
     print ("\tURL status:   %s" % settings["server_status_addr"])
-    print ("\tURL sensors:  %s" % settings["server_update_addr"])
+    print ("\tURL sensors:  %s" % settings["server_sensor_addr"])
     print ("\tURL image:    %s" % settings["server_img_addr"])
