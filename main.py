@@ -7,7 +7,7 @@ import webcam      # webcam module
 import my_globals  # global variables
 import remote_comm # server communication module
 import argparse    # argument parsing
-from helper_lib import print_error, print_log, generate_uuid
+from helper_lib import print_error, print_log, generate_uuid, is_valid_uuid
 
 
 # https://stackoverflow.com/a/30493366
@@ -17,12 +17,14 @@ parser.add_argument('-fw', '--fakewebcam', action='store_true', help='Use Fake w
 parser.add_argument('-d',   type=int,      action='store',      help='Specify Domain. 0 prod, 1 brandon c9, 2 nick c9. Default 0', default="0")
 parser.add_argument('-cd',  type=str,      action='store',      help='Specify custom Domain. This overrides all other domain settings', default=None)
 parser.add_argument('-npi', '--notpi',     action='store_true', help='Run as if this was not a raspberry pi. Disables GPIO reading', default="False")
+parser.add_argument('-u', '--uuid',     action='store', help='Use supplied UUID5 instead of generated uuid', default=None)
 args = parser.parse_args() # parse args
 my_globals.NOT_PI = args.notpi
 DOMAIN_INDEX = args.d
 DOMAIN_CUSTOM = args.cd
 SINGLE_RUN = args.single
 FAKEWEBCAM = args.fakewebcam     # enable or disable fake webcam
+UUID_CUSTOM = args.uuid          # custome uuid
 
 from cover import fsm, gpio_cleanup   # cover monitor module. Must be imported after NOT_PI has been set
 import sensors     #sensors.py
@@ -74,7 +76,19 @@ schedule.every(1).seconds.do(job_cover_monitor)
 #function Deff
 
 def initialize():
-    generate_uuid()                 # generate uuid from hardware
+    # Test if using a custom uuid and validate it. else use hardware uuid
+    if (UUID_CUSTOM == None):
+        generate_uuid()                 # generate uuid from hardware
+    else:
+        if is_valid_uuid(UUID_CUSTOM):
+            print ("Custom UUID is: %s" % UUID_CUSTOM)
+            my_globals.settings["uuid"] = UUID_CUSTOM
+        else:
+            print ("Invalid Custom UUID: %r" % str(UUID_CUSTOM))
+            print ("          Format is: 'xxxxxxxx-xxxx-4xxx-xxxx-xxxxxxxxxxxx'")
+            print ("Exiting")
+            exit()
+    
     my_globals.load_settings()      # load settings from file
     
     print ("Using fake webcam: ", FAKEWEBCAM)

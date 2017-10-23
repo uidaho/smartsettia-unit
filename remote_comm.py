@@ -171,6 +171,7 @@ def register():
     #print ("Data is: ", payload)              # debugger
 
     print ("URL:  ", url)                      # debugger
+    print ("UUID: ", payload["uuid"])
     #print ("json dmp: ", json.dumps(payload)) # debugger
     #print ("headers: ", headers)
     print_log("remote:register", url, show_logging)
