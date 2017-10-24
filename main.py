@@ -106,6 +106,7 @@ def initialize():
 
 #Program start
 print ("\nWelcome to Smartsettia!")
+print ("Version: %s" % my_globals.version)
 initialize()
 
 # if single run run everything once
