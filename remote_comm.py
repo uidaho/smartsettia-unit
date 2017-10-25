@@ -113,10 +113,6 @@ def sensor_upload():
     payload["token"] = my_globals.settings["token"]     # add token
     payload.update(my_globals.sensor_data)      # add in sensor_dat dictionary
 
-    # this should be removed when status is separated server side
-    # or.. it could stay. TODO needs discusion
-    payload.update(my_globals.status)          # add in status dictionary
-
     # Debugging Code
     #print (payload.items())                   # debugger
     print (url)                               # debugger
