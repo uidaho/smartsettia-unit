@@ -28,7 +28,10 @@ def status_update():
         del payload["server_command"]
 
     # Debugging Code
-    print ("Data is: ", payload)              # debugger
+    #print ("Data is: ", payload)              # debugger
+    print ("Device ID: %d" % my_globals.settings["id"])    # because I'm tired of scrolling up to registration output for id
+    print ("\tCover status:  %s" % payload["cover_status"])
+    print ("\tError message: %r" % payload["error_msg"])
     #print (payload.items())                   # debugger
     #print (url)                               # debugger
     #print ("json dmp: ", json.dumps(payload)) # debugger
@@ -76,10 +79,10 @@ def status_update():
                 new_cover_time_close = datetime.strptime(rtndata["data"]["close_time"], '%H:%M').time()
                 # test if values changed
                 if (new_cover_time_open != settings['cover_time_open']):
-                    print ("Cover time open changed to %s." % new_cover_time_open)
+                    print ("\tCover time open changed to %s." % new_cover_time_open)
                     settings['cover_time_open']  = new_cover_time_open
                 if (new_cover_time_close != settings['cover_time_close']):
-                    print ("Cover time close changed to %s." % new_cover_time_close)
+                    print ("\tCover time close changed to %s." % new_cover_time_close)
                     settings['cover_time_close'] = new_cover_time_close
                 print ("open %s\tclose %s" % (settings['cover_time_open'], settings['cover_time_close']))
 
@@ -104,21 +107,16 @@ def sensor_upload():
     print ("\n--- Uploading Sensor Data-------------")
     global headers
     # setup the data
-    url = my_globals.settings["server_update_addr"]
+    url = my_globals.settings["server_sensor_addr"]
     payload = {}                             # initialize variable
     payload["uuid"]  = my_globals.settings["uuid"]      # add uuid
     payload["token"] = my_globals.settings["token"]     # add token
-    payload.update(my_globals.sensor_dat)      # add in sensor_dat dictionary
-
-    # this should be removed when status is separated server side
-    # or.. it could stay. TODO needs discusion
-    payload.update(my_globals.status)          # add in status dictionary
+    payload.update(my_globals.sensor_data)      # add in sensor_dat dictionary
 
     # Debugging Code
-    #print ("Data is: ", payload)              # debugger
     #print (payload.items())                   # debugger
-    #print (url)                               # debugger
-    #print ("json dmp: ", json.dumps(payload)) # debugger
+    print (url)                               # debugger
+    print ("json dmp: ", json.dumps(payload)) # debugger
     #print ("headers: ", headers)              # debugger
     print_log("remote:sensor_upload", url, show_logging)
     #print ("-------------")
@@ -206,6 +204,7 @@ def register():
             print ("Name:  ", rtndata2["name"])
             my_globals.settings["name"] = rtndata2["name"]  # set token to response token
             print ("ID:    ", rtndata2["id"])
+            my_globals.settings["id"] = rtndata2["id"]
 
         except Exception as e:
             print ("remote_comm:register:Error converting json")

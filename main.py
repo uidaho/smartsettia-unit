@@ -49,7 +49,6 @@ def job_cover_monitor():
 def job_sensors():
     print("Getting Sensors..")
     sensors.update()
-    print ("\ttemp: %d, cpu_temp: %d" %(my_globals.sensor_dat["temperature"], my_globals.sensor_dat["cpu_temp"]))
     remote_comm.sensor_upload()
 
 # send status to server
@@ -121,6 +120,7 @@ def initialize():
 
 #Program start
 print ("\nWelcome to Smartsettia!")
+print ("Version: %s" % my_globals.version)
 initialize()
 
 # if single run run everything once

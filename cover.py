@@ -4,7 +4,7 @@
 # gpio cheatsheet:    http://raspi.tv/download/RPi.GPIO-Cheat-Sheet.pdf
 # gpio callbacks:     https://makezine.com/projects/tutorial-raspberry-pi-gpio-pins-and-python/
 import my_globals
-from my_globals import sensor_dat
+from my_globals import sensor_data
 import time
 
 # Import gpio
@@ -61,10 +61,11 @@ ls_close = 0
 # Top most Finite State Machine function
 # Determins what is the active state and calls that function
 def fsm():
-    print ( "fsm - Current state %s" % fsm_current_state)
+    print ( "Cover monitor - Current state %s" % fsm_current_state)
     global ls_open, ls_close, server
     getSwitches()
-    print ("\tCurrent sensors open/closed (%d,%d)"% (sensor_dat["limitsw_open"], sensor_dat["limitsw_close"]))
+    print ("\tCurrent sensors open/closed (%d,%d)"% (ls_open, ls_close)) #(sensor_data["limitsw_open"], sensor_data["limitsw_close"]))
+
     server = my_globals.status['server_command']
     print ("\tCurrent server command: ", server)
     if fsm_current_state == "error":
@@ -83,8 +84,8 @@ def fsm():
         print ("ERROR: Unknown state.")
     
     # update global variables with current limit switches
-    sensor_dat["limitsw_open"]  = ls_open
-    sensor_dat["limitsw_close"] = ls_close
+    # sensor_data["limitsw_open"]  = ls_open
+    # sensor_data["limitsw_close"] = ls_close
     my_globals.status["cover_status"] = fsm_current_state
     print ( "fsm - Next state %s" % fsm_current_state)
     print ("--------------------------------------")
@@ -93,39 +94,44 @@ def fsm_open():
     print ("Entered State: open")
     global ls_close, ls_close, fsm_current_state, fsm_transition_state
     # if not open. unexpected movement
-    print ("fsm_open:server = ", server)
     if  not (ls_open == 1 and ls_close == 0):
         my_globals.status["error_msg"] = "Unexpected Movement"
         fsm_current_state = "error"
-    # check if the we are not were we want to be
-    elif (server != fsm_current_state):
-        if (server == "close"):
-            print ("Server change event: closing")
-            fsm_transition_state = "ts0:RelayOn"       # reset
-            fsm_current_state = "closing"
-        elif (server == "lock"):
-            print ("Server change event: locked")
-            fsm_current_state = "locked"
-        else:
-            print ("Unknown server change")
+    
+    # check next state conditions
+    elif (server == "open"):
+        return                  # do nothing
+    elif (server == "close"):
+        print ("Server change event: closing")
+        fsm_transition_state = "ts0:RelayOn"       # reset
+        fsm_current_state = "closing"
+    elif (server == "lock"):
+        print ("Server change event: locked")
+        fsm_current_state = "locked"
+    else:
+        print ("Unknown server change")
             
 def fsm_close():
     print ("Entered State: closed")
     global ls_close, ls_close, fsm_current_state, fsm_transition_state
-    # if not open. unexpected movement
+    # if not closed. unexpected movement
     if  not (ls_open == 0 and ls_close == 1):
         my_globals.status["error_msg"] = "Unexpected Movement"
         fsm_current_state = "error"
-    elif (server != fsm_current_state):
-        if (server == "open"):
-            print ("Server change event: opening")
-            fsm_transition_state = "ts0:RelayOn"       # reset
-            fsm_current_state = "opening"
-        elif (server == "lock"):
-            print ("Server change event: locked")
-            fsm_current_state = "locked"
-        else:
-            print ("Unknown server change")
+
+    # check next state conditions
+    elif (server == "close"):  # server says close. i'm currently in the 'closed' state
+        return                  # do nothing
+    elif (server == "open"):
+        print ("Server change event: opening")
+        fsm_transition_state = "ts0:RelayOn"       # reset
+        fsm_current_state = "opening"
+    elif (server == "lock"):
+        print ("Server change event: locked")
+        fsm_current_state = "locked"
+    else:
+        print ("Unknown server change")
+    
             
 def fsm_opening():
     print ("Entered State: opening\tSubstate: %s" % fsm_transition_state)
