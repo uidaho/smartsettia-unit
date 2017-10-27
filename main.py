@@ -116,6 +116,7 @@ def initialize():
     # run the cover montitor a few times to let it syncronize
     job_cover_monitor()
     job_cover_monitor()
+    job_upload_status()
 
 
 #Program start

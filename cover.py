@@ -48,8 +48,7 @@ RELAY_WAIT = 3
 COVER_WAIT = 25
 
 # current status reported to the server
-current_status = "error"
-server = "error"
+server_cmd = None
 
 # local readings of limit switches
 # later copied to my_globals sensor data
@@ -62,12 +61,12 @@ ls_close = 0
 # Determins what is the active state and calls that function
 def fsm():
     print ( "Cover monitor - Current state %s" % fsm_current_state)
-    global ls_open, ls_close, server
+    global ls_open, ls_close, server_cmd
     getSwitches()
     print ("\tCurrent sensors open/closed (%d,%d)"% (ls_open, ls_close)) #(sensor_data["limitsw_open"], sensor_data["limitsw_close"]))
 
-    server = my_globals.status['server_command']
-    print ("\tCurrent server command: ", server)
+    server_cmd = my_globals.status['server_command']
+    print ("\tCurrent server command: ", server_cmd)
     if fsm_current_state == "error":
         fsm_error()
     elif (fsm_current_state == "open"):
@@ -99,13 +98,13 @@ def fsm_open():
         fsm_current_state = "error"
     
     # check next state conditions
-    elif (server == "open"):
+    elif (server_cmd == "open"):
         return                  # do nothing
-    elif (server == "close"):
+    elif (server_cmd == "close"):
         print ("Server change event: closing")
         fsm_transition_state = "ts0:RelayOn"       # reset
         fsm_current_state = "closing"
-    elif (server == "lock"):
+    elif (server_cmd == "lock"):
         print ("Server change event: locked")
         fsm_current_state = "locked"
     else:
@@ -120,13 +119,13 @@ def fsm_close():
         fsm_current_state = "error"
 
     # check next state conditions
-    elif (server == "close"):  # server says close. i'm currently in the 'closed' state
+    elif (server_cmd == "close"):  # server says close. i'm currently in the 'closed' state
         return                  # do nothing
-    elif (server == "open"):
+    elif (server_cmd == "open"):
         print ("Server change event: opening")
         fsm_transition_state = "ts0:RelayOn"       # reset
         fsm_current_state = "opening"
-    elif (server == "lock"):
+    elif (server_cmd == "lock"):
         print ("Server change event: locked")
         fsm_current_state = "locked"
     else:
@@ -253,8 +252,9 @@ def fsm_closing():
 def fsm_locked():
     print ("Entered State: locked")
     global fsm_current_state
-    if (server != "lock"):
+    if (server_cmd != "lock"):
         fsm_current_state = "error" # to resolve
+        fsm_error()                 # run immediatly to resolve state if possible before the next status update
     
 # error and resolution
 def fsm_error():
@@ -262,8 +262,12 @@ def fsm_error():
     global ls_open, ls_close, fsm_current_state
     if  (ls_open == 1 and ls_close == 0):
         fsm_current_state = "open"
+        my_globals.status["server_command"]  = "open"
+        my_globals.status["server_override"] = True  # will change server state to match
     elif (ls_open == 0 and ls_close == 1):
         fsm_current_state = "closed"
+        my_globals.status["server_command"]  = "close"
+        my_globals.status["server_override"] = True  # will change server state to match
     elif (ls_open == 0 and ls_close == 0):
         fsm_current_state = "error"
     else:

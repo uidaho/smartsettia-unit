@@ -23,9 +23,13 @@ def status_update():
     payload["token"] = my_globals.settings["token"]     # add token
     payload.update(my_globals.status)        # add in status dictionary
     
-    if ("server_command" in payload):
-       # print ("server_command exists and was sent. removing")
-        del payload["server_command"]
+    # server command, if sent, will override that variable server side
+    # server_override if true will not delete 
+    if (my_globals.status["server_override"] == True):
+        print ("Overriding server command to %s" % payload["server_command"])
+        my_globals.status["server_override"] = False   # reset back to false
+    else:
+        del payload["server_command"]       # only deleting this entry from payload. my_globals will still exist
 
     # Debugging Code
     #print ("Data is: ", payload)              # debugger

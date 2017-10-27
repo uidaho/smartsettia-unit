@@ -31,9 +31,10 @@ sensor_data["sensor_data"] = [
 
 # possible server commands
 # server_command = { open, close, lock }
-status =        {"cover_status": "closed",
-                "server_command": "close",
-                "error_msg": None
+status =        {"cover_status"   : "error",
+                "server_command"  : None,
+                "server_override" : False,      # will allow the sending of server_command back to server which will override server's state
+                "error_msg"       : None
                 }
 
 settings =      {"name":"UnNamed",                          # Name of Device
