@@ -26,7 +26,7 @@ SINGLE_RUN = args.single
 FAKEWEBCAM = args.fakewebcam     # enable or disable fake webcam
 UUID_CUSTOM = args.uuid          # custome uuid
 
-from cover import fsm, gpio_cleanup   # cover monitor module. Must be imported after NOT_PI has been set
+from cover import fsm, gpio_cleanup, cover_schedual   # cover monitor module. Must be imported after NOT_PI has been set
 import sensors     #sensors.py
 
 # multi thread support
@@ -44,6 +44,9 @@ def job_save_settings():
     
 def job_cover_monitor():
     fsm()
+    
+def job_cover_schedual():
+    cover_schedual()
 
 # Read enviroment sensors
 def job_sensors():
@@ -71,6 +74,7 @@ schedule.every(5).seconds.do(job_sensors)
 schedule.every(3).seconds.do(job_webcam)
 schedule.every(2).seconds.do(job_upload_status)
 schedule.every(1).seconds.do(job_cover_monitor)
+schedule.every(3).seconds.do(job_cover_schedual)
 
 
 #function Deff
@@ -117,6 +121,7 @@ def initialize():
     # run the cover montitor a few times to let it syncronize
     job_cover_monitor()
     job_cover_monitor()
+    job_upload_status()
 
 
 #Program start

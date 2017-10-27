@@ -54,8 +54,8 @@ settings =      {"name":"UnNamed",                          # Name of Device
                 "job_server_sensors_sec":20,                # send device sensors job
                                                             # other jobs
                 "cover_schedual_en":1,                      # auto schedule enabled
-                "cover_time_open":  "HH:MM:SS",             # open time
-                "cover_time_close": "HH:MM:SS",             # close time
+                "cover_time_open":  None,                   # open time
+                "cover_time_close": None,                   # close time
                 "img_dir": "/mnt/ramdisk/",                 # directory where picture is saved
                 "img_name": "webcam_img.jpg"
                 }

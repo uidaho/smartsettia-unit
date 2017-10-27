@@ -76,12 +76,14 @@ def status_update():
                 new_cover_time_close = datetime.strptime(rtndata["data"]["close_time"], '%H:%M').time()
                 # test if values changed
                 if (new_cover_time_open != settings['cover_time_open']):
-                    print ("Cover time open changed to %s." % new_cover_time_open)
-                    settings['cover_time_open']  = new_cover_time_open
+                    my_globals.settings['cover_time_open']  = new_cover_time_open
+                    print ("\tCover time open changed to %s." % my_globals.settings["cover_time_open"])
+                    
                 if (new_cover_time_close != settings['cover_time_close']):
-                    print ("Cover time close changed to %s." % new_cover_time_close)
-                    settings['cover_time_close'] = new_cover_time_close
-                print ("open %s\tclose %s" % (settings['cover_time_open'], settings['cover_time_close']))
+                    my_globals.settings['cover_time_close'] = new_cover_time_close
+                    print ("\tCover time close changed to %s." % my_globals.settings["cover_time_close"])
+                    
+                print ("open %s\tclose %s" % (my_globals.settings['cover_time_open'], my_globals.settings['cover_time_close']))
 
                 # update job rates
                 # do in main?
