@@ -1,8 +1,9 @@
 import time
 import platform         # test if pi for cpu temp
 import my_globals
+from subprocess import check_output
 
-FAKE_SENSORS = 1
+FAKE_SENSORS = my_globals.NOT_PI
 
 # sensor simulate
 sim_temperature = 0   # needs to be global to simulate Sensors
@@ -17,7 +18,7 @@ def update():
     my_globals.sensor_data["sensor_data"][2]["value"] = str(get_light())  # TODO add light inner
     #my_globals.sensor_dat["cpu_temp"] = get_cpu_temp()
     my_globals.sensor_data["sensor_data"][4]["value"]    = str(get_cpu_temp())
-    print ("Temp: %d\tCpu Temp: %d\tLight: %d" % (get_Temp_Hum(), get_cpu_temp(), get_light()))
+    print ("Temp: %d\tCpu Temp: %r\tLight: %d" % (get_Temp_Hum(), get_cpu_temp(), get_light()))
 
 # get temperature and humidity from sensor
 def get_Temp_Hum():
