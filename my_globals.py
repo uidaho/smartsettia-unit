@@ -1,6 +1,6 @@
 # This file contains the global variables used in smartsettia
 import json
-version= "0.2.1"
+version= "0.2.2"
 
 # Note to concatonate dictionaries
 # z = x.copy()
@@ -33,7 +33,7 @@ sensor_data["sensor_data"] = [
 # server_command = { open, close, lock }
 status =        {"cover_status": "closed",
                 "server_command": "close",
-                "error_msg": "TEST ERROR"
+                "error_msg": None
                 }
 
 settings =      {"name":"UnNamed",                          # Name of Device
@@ -53,7 +53,6 @@ settings =      {"name":"UnNamed",                          # Name of Device
                 "job_server_status_sec" :1,                 # send device status job
                 "job_server_sensors_sec":20,                # send device sensors job
                                                             # other jobs
-                "cover_schedual_en":1,                      # auto schedule enabled
                 "cover_time_open":  "HH:MM:SS",             # open time
                 "cover_time_close": "HH:MM:SS",             # close time
                 "img_dir": "/mnt/ramdisk/",                 # directory where picture is saved
