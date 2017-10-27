@@ -35,7 +35,7 @@ def get_light():
 # get raspberri pi system temp
 def get_cpu_temp():
     "Returns the CPU temerature based on architecture"
-    if FAKE_SENSORS == False and platform.machine() == "armv7l":
+    if platform.machine() == "armv7l":
         return check_output(["/opt/vc/bin/vcgencmd measure_temp | cut -c6-9"], shell=True)[:-1]
     else:                   # either faking sensors and/or no armv7l architecture detected
         global sim_cpuTemp
