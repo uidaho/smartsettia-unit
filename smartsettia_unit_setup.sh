@@ -46,7 +46,9 @@ apt -qq update
 apt install -y python3 python3-pip
 #pip install --upgrade pip
 #pip install --upgrade virtualenv
-apt install -y fswebcam
+# apt install -y fswebcam   # old webcam implementation
+apt install -y xawtv        # webcam
+apt install -y imagemagick  # Adds overlay to photos
 
 
 echo -e "\nInstalling python dependencies"
