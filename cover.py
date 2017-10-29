@@ -27,6 +27,7 @@ if (my_globals.NOT_PI != True):
     try: 
         GPIO.setmode(GPIO.BCM)
         GPIO.setup(pin_relay,    GPIO.OUT)
+        GPIO.output(pin_relay,   GPIO.LOW)  # set pin output to LOW
         GPIO.setup(pin_ls_open,  GPIO.IN, pull_up_down=GPIO.PUD_UP)
         GPIO.setup(pin_ls_close, GPIO.IN, pull_up_down=GPIO.PUD_UP)
     except Exception as e:
