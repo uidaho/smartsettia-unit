@@ -32,16 +32,11 @@ def status_update():
         del payload["server_command"]       # only deleting this entry from payload. my_globals will still exist
 
     # Debugging Code
-    #print ("Data is: ", payload)              # debugger
     print ("Device ID: %d" % my_globals.settings["id"])    # because I'm tired of scrolling up to registration output for id
     print ("\tCover status:  %s" % payload["cover_status"])
     print ("\tError message: %r" % payload["error_msg"])
-    #print (payload.items())                   # debugger
-    #print (url)                               # debugger
-    #print ("json dmp: ", json.dumps(payload)) # debugger
-    #print ("headers: ", headers)              # debugger
-    print_log("remote:status_update", url, show_logging)
-    #print ("-------------")
+    
+    #print_log("remote:status_update", url, show_logging)
 
     try:
         try:  # Send the request
@@ -104,7 +99,10 @@ def status_update():
         if req.status_code == 201:
             print ("Status Update Successful")
         else:
-            print ("status_update failed: Responce code: ", req.status_code)
+            print ("\tstatus_update failed: Responce code: ", req.status_code)
+            print ("\tURL: ", url)                      # debugger
+            print ("\tHeaders: ", headers)              # debugger
+            print ("\tjson dmp: ", json.dumps(payload)) # debugger
     except:
         print ("remote_comm:status_update:General Error")
     print ("--------------------------------------")
@@ -121,13 +119,7 @@ def sensor_upload():
     payload["token"] = my_globals.settings["token"]     # add token
     payload.update(my_globals.sensor_data)      # add in sensor_dat dictionary
 
-    # Debugging Code
-    #print (payload.items())                   # debugger
-    print (url)                               # debugger
-    print ("json dmp: ", json.dumps(payload)) # debugger
-    #print ("headers: ", headers)              # debugger
-    print_log("remote:sensor_upload", url, show_logging)
-    #print ("-------------")
+    #print_log("remote:sensor_upload", url, show_logging)
 
     try:
         try:  # Send the request
@@ -167,6 +159,10 @@ def sensor_upload():
             register()
         else:
             print ("sensor_upload failed: Responce code: ", req.status_code)
+            # Debugging Code
+            print ("\tURL: ", url)                      # debugger
+            print ("\tHeaders: ", headers)              # debugger
+            print ("\tjson dmp: ", json.dumps(payload)) # debugger
     except:
         print ("remote_comm:sensor_upload:General Error")
     print ("--------------------------------------")
@@ -180,14 +176,8 @@ def register():
     payload = {}
     payload["uuid"] = my_globals.settings["uuid"]
     payload["challenge"] = my_globals.settings["challenge"]
-    #print ("Data is: ", payload)              # debugger
 
-    print ("URL:  ", url)                      # debugger
-    print ("UUID: ", payload["uuid"])
-    #print ("json dmp: ", json.dumps(payload)) # debugger
-    #print ("headers: ", headers)
-    print_log("remote:register", url, show_logging)
-    #print "-------------"
+    #print_log("remote:register", url, show_logging)
 
     try:
         try:
@@ -208,7 +198,6 @@ def register():
             print ("remote_comm:register:Error writing to log")
             print (e)
 
-        print ("--- Registration return ---")
         print ("Response code: ", req.status_code)
         #print req.text
         try:
@@ -231,6 +220,10 @@ def register():
             print ("Registration Successful")
         else:
             print ("Registration failed: Responce code: ", req.status_code)
+            print ("\tURL:  ", url)                     # debugger
+            print ("\tUUID: ", payload["uuid"])         # debugger
+            print ("\tHeaders: ", headers)              # debugger
+            print ("\tjson dmp: ", json.dumps(payload)) # debugger
     except:
         print ("remote_comm:register:General Error")
     print ("--------------------------------------")
@@ -241,7 +234,6 @@ def pic_upload():
     print ("--- Uploading Picture ----------------")
     # first check if file exists
     image = my_globals.settings["img_dir"] + my_globals.settings["img_name"]
-    print ("Image name: ", image)
     if os.path.isfile(image) == 0:           # if path to file exists
         print ("Image does not exist. Skipping upload")
         return
@@ -255,12 +247,7 @@ def pic_upload():
     payload["token"] = ('', str(my_globals.settings["token"]))
     files= {"image": open(my_globals.settings["img_dir"] + my_globals.settings["img_name"],'rb')}
 
-    # Debugging Code
-    #print ("Data is: ", payload)              # debugger
-    #print (payload.items())                   # debugger
-    #print (url)                               # debugger
-    #print ("json dmp: ", json.dumps(payload)) # debugger
-    #print ("headers: ", headers)              # debugger
+
     print_log("remote:webcam", url, show_logging)
     #print ("-------------")
 
@@ -299,6 +286,11 @@ def pic_upload():
             print ("Webcam upload Successful")
         else:
             print ("Webcam upload failed: Responce code: ", req.status_code)
+            # Debugging Code
+            print ("\tImage name: ", image)             # debugger
+            print ("\tURL: ", url)                      # debugger
+            print ("\tHeaders: ", headers)              # debugger
+            print ("\tjson dmp: ", json.dumps(payload)) # debugger
     except:
         print ("remote_comm:webcam:General Error")
     print ("--------------------------------------")

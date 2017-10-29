@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 import time
+import datetime
 from os import path   # Used in checking webcam storage path
 import threading
 import schedule    # scheduler library
@@ -36,7 +37,7 @@ def run_threaded(job_func):
 
 # If I'm running you should see this periodically
 def job_heartbeat():
-    print("I'm working...")
+    print("I'm working. %s" % datetime.datetime.now())
 
 # Save setting to file
 def job_save_settings():
@@ -64,7 +65,7 @@ def job_webcam():
     print ("timepic: %d" % (t1-t0))      # debugger
     remote_comm.pic_upload()
 
-schedule.every(20).seconds.do(job_heartbeat)
+schedule.every(30).seconds.do(job_heartbeat)
 schedule.every(5).seconds.do(remote_comm.register)   # periodic re-register device with webserver
 schedule.every(2).seconds.do(job_upload_status)
 schedule.every(5).seconds.do(job_sensors)
