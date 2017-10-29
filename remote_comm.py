@@ -54,7 +54,10 @@ def status_update():
             # The [:-3] truncates the last 3 characters of the string which is used cut out some microsecond digits
             file.write("\n\n" + str(datetime.now())[:-3] + "\n")
             file.write(str(req.status_code) + "\n")
-            file.write(req.text)
+            if req.status_code == 503:
+                file.write("Server unavailable")
+            else:
+                file.write(req.text)
             file.close()
         except Exception as e:
             #raise
@@ -136,7 +139,10 @@ def sensor_upload():
             file=open("request_sensor_upload.log","a")
             file.write("\n\n" + str(datetime.now())[:-3] + "\n")
             file.write(str(req.status_code) + "\n")
-            file.write(req.text)
+            if req.status_code == 503:
+                file.write("Server unavailable")
+            else:
+                file.write(req.text)
             file.close()
         except Exception as e:
             #raise
@@ -156,6 +162,9 @@ def sensor_upload():
         # test status code to determin if we were Successful
         if req.status_code == 200 or req.status_code == 201:
             print ("Sensor Upload Successful")
+        elif req.status_code == 422:
+            print ("Unprocessable Entity. Re-registering")
+            register()
         else:
             print ("sensor_upload failed: Responce code: ", req.status_code)
     except:
@@ -189,7 +198,10 @@ def register():
             file=open("request_register.log","a")
             file.write("\n\n" + str(datetime.now())[:-3] + "\n")
             file.write(str(req.status_code) + "\n")
-            file.write(req.text)
+            if req.status_code == 503:
+                file.write("Server unavailable")
+            else:
+                file.write(req.text)
             file.close()
         except Exception as e:
             #raise
@@ -262,7 +274,10 @@ def pic_upload():
             file=open("request_webcam.log","a")
             file.write("\n\n" + str(datetime.now())[:-3] + "\n")
             file.write(str(req.status_code) + "\n")
-            file.write(req.text)
+            if req.status_code == 503:
+                file.write("Server unavailable")
+            else:
+                file.write(req.text)
             file.close()
         except Exception as e:
             #raise
