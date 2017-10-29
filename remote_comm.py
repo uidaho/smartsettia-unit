@@ -51,7 +51,8 @@ def status_update():
             print ("\t", e)
         try:  # log raw response to rile
             file=open("request_status_update.log","a")
-            file.write("\n\n" + str(time.time()) + "\n")
+            # The [:-3] truncates the last 3 characters of the string which is used cut out some microsecond digits
+            file.write("\n\n" + str(datetime.now())[:-3] + "\n")
             file.write(str(req.status_code) + "\n")
             file.write(req.text)
             file.close()
@@ -133,7 +134,7 @@ def sensor_upload():
             print ("\t", e)
         try:  # log raw response to rile
             file=open("request_sensor_upload.log","a")
-            file.write("\n\n" + str(time.time()) + "\n")
+            file.write("\n\n" + str(datetime.now())[:-3] + "\n")
             file.write(str(req.status_code) + "\n")
             file.write(req.text)
             file.close()
@@ -186,7 +187,7 @@ def register():
             print ("remote_comm:register:Error sending request")
         try:
             file=open("request_register.log","a")
-            file.write("\n\n" + str(time.time()) + "\n")
+            file.write("\n\n" + str(datetime.now())[:-3] + "\n")
             file.write(str(req.status_code) + "\n")
             file.write(req.text)
             file.close()
@@ -259,7 +260,7 @@ def pic_upload():
             print ("\t", e)
         try:  # log raw response to rile
             file=open("request_webcam.log","a")
-            file.write("\n\n" + str(time.time()) + "\n")
+            file.write("\n\n" + str(datetime.now())[:-3] + "\n")
             file.write(str(req.status_code) + "\n")
             file.write(req.text)
             file.close()

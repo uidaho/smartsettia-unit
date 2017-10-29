@@ -62,7 +62,8 @@ def get_Picture(FAKEWEBCAM):
     # overlay_text = "/usr/bin/convert "+ filename + "  -pointsize 36 -fill white -annotate +40+728 '" + "hello" + "' "  
     # overlay_text += " -pointsize 36 -fill white -annotate +40+630 'Your Text annotation here ' " + filename
     
-    text = '"Smartsettia - %s UTC"' % datetime.datetime.now().strftime("%H:%M:%S")
+    # The [:-4] truncates the last 4 characters of the string which is used cut out some microsecond digits
+    text = '"Smartsettia - %s UTC"' % datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     overlay_text = "convert " + filename + " -gravity North   -background YellowGreen  -splice 0x18 \
           -annotate +0+2 " + text + " " + filename
   
