@@ -71,15 +71,17 @@ def status_update():
                 #print ("server_command exists and was sent. removing")
                 del my_globals.status["server_command"]
                 
-            try:  # parse returned datea
+            try:  # parse returned data
                 rtndata = req.json()
                 #print "rtndata: ", rtndata     # debugger
                 my_globals.status['server_command'] = rtndata["data"]["cover_command"]
                 print ("server command: ", my_globals.status['server_command'])
 
                 # Convert the time string from server into a time object for HH:MM
-                new_cover_time_open  = datetime.strptime(rtndata["data"]["open_time"],  '%H:%M').time()
-                new_cover_time_close = datetime.strptime(rtndata["data"]["close_time"], '%H:%M').time()
+                #new_cover_time_open  = datetime.strptime(rtndata["data"]["open_time"],  '%H:%M').time()
+                #new_cover_time_close = datetime.strptime(rtndata["data"]["close_time"], '%H:%M').time()
+                new_cover_time_open  = rtndata["data"]["open_time"]
+                new_cover_time_close = rtndata["data"]["close_time"]
                 # test if values changed
                 if (new_cover_time_open != settings['cover_time_open']):
                     print ("\tCover time open changed to %s." % new_cover_time_open)
