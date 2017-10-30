@@ -56,7 +56,7 @@ def get_Picture(FAKEWEBCAM):
           
         # call v4lctl to take the picture
         call(["v4lctl", "-c", device, "snap", "jpeg", resolution, filename])
-        call(["du", "-h", filename])    # prints size of picture
+        print ("Img size: ", call(["du", "-h", filename]))    # prints size of picture
     
     # overlay reference
     # overlay_text = "/usr/bin/convert "+ filename + "  -pointsize 36 -fill white -annotate +40+728 '" + "hello" + "' "  

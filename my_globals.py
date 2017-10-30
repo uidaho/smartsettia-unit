@@ -1,13 +1,13 @@
 # This file contains the global variables used in smartsettia
 import json
-version= "0.2.2"
+version= "1.0.0"
 
 # Note to concatonate dictionaries
 # z = x.copy()
 # z.update(y)
 
 # Set domain being used
-DOMAIN_INDEX = 2    # choose which domain. 0-2
+DOMAIN_INDEX = 0    # choose which domain. 0-2
 DOMAIN =    ["https://smartsettia.com/",
             "https://smartsettia-backburn.c9users.io/",
             "https://smartsettia-nkrenowicz.c9users.io/"]
