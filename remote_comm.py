@@ -238,6 +238,7 @@ def pic_upload():
     image = my_globals.settings["img_dir"] + my_globals.settings["img_name"]
     if os.path.isfile(image) == 0:           # if path to file exists
         print ("Image does not exist. Skipping upload")
+        print ("--------------------------------------")
         return
 
     ## upload picture
