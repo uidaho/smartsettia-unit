@@ -25,13 +25,13 @@ def get_cat_picture(filename):
     url = "http://207.251.86.238/cctv448.jpg"       # NY trafic cam
     remove_image(filename)
     cat_pic = wget.download(url, out=filename, bar=None)
-    print ("filename: ", cat_pic)
+    #print ("filename: ", cat_pic)
 
 
 def get_Picture(FAKEWEBCAM):
     print ("\n--- Getting picture ------------------")
     filename = my_globals.settings["img_dir"] + my_globals.settings["img_name"]      # full path to image
-    print ("Img Filename: ", filename)
+    #print ("Img Filename: ", filename)
     if FAKEWEBCAM == 1:     # get fake picture
         get_cat_picture(filename)
         #return
@@ -67,6 +67,5 @@ def get_Picture(FAKEWEBCAM):
     overlay_text = "convert " + filename + " -gravity North   -background YellowGreen  -splice 0x18 \
           -annotate +0+2 " + text + " " + filename
   
-    print( "overlaying text"  )
     # print ("convert command: %s" % overlay_text)      # debugger to see command executed
     call ([overlay_text], shell=True)

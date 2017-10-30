@@ -66,12 +66,12 @@ def job_webcam():
     remote_comm.pic_upload()
 
 schedule.every(30).seconds.do(job_heartbeat)
-schedule.every(5).seconds.do(remote_comm.register)   # periodic re-register device with webserver
-schedule.every(2).seconds.do(job_upload_status)
-schedule.every(5).seconds.do(job_sensors)
-schedule.every(3).seconds.do(job_webcam)
+schedule.every(15).minutes.do(remote_comm.register)   # periodic re-register device with webserver
+schedule.every(1).seconds.do(job_upload_status)
+schedule.every(30).seconds.do(job_sensors)
+schedule.every(7).seconds.do(job_webcam)
 schedule.every(1).seconds.do(job_cover_monitor)
-schedule.every(60).seconds.do(job_save_settings)
+schedule.every(2).minutes.do(job_save_settings)
 
 
 #function Deff
