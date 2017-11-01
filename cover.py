@@ -4,7 +4,7 @@
 # gpio cheatsheet:    http://raspi.tv/download/RPi.GPIO-Cheat-Sheet.pdf
 # gpio callbacks:     https://makezine.com/projects/tutorial-raspberry-pi-gpio-pins-and-python/
 import my_globals
-from my_globals import sensor_dat
+from my_globals import sensor_data
 import time
 
 # Import gpio
@@ -27,6 +27,7 @@ if (my_globals.NOT_PI != True):
     try: 
         GPIO.setmode(GPIO.BCM)
         GPIO.setup(pin_relay,    GPIO.OUT)
+        GPIO.output(pin_relay,   GPIO.LOW)  # set pin output to LOW
         GPIO.setup(pin_ls_open,  GPIO.IN, pull_up_down=GPIO.PUD_UP)
         GPIO.setup(pin_ls_close, GPIO.IN, pull_up_down=GPIO.PUD_UP)
     except Exception as e:
@@ -48,8 +49,7 @@ RELAY_WAIT = 3
 COVER_WAIT = 25
 
 # current status reported to the server
-current_status = "error"
-server = "error"
+server_cmd = None
 
 # local readings of limit switches
 # later copied to my_globals sensor data
@@ -61,12 +61,13 @@ ls_close = 0
 # Top most Finite State Machine function
 # Determins what is the active state and calls that function
 def fsm():
-    print ( "fsm - Current state %s" % fsm_current_state)
-    global ls_open, ls_close, server
+    print ( "Cover monitor - Current state %s" % fsm_current_state)
+    global ls_open, ls_close, server_cmd
     getSwitches()
-    print ("\tCurrent sensors open/close (%d,%d)"% (sensor_dat["limitsw_open"], sensor_dat["limitsw_close"]))
-    server = my_globals.status['server_command']
-    print ("\tCurrent server command: ", server)
+    print ("\tCurrent sensors open/closed (%d,%d)"% (ls_open, ls_close)) #(sensor_data["limitsw_open"], sensor_data["limitsw_close"]))
+
+    server_cmd = my_globals.status['server_command']
+    print ("\tCurrent server command: ", server_cmd)
     if fsm_current_state == "error":
         fsm_error()
     elif (fsm_current_state == "open"):
@@ -83,8 +84,8 @@ def fsm():
         print ("ERROR: Unknown state.")
     
     # update global variables with current limit switches
-    sensor_dat["limitsw_open"]  = ls_open
-    sensor_dat["limitsw_close"] = ls_close
+    # sensor_data["limitsw_open"]  = ls_open
+    # sensor_data["limitsw_close"] = ls_close
     my_globals.status["cover_status"] = fsm_current_state
     print ( "fsm - Next state %s" % fsm_current_state)
     print ("--------------------------------------")
@@ -93,39 +94,44 @@ def fsm_open():
     print ("Entered State: open")
     global ls_close, ls_close, fsm_current_state, fsm_transition_state
     # if not open. unexpected movement
-    print ("fsm_open:server = ", server)
     if  not (ls_open == 1 and ls_close == 0):
         my_globals.status["error_msg"] = "Unexpected Movement"
         fsm_current_state = "error"
-    # check if the we are not were we want to be
-    elif (server != fsm_current_state):
-        if (server == "close"):
-            print ("Server change event: closing")
-            fsm_transition_state = "ts0:RelayOn"       # reset
-            fsm_current_state = "closing"
-        elif (server == "lock"):
-            print ("Server change event: locked")
-            fsm_current_state = "locked"
-        else:
-            print ("Unknown server change")
+    
+    # check next state conditions
+    elif (server_cmd == "open"):
+        return                  # do nothing
+    elif (server_cmd == "close"):
+        print ("Server change event: closing")
+        fsm_transition_state = "ts0:RelayOn"       # reset
+        fsm_current_state = "closing"
+    elif (server_cmd == "lock"):
+        print ("Server change event: locked")
+        fsm_current_state = "locked"
+    else:
+        print ("Unknown server change")
             
 def fsm_close():
     print ("Entered State: closed")
     global ls_close, ls_close, fsm_current_state, fsm_transition_state
-    # if not open. unexpected movement
+    # if not closed. unexpected movement
     if  not (ls_open == 0 and ls_close == 1):
         my_globals.status["error_msg"] = "Unexpected Movement"
         fsm_current_state = "error"
-    elif (server != fsm_current_state):
-        if (server == "open"):
-            print ("Server change event: opening")
-            fsm_transition_state = "ts0:RelayOn"       # reset
-            fsm_current_state = "opening"
-        elif (server == "lock"):
-            print ("Server change event: locked")
-            fsm_current_state = "locked"
-        else:
-            print ("Unknown server change")
+
+    # check next state conditions
+    elif (server_cmd == "close"):  # server says close. i'm currently in the 'closed' state
+        return                  # do nothing
+    elif (server_cmd == "open"):
+        print ("Server change event: opening")
+        fsm_transition_state = "ts0:RelayOn"       # reset
+        fsm_current_state = "opening"
+    elif (server_cmd == "lock"):
+        print ("Server change event: locked")
+        fsm_current_state = "locked"
+    else:
+        print ("Unknown server change")
+    
             
 def fsm_opening():
     print ("Entered State: opening\tSubstate: %s" % fsm_transition_state)
@@ -150,8 +156,6 @@ def fsm_opening():
         if (time.time() >= wait_time):                # if we exceded our wait time
             set_Relay("off")                          # turn off relay
             fsm_transition_state = "ts3:MovingTest"   # go to next transition state
-            if (my_globals.NOT_PI == True):           # GPIO disabled
-                sw00()         # DEBUGGER Simulate 0,0 switches
         
     # test if cover is actually moving
     elif fsm_transition_state == "ts3:MovingTest":
@@ -186,8 +190,6 @@ def fsm_opening():
             
         # 0,0 and not timedout 
             # do nothing. we are waiting
-        if (my_globals.NOT_PI == True):     # this is NOT a pi and NOT usng gpio. GPIO disabled
-            sw1()           # DEBUGGER  Simulate 1,0 switches
 
     
 def fsm_closing():
@@ -213,8 +215,6 @@ def fsm_closing():
         if (time.time() >= wait_time):                # if we exceded our wait time
             set_Relay("off")                          # turn off relay
             fsm_transition_state = "ts3:MovingTest"   # go to next transition state
-            if (my_globals.NOT_PI == True):           # GPIO disabled
-                sw00()         # DEBUGGER Simulate 0,0 switches
         
     # test if cover is actually moving
     elif fsm_transition_state == "ts3:MovingTest":
@@ -230,10 +230,10 @@ def fsm_closing():
     # its moving. lets wait for it to finish
     elif fsm_transition_state == "ts4:Moving":
         # did it finish and close?
-        if (ls_open == 1 and ls_close == 0):
+        if (ls_open == 0 and ls_close == 1):
             # success
             print("\tClosing finished")
-            fsm_current_state = "close"          # send to open state
+            fsm_current_state = "closed"          # send to open state
             
         # did it somehow reverse and went back to close? dont know how
         elif (ls_open == 1 and ls_close == 0):
@@ -249,14 +249,13 @@ def fsm_closing():
             
         # 0,0 and not timedout 
             # do nothing. we are waiting
-        if (my_globals.NOT_PI == True):     # this is NOT a pi and NOT usng gpio. GPIO disabled
-            sw0()           # DEBUGGER  Simulate 0,1 switches
     
 def fsm_locked():
     print ("Entered State: locked")
     global fsm_current_state
-    if (server != "lock"):
+    if (server_cmd != "lock"):
         fsm_current_state = "error" # to resolve
+        fsm_error()                 # run immediatly to resolve state if possible before the next status update
     
 # error and resolution
 def fsm_error():
@@ -264,12 +263,12 @@ def fsm_error():
     global ls_open, ls_close, fsm_current_state
     if  (ls_open == 1 and ls_close == 0):
         fsm_current_state = "open"
-        if (my_globals.NOT_PI == True):     # this is NOT a pi and NOT usng gpio. GPIO disabled
-            sw1()           # DEBUGGER REMOVE LATER
+        my_globals.status["server_command"]  = "open"
+        my_globals.status["server_override"] = True  # will change server state to match
     elif (ls_open == 0 and ls_close == 1):
         fsm_current_state = "closed"
-        if (my_globals.NOT_PI == True):     # this is NOT a pi and NOT usng gpio. GPIO disabled
-            sw0()           # DEBUGGER REMOVE LATER
+        my_globals.status["server_command"]  = "close"
+        my_globals.status["server_override"] = True  # will change server state to match
     elif (ls_open == 0 and ls_close == 0):
         fsm_current_state = "error"
     else:
@@ -299,8 +298,36 @@ def getSwitches():
     print ("Reading limit switches")
     global ls_open, ls_close
     if (my_globals.NOT_PI == True):     # this is NOT a pi and NOT usng gpio
-        ls_open  = 0 # setting these to 0 will land the state machine in error mode
-        ls_close = 1
+        # Simulate switches based on current state
+        print ("\t## Simulating switches")
+        """
+        ts0:RelayOn      relay on
+        ts1:RelayWait    keep relay on for set time. then turn off
+        *ts2:Null         NULL not implemented
+        ts3:MovingTest   testing if it moved
+        ts4:Moving       cover currently moving
+        """
+        if (fsm_current_state == "open"):       # the open switch should be active
+            ls_open  = 1
+            ls_close = 0
+        elif (fsm_current_state == "closed"):    # the close switch should be active
+            ls_open  = 0
+            ls_close = 1
+        elif (fsm_current_state == "error"):  # resolve to open when in error state
+            ls_open  = 1
+            ls_close = 0
+        elif (fsm_current_state == "opening" or fsm_current_state == "closing"): # in transition states
+            if (fsm_transition_state == "ts1:RelayWait"):   # relay activates motor which puts the cover in between the switches
+                ls_open  = 0
+                ls_close = 0
+            if (fsm_transition_state == "ts4:Moving"):      # Done moving and hits its termination state
+                if (fsm_current_state == "opening"):        # open state
+                    ls_open  = 1
+                    ls_close = 0
+                else:                                       # closed state
+                    ls_open  = 0
+                    ls_close = 1
+        
     else: 
         try:
             ls_open = not GPIO.input(pin_ls_open)
@@ -309,52 +336,6 @@ def getSwitches():
         except Exception as e:
             print ("\tError reading limit switch pins:", e)
         
-        
-    
-# debugging function set to open
-def sw1():
-    print ("Reading limit switches")
-    global ls_open, ls_close
-    ls_open  = 1
-    ls_close = 0
-    
-# debugging function set to close
-def sw0():
-    print ("Reading limit switches")
-    global ls_open, ls_close
-    ls_open  = 0
-    ls_close = 1
-    
-# debugging function set to close
-def sw00():
-    print ("Reading limit switches")
-    global ls_open, ls_close
-    ls_open  = 0
-    ls_close = 0
-    
-
-if False:
-    # Testing Code
-    fsm()
-    fsm()
-    fsm()
-    print ("server open")
-    my_globals.status['server_command'] = "open"
-    fsm()
-    fsm()
-    time.sleep(0.1)
-    fsm()
-    time.sleep(0.1)
-    fsm()
-    time.sleep(0.1)
-    fsm()
-    time.sleep(0.1)
-    fsm()
-    time.sleep(0.1)
-    fsm()
-    time.sleep(0.1)
-    fsm()
-    
 
 # This will reset gpios back to what they were before the script started.
 # The problem is that this program exits by interruping it and so this will never get called
