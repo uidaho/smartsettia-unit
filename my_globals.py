@@ -56,8 +56,8 @@ settings =      {"name":"UnNamed",                          # Name of Device
                                                             # other jobs
                 "cover_time_open":  "HH:MM:SS",             # open time
                 "cover_time_close": "HH:MM:SS",             # close time
-                "img_dir": "/mnt/ramdisk/",                 # directory where picture is saved
-                "img_name": "webcam_img.jpg"
+                "storage_dir": "/mnt/ramdisk/",             # directory where picture & logs are saved do
+                "img_name": "webcam_img.jpg"                # name of webcam picture
                 }
 
 
