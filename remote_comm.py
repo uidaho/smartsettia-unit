@@ -40,7 +40,7 @@ def status_update():
 
     try:
         try:  # Send the request
-            req = requests.post(url,headers=headers, json=payload)
+            req = requests.post(url,headers=headers, json=payload, timeout=(3.05, 27))
         except Exception as e:
             print ("remote_comm:status_update:Error sending request")
             print ("\t", e)
@@ -125,7 +125,7 @@ def sensor_upload():
 
     try:
         try:  # Send the request
-            req = requests.post(url,headers=headers, json=payload)
+            req = requests.post(url,headers=headers, json=payload, timeout=(3.05, 27))
         except Exception as e:
             print ("remote_comm:sensor_upload:Error sending request")
             print ("\t", e)
@@ -183,7 +183,7 @@ def register():
 
     try:
         try:
-            req = requests.post(url, headers=headers, data=json.dumps(payload))
+            req = requests.post(url, headers=headers, data=json.dumps(payload), timeout=(3.05, 27))
         except:
             print ("remote_comm:register:Error sending request")
         try:
@@ -256,7 +256,7 @@ def pic_upload():
 
     try:
         try:  # Send the request
-            req = requests.post(url,headers=headers, files=files, data=payload)
+            req = requests.post(url,headers=headers, files=files, data=payload, timeout=(3.05, 27))
         except Exception as e:
             print ("remote_comm:webcam:Error sending request")
             print ("\t", e)
