@@ -1,6 +1,8 @@
 #!/usr/bin/python3
 import time
+import datetime
 from os import path   # Used in checking webcam storage path
+import os
 import threading
 import schedule    # scheduler library
 import webcam      # webcam module
@@ -36,7 +38,7 @@ def run_threaded(job_func):
 
 # If I'm running you should see this periodically
 def job_heartbeat():
-    print("I'm working...")
+    print("I'm working. %s" % datetime.datetime.now())
 
 # Save setting to file
 def job_save_settings():
@@ -52,7 +54,6 @@ def job_cover_schedual():
 def job_sensors():
     print("Getting Sensors..")
     sensors.update()
-    print ("\ttemp: %d, cpu_temp: %d" %(my_globals.sensor_dat["temperature"], my_globals.sensor_dat["cpu_temp"]))
     remote_comm.sensor_upload()
 
 # send status to server
@@ -68,13 +69,14 @@ def job_webcam():
     print ("timepic: %d" % (t1-t0))      # debugger
     remote_comm.pic_upload()
 
-schedule.every(20).seconds.do(job_heartbeat)
-schedule.every(60).seconds.do(job_save_settings)
-schedule.every(5).seconds.do(job_sensors)
-schedule.every(3).seconds.do(job_webcam)
-schedule.every(2).seconds.do(job_upload_status)
+schedule.every(30).seconds.do(job_heartbeat)
+schedule.every(15).minutes.do(remote_comm.register)   # periodic re-register device with webserver
+schedule.every(1).seconds.do(job_upload_status)
+schedule.every(30).seconds.do(job_sensors)
+schedule.every(7).seconds.do(job_webcam)
 schedule.every(1).seconds.do(job_cover_monitor)
 schedule.every(3).seconds.do(job_cover_schedual)
+schedule.every(2).minutes.do(job_save_settings)
 
 
 #function Deff
@@ -111,21 +113,28 @@ def initialize():
         exit()
     
     # check if /mnt/ramdisk exists else fallback to tmp directory
-    if path.isdir(my_globals.settings["img_dir"]) == 0:   # if path to directory exists
-        print ("Ramdisk does not exist. Using /tmp/")
+    if path.isdir(my_globals.settings["storage_dir"]) == 0:   # if path to directory exists
+        print ("Ramdisk does not exist. Using /tmp/smartsettia")
         # This is undesirable for sdcard wear and writing speed compared to a ramdisk
-        my_globals.settings["img_dir"] = "/tmp/"
-    
-    remote_comm.register()          # register device with webserver
+        if not os.path.exists("/tmp/smartsettia/"):     # test if tmp directory exists
+            os.makedirs("/tmp/smartsettia/")            # create directory
+        my_globals.settings["storage_dir"] = "/tmp/smartsettia/"
+
+    # log file setup for program start
+    file=open(my_globals.settings["storage_dir"] + "error.log","a")
+    file.write(str(datetime.datetime.now()))
+    file.write("\tProgram start\n-------------\n")
+    file.close()    
     
     # run the cover montitor a few times to let it syncronize
     job_cover_monitor()
     job_cover_monitor()
-    job_upload_status()
+    print ("--------------------------------------")
 
 
 #Program start
 print ("\nWelcome to Smartsettia!")
+print ("Version: %s" % my_globals.version)
 initialize()
 
 # if single run run everything once

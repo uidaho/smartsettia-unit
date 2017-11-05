@@ -4,7 +4,7 @@
 # gpio cheatsheet:    http://raspi.tv/download/RPi.GPIO-Cheat-Sheet.pdf
 # gpio callbacks:     https://makezine.com/projects/tutorial-raspberry-pi-gpio-pins-and-python/
 import my_globals
-from my_globals import sensor_dat
+from my_globals import sensor_data
 import time
 import datetime
 
@@ -30,6 +30,7 @@ if (my_globals.NOT_PI != True):
     try: 
         GPIO.setmode(GPIO.BCM)
         GPIO.setup(pin_relay,    GPIO.OUT)
+        GPIO.output(pin_relay,   GPIO.LOW)  # set pin output to LOW
         GPIO.setup(pin_ls_open,  GPIO.IN, pull_up_down=GPIO.PUD_UP)
         GPIO.setup(pin_ls_close, GPIO.IN, pull_up_down=GPIO.PUD_UP)
     except Exception as e:
@@ -53,8 +54,7 @@ RELAY_WAIT = 3
 COVER_WAIT = 25
 
 # current status reported to the server
-current_status = "error"
-server = "error"
+server_cmd = None
 
 # local readings of limit switches
 # later copied to my_globals sensor data
@@ -119,12 +119,13 @@ print ("#######################")
 # Top most Finite State Machine function
 # Determins what is the active state and calls that function
 def fsm():
-    print ( "fsm - Current state %s" % fsm_current_state)
-    global ls_open, ls_close, server
+    print ( "Cover monitor - Current state %s" % fsm_current_state)
+    global ls_open, ls_close, server_cmd
     getSwitches()
-    print ("\tCurrent sensors open/closed (%d,%d)"% (sensor_dat["limitsw_open"], sensor_dat["limitsw_close"]))
-    server = my_globals.status['server_command']
-    print ("\tCurrent server command: ", server)
+    print ("\tCurrent sensors open/closed (%d,%d)"% (ls_open, ls_close)) #(sensor_data["limitsw_open"], sensor_data["limitsw_close"]))
+
+    server_cmd = my_globals.status['server_command']
+    print ("\tCurrent server command: ", server_cmd)
     if fsm_current_state == "error":
         fsm_error()
     elif (fsm_current_state == "open"):
@@ -141,8 +142,8 @@ def fsm():
         print ("ERROR: Unknown state.")
     
     # update global variables with current limit switches
-    sensor_dat["limitsw_open"]  = ls_open
-    sensor_dat["limitsw_close"] = ls_close
+    # sensor_data["limitsw_open"]  = ls_open
+    # sensor_data["limitsw_close"] = ls_close
     my_globals.status["cover_status"] = fsm_current_state
     print ( "fsm - Next state %s" % fsm_current_state)
     print ("--------------------------------------")
@@ -151,39 +152,44 @@ def fsm_open():
     print ("Entered State: open")
     global ls_close, ls_close, fsm_current_state, fsm_transition_state
     # if not open. unexpected movement
-    print ("fsm_open:server = ", server)
     if  not (ls_open == 1 and ls_close == 0):
         my_globals.status["error_msg"] = "Unexpected Movement"
         fsm_current_state = "error"
-    # check if the we are not were we want to be
-    elif (server != fsm_current_state):
-        if (server == "close"):
-            print ("Server change event: closing")
-            fsm_transition_state = "ts0:RelayOn"       # reset transition substate back to 0
-            fsm_current_state = "closing"
-        elif (server == "lock"):
-            print ("Server change event: locked")
-            fsm_current_state = "locked"
-        else:
-            print ("Unknown server change")
+    
+    # check next state conditions
+    elif (server_cmd == "open"):
+        return                  # do nothing
+    elif (server_cmd == "close"):
+        print ("Server change event: closing")
+        fsm_transition_state = "ts0:RelayOn"       # reset transition substate back to 0
+        fsm_current_state = "closing"
+    elif (server_cmd == "lock"):
+        print ("Server change event: locked")
+        fsm_current_state = "locked"
+    else:
+        print ("Unknown server change")
             
 def fsm_close():
     print ("Entered State: closed")
     global ls_close, ls_close, fsm_current_state, fsm_transition_state
-    # if not open. unexpected movement
+    # if not closed. unexpected movement
     if  not (ls_open == 0 and ls_close == 1):
         my_globals.status["error_msg"] = "Unexpected Movement"
         fsm_current_state = "error"
-    elif (server != fsm_current_state):
-        if (server == "open"):
-            print ("Server change event: opening")
-            fsm_transition_state = "ts0:RelayOn"       # reset transition substate back to 0
-            fsm_current_state = "opening"
-        elif (server == "lock"):
-            print ("Server change event: locked")
-            fsm_current_state = "locked"
-        else:
-            print ("Unknown server change")
+
+    # check next state conditions
+    elif (server_cmd == "close"):  # server says close. i'm currently in the 'closed' state
+        return                  # do nothing
+    elif (server_cmd == "open"):
+        print ("Server change event: opening")
+        fsm_transition_state = "ts0:RelayOn"       # reset transition substate back to 0
+        fsm_current_state = "opening"
+    elif (server_cmd == "lock"):
+        print ("Server change event: locked")
+        fsm_current_state = "locked"
+    else:
+        print ("Unknown server change")
+    
             
 def fsm_opening():
     print ("Entered State: opening\tSubstate: %s" % fsm_transition_state)
@@ -305,8 +311,9 @@ def fsm_closing():
 def fsm_locked():
     print ("Entered State: locked")
     global fsm_current_state
-    if (server != "lock"):
+    if (server_cmd != "lock"):
         fsm_current_state = "error" # to resolve
+        fsm_error()                 # run immediatly to resolve state if possible before the next status update
     
 # error and resolution
 def fsm_error():
@@ -314,8 +321,12 @@ def fsm_error():
     global ls_open, ls_close, fsm_current_state
     if  (ls_open == 1 and ls_close == 0):
         fsm_current_state = "open"
+        my_globals.status["server_command"]  = "open"
+        my_globals.status["server_override"] = True  # will change server state to match
     elif (ls_open == 0 and ls_close == 1):
         fsm_current_state = "closed"
+        my_globals.status["server_command"]  = "close"
+        my_globals.status["server_override"] = True  # will change server state to match
     elif (ls_open == 0 and ls_close == 0):
         fsm_current_state = "error"
     else:
