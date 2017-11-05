@@ -1,6 +1,7 @@
 # This file contains the global variables used in smartsettia
 import json
-version= "1.0.0"
+from time import sleep
+version= "1.0.1"        # program version
 
 # Note to concatonate dictionaries
 # z = x.copy()
@@ -37,7 +38,8 @@ status =        {"cover_status"   : "error",
                 "error_msg"       : None
                 }
 
-settings =      {"name":"UnNamed",                          # Name of Device
+settings =      {"Config_Version": 1,    ### INCREMENT THIS IF SETTING STRUCTURE CHANGED ###
+                "name":"UnNamed",                          # Name of Device
                 "uuid": "NOT_SET0-0000-0000-0000-000000000000",   # UUID V1
                 "token": "none",      # post token key
                 "id": -1,                                   # ID no. of the device
@@ -64,7 +66,7 @@ settings =      {"name":"UnNamed",                          # Name of Device
 def save_settings():
     print ("Saving settings")
     global settings
-    # print settings         # debugger
+    #print ("Settings dump: ",settings)         # debugger
     try:
         with open('config.json', 'w') as f:
             json.dump(settings, f)
@@ -83,9 +85,24 @@ def load_settings():
     #    print "config.json file not found. loading default settings"
     except Exception as e:
         print ("\tLoad settings error ", e)
+        sleep(3)
 
     else:       # if file was found and all is good
         # print temp             # debugger
+        # test if loaded config version matches default version number
+        try: 
+            if temp["Config_Version"] != settings["Config_Version"]:
+                print ("\tConfig Version does not match.")
+                print ("\tUsing default settings")
+                sleep(3)
+                return
+        except:
+                print ("\tConfig Version error.")   # likely means its a really old config without config_version entry
+                print ("\tUsing default settings")
+                sleep(3)
+                return
+        
+        # Test if uuid's are matching.
         if temp["uuid"] == settings["uuid"]:
             print ("\tUUID matches loaded settings - keeping")
             settings = temp     # set settings to loaded values
@@ -96,7 +113,7 @@ def load_settings():
         else:
             print ("\tUUID does not mach loaded settings - discarding")
             print ("\tUsing default settings")
-
+            sleep(3)
 
 def update_url(domain):
     global settings
