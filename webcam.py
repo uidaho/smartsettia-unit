@@ -30,7 +30,7 @@ def get_cat_picture(filename):
 
 def get_Picture(FAKEWEBCAM):
     print ("\n--- Getting picture ------------------")
-    filename = my_globals.settings["img_dir"] + my_globals.settings["img_name"]      # full path to image
+    filename = my_globals.settings["storage_dir"] + my_globals.settings["img_name"]      # full path to image
     #print ("Img Filename: ", filename)
     remove_image(filename)
     if FAKEWEBCAM == 1:     # get fake picture

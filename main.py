@@ -2,6 +2,7 @@
 import time
 import datetime
 from os import path   # Used in checking webcam storage path
+import os
 import threading
 import schedule    # scheduler library
 import webcam      # webcam module
@@ -108,10 +109,18 @@ def initialize():
         exit()
     
     # check if /mnt/ramdisk exists else fallback to tmp directory
-    if path.isdir(my_globals.settings["img_dir"]) == 0:   # if path to directory exists
-        print ("Ramdisk does not exist. Using /tmp/")
+    if path.isdir(my_globals.settings["storage_dir"]) == 0:   # if path to directory exists
+        print ("Ramdisk does not exist. Using /tmp/smartsettia")
         # This is undesirable for sdcard wear and writing speed compared to a ramdisk
-        my_globals.settings["img_dir"] = "/tmp/"
+        if not os.path.exists("/tmp/smartsettia/"):     # test if tmp directory exists
+            os.makedirs("/tmp/smartsettia/")            # create directory
+        my_globals.settings["storage_dir"] = "/tmp/smartsettia/"
+
+    # log file setup for program start
+    file=open(my_globals.settings["storage_dir"] + "error.log","a")
+    file.write(str(datetime.datetime.now()))
+    file.write("\tProgram start\n-------------\n")
+    file.close()    
     
     # run the cover montitor a few times to let it syncronize
     job_cover_monitor()

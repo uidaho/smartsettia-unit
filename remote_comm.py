@@ -45,7 +45,7 @@ def status_update():
             print ("remote_comm:status_update:Error sending request")
             print ("\t", e)
         try:  # log raw response to rile
-            file=open("request_status_update.log","a")
+            file=open(my_globals.settings["storage_dir"] +"request_status_update.log","a")
             # The [:-3] truncates the last 3 characters of the string which is used cut out some microsecond digits
             file.write("\n\n" + str(datetime.now())[:-3] + "\n")
             file.write(str(req.status_code) + "\n")
@@ -130,7 +130,7 @@ def sensor_upload():
             print ("remote_comm:sensor_upload:Error sending request")
             print ("\t", e)
         try:  # log raw response to rile
-            file=open("request_sensor_upload.log","a")
+            file=open(my_globals.settings["storage_dir"] +"request_sensor_upload.log","a")
             file.write("\n\n" + str(datetime.now())[:-3] + "\n")
             file.write(str(req.status_code) + "\n")
             if req.status_code == 503:
@@ -187,7 +187,7 @@ def register():
         except:
             print ("remote_comm:register:Error sending request")
         try:
-            file=open("request_register.log","a")
+            file=open(my_globals.settings["storage_dir"] +"request_register.log","a")
             file.write("\n\n" + str(datetime.now())[:-3] + "\n")
             file.write(str(req.status_code) + "\n")
             if req.status_code == 503:
@@ -235,7 +235,7 @@ def register():
 def pic_upload():
     print ("--- Uploading Picture ----------------")
     # first check if file exists
-    image = my_globals.settings["img_dir"] + my_globals.settings["img_name"]
+    image = my_globals.settings["storage_dir"] + my_globals.settings["img_name"]
     if os.path.isfile(image) == 0:           # if path to file exists
         print ("Image does not exist. Skipping upload")
         print ("--------------------------------------")
@@ -248,10 +248,10 @@ def pic_upload():
     payload = {}
     payload["uuid"] = ('', str(my_globals.settings["uuid"]))
     payload["token"] = ('', str(my_globals.settings["token"]))
-    files= {"image": open(my_globals.settings["img_dir"] + my_globals.settings["img_name"],'rb')}
+    files= {"image": open(my_globals.settings["storage_dir"] + my_globals.settings["img_name"],'rb')}
 
 
-    print_log("remote:webcam", url, show_logging)
+    #print_log("remote:webcam", url, show_logging)
     #print ("-------------")
 
     try:
@@ -261,7 +261,7 @@ def pic_upload():
             print ("remote_comm:webcam:Error sending request")
             print ("\t", e)
         try:  # log raw response to rile
-            file=open("request_webcam.log","a")
+            file=open(my_globals.settings["storage_dir"] +"request_webcam.log","a")
             file.write("\n\n" + str(datetime.now())[:-3] + "\n")
             file.write(str(req.status_code) + "\n")
             if req.status_code == 503:

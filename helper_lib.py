@@ -3,16 +3,7 @@ import uuid
 from uuid import UUID   # for some reason UUID is not imported when importing all of uuid
 import my_globals
 
-error_filename = "error.log"    # name of log file
-log_filename =   "log.log"
 t0 = time.time()                # program start time
-
-# log file setup for program start
-file=open(error_filename,"a")
-file.write("\nProgram start" + "\n")
-file.write(str(time.time()) + "\n")
-file.write("-------------" + "\n")
-file.close()
 
 # usage
 # print_error("name of function", "error description")
@@ -27,7 +18,7 @@ def print_error(fun_name, error):
 
     # also right error to file
     try:
-        file=open(error_filename,"a")
+        file=open(my_globals.settings["storage_dir"] + "error.log","a")
         file.write(error_msg + "\n")
         file.close()
     except:
