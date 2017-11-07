@@ -25,11 +25,16 @@ def status_update():
     
     # server command, if sent, will override that variable server side
     # server_override if true will not delete 
+    # server_command is the local variable, cover_command is the server variable
     if (my_globals.status["server_override"] == True):
         print ("Overriding server command to %s" % payload["server_command"])
+        payload["cover_command"] = payload["server_command"]
         my_globals.status["server_override"] = False   # reset back to false
+        time.sleep(5)
     else:
         del payload["server_command"]       # only deleting this entry from payload. my_globals will still exist
+    
+    print ("\tjson dmp: ", json.dumps(payload)) # debugger
 
     # Debugging Code
     print ("Device ID: %d" % my_globals.settings["id"])    # because I'm tired of scrolling up to registration output for id

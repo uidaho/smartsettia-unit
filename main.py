@@ -28,7 +28,7 @@ SINGLE_RUN = args.single
 FAKEWEBCAM = args.fakewebcam     # enable or disable fake webcam
 UUID_CUSTOM = args.uuid          # custome uuid
 
-from cover import fsm, gpio_cleanup, cover_schedual   # cover monitor module. Must be imported after NOT_PI has been set
+from cover import fsm, gpio_cleanup, cover_schedule   # cover monitor module. Must be imported after NOT_PI has been set
 import sensors     #sensors.py
 
 # multi thread support
@@ -47,8 +47,8 @@ def job_save_settings():
 def job_cover_monitor():
     fsm()
     
-def job_cover_schedual():
-    cover_schedual()
+def job_cover_schedule():
+    cover_schedule()
 
 # Read enviroment sensors
 def job_sensors():
@@ -71,11 +71,11 @@ def job_webcam():
 
 schedule.every(30).seconds.do(job_heartbeat)
 schedule.every(15).minutes.do(remote_comm.register)   # periodic re-register device with webserver
-schedule.every(1).seconds.do(job_upload_status)
+schedule.every(2).seconds.do(job_upload_status)
 schedule.every(30).seconds.do(job_sensors)
 schedule.every(7).seconds.do(job_webcam)
-schedule.every(1).seconds.do(job_cover_monitor)
-schedule.every(3).seconds.do(job_cover_schedual)
+schedule.every(2).seconds.do(job_cover_monitor)
+schedule.every(10).seconds.do(job_cover_schedule)
 schedule.every(2).minutes.do(job_save_settings)
 
 
@@ -125,6 +125,8 @@ def initialize():
     file.write(str(datetime.datetime.now()))
     file.write("\tProgram start\n-------------\n")
     file.close()    
+    
+    remote_comm.register()
     
     # run the cover montitor a few times to let it syncronize
     job_cover_monitor()

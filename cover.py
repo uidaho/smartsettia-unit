@@ -144,7 +144,7 @@ def cover_schedule():
 # like opening or closing
 def set_transition(new_state, source="unknown", override_server= False):
     global fsm_current_state, fsm_transition_state
-    print("Entered set transistion: %s, %s, %s" %(new_state, source, override_server))
+    print("Entered set transition: %s, %s, %s" %(new_state, source, override_server))
     dtn = datetime.datetime.strftime(datetime.datetime.utcnow() , '%Y-%m-%d %H:%M:%S')
     coverlog = "%s - By %s" % (dtn, source)     # this variable contains all the text that will be printed to terminal and log file
 
@@ -156,7 +156,7 @@ def set_transition(new_state, source="unknown", override_server= False):
             coverlog += " - cover set to close"
             if override_server == True:
                 my_globals.status["server_override"] = True  # change server command
-                my_globals.status["server_cmd"] = "close"
+                my_globals.status["server_command"] = "close"
                 coverlog += " - overriding server cmd"
         elif (fsm_current_state == "closed"):
             coverlog += " - cover already closed. aborting"
@@ -171,7 +171,7 @@ def set_transition(new_state, source="unknown", override_server= False):
             coverlog += " - cover set to open "
             if override_server == True:
                 my_globals.status["server_override"] = True   # change server command
-                my_globals.status["server_cmd"] = "open"
+                my_globals.status["server_command"] = "open"
                 coverlog += " - overriding server cmd"
         elif (fsm_current_state == "open"):
             coverlog += " - cover already open. aborting"
