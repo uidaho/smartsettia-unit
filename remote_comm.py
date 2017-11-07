@@ -30,7 +30,6 @@ def status_update():
         print ("Overriding server command to %s" % payload["server_command"])
         payload["cover_command"] = payload["server_command"]
         my_globals.status["server_override"] = False   # reset back to false
-        time.sleep(5)
     else:
         del payload["server_command"]       # only deleting this entry from payload. my_globals will still exist
     
