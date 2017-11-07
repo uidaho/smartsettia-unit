@@ -125,7 +125,7 @@ def initialize():
     file.write(str(datetime.datetime.now()))
     file.write("\tProgram start\n-------------\n")
     file.close()    
-    
+
     remote_comm.register()
     
     # run the cover montitor a few times to let it syncronize
