@@ -8,8 +8,6 @@ from my_globals import sensor_data
 import time
 import datetime
 
-my_globals.NOT_PI = True   # testing remove
-
 # Import gpio
 if (my_globals.NOT_PI != True):
     try:
