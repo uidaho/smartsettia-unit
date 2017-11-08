@@ -148,4 +148,8 @@ if SINGLE_RUN:
 
 while True and not SINGLE_RUN:
     schedule.run_pending()
-    time.sleep(0.1)
+    try:
+        time.sleep(0.1)
+    except KeyboardInterrupt as e:
+        print("\nProgram exited by keyboard interrupt")
+        exit()
