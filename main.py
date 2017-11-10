@@ -11,7 +11,6 @@ import remote_comm # server communication module
 import argparse    # argument parsing
 from helper_lib import print_error, print_log, generate_uuid, is_valid_uuid
 
-
 # https://stackoverflow.com/a/30493366
 parser = argparse.ArgumentParser()
 parser.add_argument('-s',  '--single',     action='store_true', help='Runs the program loop only once')
@@ -146,10 +145,44 @@ if SINGLE_RUN:
     gpio_cleanup()
     exit()              # exit program
 
+# watch dog setup.
+# move to better spot later
+# https://www.freedesktop.org/software/systemd/man/sd_notify.html#
+# sdnotify: https://github.com/bb4242/sdnotify
+import sdnotify
+n = sdnotify.SystemdNotifier()
+n.notify("READY=1")
+
+# https://docs.python.org/2/library/signal.html
+import signal
+
+def signal_term_handler(signal, frame):
+    print ('Recived signal: ', str(signal))
+    #print ('got SIGTERM')
+    n.notify("STOPPING=1")
+    gpio_cleanup()
+    exit(0)
+    
 while True and not SINGLE_RUN:
     schedule.run_pending()
     try:
         time.sleep(0.1)
     except KeyboardInterrupt as e:
         print("\nProgram exited by keyboard interrupt")
+        n.notify("STOPPING=1")
+        gpio_cleanup()
         exit()
+    
+    # watchdog
+    try:
+        n.notify("WATCHDOG=1")
+    except Exception as e:
+        print ("Error with watchdog: ", e)
+        exit()  # debugging
+    
+    # test if program recieved a terminate command
+    signal.signal(signal.SIGHUP , signal_term_handler) # 1
+    signal.signal(signal.SIGINT , signal_term_handler) # 2
+    signal.signal(signal.SIGQUIT, signal_term_handler) # 3
+    signal.signal(signal.SIGABRT, signal_term_handler) # 6
+    signal.signal(signal.SIGTERM, signal_term_handler) # 15

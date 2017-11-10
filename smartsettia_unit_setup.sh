@@ -59,6 +59,7 @@ pip3 install --upgrade wget     # webcam replacement if no webcam
 pip3 install --upgrade call
 pip3 install --upgrade uuid     # is this really needed?
 pip3 install --upgrade RPI.GPIO # gpio
+pip3 install --upgrade sdnotify # systemd watchdog support
 
 
 echo -e "\nSetting up Environment"
