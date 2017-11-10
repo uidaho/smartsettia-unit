@@ -25,11 +25,15 @@ def status_update():
     
     # server command, if sent, will override that variable server side
     # server_override if true will not delete 
+    # server_command is the local variable, cover_command is the server variable
     if (my_globals.status["server_override"] == True):
         print ("Overriding server command to %s" % payload["server_command"])
+        payload["cover_command"] = payload["server_command"]
         my_globals.status["server_override"] = False   # reset back to false
     else:
         del payload["server_command"]       # only deleting this entry from payload. my_globals will still exist
+    
+    print ("\tjson dmp: ", json.dumps(payload)) # debugger
 
     # Debugging Code
     print ("Device ID: %d" % my_globals.settings["id"])    # because I'm tired of scrolling up to registration output for id
@@ -84,12 +88,14 @@ def status_update():
                 new_cover_time_close = rtndata["data"]["close_time"]
                 # test if values changed
                 if (new_cover_time_open != settings['cover_time_open']):
-                    print ("\tCover time open changed to %s." % new_cover_time_open)
-                    settings['cover_time_open']  = new_cover_time_open
+                    my_globals.settings['cover_time_open']  = new_cover_time_open
+                    print ("\tCover time open changed to %s." % my_globals.settings["cover_time_open"])
+                    
                 if (new_cover_time_close != settings['cover_time_close']):
-                    print ("\tCover time close changed to %s." % new_cover_time_close)
-                    settings['cover_time_close'] = new_cover_time_close
-                print ("open %s\tclose %s" % (settings['cover_time_open'], settings['cover_time_close']))
+                    my_globals.settings['cover_time_close'] = new_cover_time_close
+                    print ("\tCover time close changed to %s." % my_globals.settings["cover_time_close"])
+                    
+                print ("open %s\tclose %s" % (my_globals.settings['cover_time_open'], my_globals.settings['cover_time_close']))
 
                 # update job rates
                 # do in main?

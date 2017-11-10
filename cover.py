@@ -6,6 +6,7 @@
 import my_globals
 from my_globals import sensor_data
 import time
+import datetime
 
 # Import gpio
 if (my_globals.NOT_PI != True):
@@ -45,6 +46,7 @@ fsm_current_state = "error"
 fsm_transition_state = 0    # Linear sub state counter for opening & closing
 wait_time = 0               # time variable that will mark the time to stop waiting
 
+# wait times for transition state
 RELAY_WAIT = 3
 COVER_WAIT = 25
 
@@ -57,6 +59,128 @@ ls_open = 1
 ls_close = 0
 
 
+# Open close schedule
+def cover_schedule():
+    print ("\n--- Schedule -------------------------")
+    global fsm_current_state, fsm_transition_state
+    
+    # Test if a schedule has been set
+    if (my_globals.settings["cover_time_open"] == None or my_globals.settings["cover_time_close"] == None):
+        print ("One or both cover times are null: %r, %r" % (my_globals.settings["cover_time_open"], my_globals.settings["cover_time_close"]))
+        time.sleep(2)                   # debugger allows the user to spot this event
+        return
+    
+    # Naming convention  dt_open := datetime open;  t_open := time open 
+    #t_open = datetime.datetime.strptime('04:07:00', '%H:%M:%S').time()         # debugger Manual set
+    #t_close = datetime.datetime.strptime('04:44:00', '%H:%M:%S').time()        # debugger Manual set
+    t_open =  datetime.datetime.strptime(my_globals.settings["cover_time_open"],  '%H:%M').time()    # time open     datetime.time
+    t_close = datetime.datetime.strptime(my_globals.settings["cover_time_close"], '%H:%M').time()    # time close    datetime.time
+    dt_now =  datetime.datetime.utcnow()                                                             # time now      datetime.datetime
+    dt_last_checked = my_globals.settings["schedule_last_checked"]                                   # load raw last checked from settings
+    
+    # check if last check string is empty, if not parse it into datetime object
+    if dt_last_checked == None:
+        # null time. Update to curent time and return
+        print ("Last checked time was blank.")
+        dt_last_checked = datetime.datetime.strftime(dt_now, '%Y-%m-%d %H:%M:%S')
+        my_globals.settings["schedule_last_checked"] = dt_last_checked
+        return      # algoritm cannot work without a last check
+    else:
+        dt_last_checked = datetime.datetime.strptime(my_globals.settings["schedule_last_checked"], '%Y-%m-%d %H:%M:%S')
+    
+    # convert times into datetime. Add todays date and event time together to form a datetime object
+    date_today = datetime.date.today()
+    dt_open  = datetime.datetime.combine( date_today, t_open )
+    dt_close = datetime.datetime.combine( date_today, t_close )
+    
+    # debugging times
+    #print ("time now   : ", dt_now)
+    #print ("last check : ", dt_last_checked)
+    #print ("time open  : ", dt_open)
+    #print ("time close : ", dt_close)
+    
+    close_active = False    # true if open  event is within our test
+    open_active  = False    # true if close event is within our test
+    
+    try:
+        # Test if open time is between last checked and now
+        if dt_open > dt_last_checked and dt_open < dt_now:
+            open_active = True
+        # Test if close time is between last checked and now
+        if dt_close > dt_last_checked and dt_close < dt_now:
+            close_active = True
+    except Exception as e:
+        print ("Schedule conditions error. ", e)
+        return
+    else:
+        print ("Schedule condition events: open:%s, close:%s" % (open_active, close_active))
+        if open_active and close_active:        # Both open and close events are within timeframe
+            print ("   Both events happened since last checked. looking for latest")
+            if dt_open > dt_close:              # checking which was the latest event
+                print ("\tSchedule opening activated")
+                set_transition("open", "Schedule open", True)
+            else:
+                print ("\tSchedule closing activated")
+                set_transition("close", "Schedule close", True)
+        else:                                   # only one event happened. act on whichever event that was
+            if open_active:
+                print ("\tSchedule opening activated")
+                set_transition("open", "Schedule open", True)
+            elif close_active:
+                print ("\tSchedule closing activated")
+                set_transition("close", "Schedule close", True)
+
+    # update last checked timestamp
+    dt_last_checked = datetime.datetime.strftime(dt_now, '%Y-%m-%d %H:%M:%S')   # convert datetime now to string
+    my_globals.settings["schedule_last_checked"] = dt_last_checked
+    print ("--------------------------------------")
+
+
+# This function sets up the state machine to a transition state
+# like closed > opening or open > closing
+def set_transition(cmd, source="unknown", override_server= False):
+    global fsm_current_state, fsm_transition_state
+    print("Entered set transition: %s, %s, %s" %(cmd, source, override_server))
+    dt_now = datetime.datetime.strftime(datetime.datetime.utcnow() , '%Y-%m-%d %H:%M:%S')
+    coverlog = "%s - By %s" % (dt_now, source)     # this variable contains all the text that will be printed to terminal and log file
+
+    if (cmd == "close"):
+        if (fsm_current_state == "open"):                   # test to see if already open
+            fsm_current_state = "closing"                   # set state machine to start moving
+            fsm_transition_state = "ts0:RelayOn"            # reset transition substate back to 0
+            coverlog += " - cover set to close"
+            if override_server == True:
+                my_globals.status["server_override"] = True  # change server command
+                my_globals.status["server_command"] = "close"
+                coverlog += " - overriding server cmd"
+        elif (fsm_current_state == "closed"):
+            coverlog += " - cover already closed. aborting"
+        else:
+            coverlog += " - can't close cover if cover is not in open state"
+    
+    elif (cmd == "open"):
+        if (fsm_current_state == "closed"):                  # test to see if already open
+            fsm_current_state = "opening"                   # set state machine to start moving
+            fsm_transition_state = "ts0:RelayOn"            # reset transition substate back to 0
+            coverlog += " - cover set to open "
+            if override_server == True:
+                my_globals.status["server_override"] = True   # change server command
+                my_globals.status["server_command"] = "open"
+                coverlog += " - overriding server cmd"
+        elif (fsm_current_state == "open"):
+            coverlog += " - cover already open. aborting"
+        else:
+            coverlog += " - can't open cover if cover is not in closed state"
+    else:
+        coverlog += " - unknown state. only open/close are recognised"
+    
+    # print log output
+    print (coverlog)
+    file = open(my_globals.settings["storage_dir"] + "cover.log", "a")
+    file.write(coverlog + ".\n")
+    file.close
+    return
+            
 
 # Top most Finite State Machine function
 # Determins what is the active state and calls that function
@@ -83,9 +207,6 @@ def fsm():
     else:
         print ("ERROR: Unknown state.")
     
-    # update global variables with current limit switches
-    # sensor_data["limitsw_open"]  = ls_open
-    # sensor_data["limitsw_close"] = ls_close
     my_globals.status["cover_status"] = fsm_current_state
     print ( "fsm - Next state %s" % fsm_current_state)
     print ("--------------------------------------")
@@ -103,8 +224,7 @@ def fsm_open():
         return                  # do nothing
     elif (server_cmd == "close"):
         print ("Server change event: closing")
-        fsm_transition_state = "ts0:RelayOn"       # reset
-        fsm_current_state = "closing"
+        set_transition("close", "Server cmd", False)
     elif (server_cmd == "lock"):
         print ("Server change event: locked")
         fsm_current_state = "locked"
@@ -124,8 +244,7 @@ def fsm_close():
         return                  # do nothing
     elif (server_cmd == "open"):
         print ("Server change event: opening")
-        fsm_transition_state = "ts0:RelayOn"       # reset
-        fsm_current_state = "opening"
+        set_transition("open", "Server cmd", False)
     elif (server_cmd == "lock"):
         print ("Server change event: locked")
         fsm_current_state = "locked"
