@@ -114,7 +114,7 @@ def cover_schedule():
         logging.error ("Schedule conditions error. ", e)
         return
     else:
-        print ("Schedule condition events: open:%s, close:%s" % (open_active, close_active))
+        logging.debug ("Schedule condition events: open:%s, close:%s" % (open_active, close_active))
         if open_active and close_active:        # Both open and close events are within timeframe
             print ("   Both events happened since last checked. looking for latest")
             if dt_open > dt_close:              # checking which was the latest event
