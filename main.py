@@ -13,15 +13,23 @@ from helper_lib import generate_uuid, is_valid_uuid
 import helper_lib
 import logging
 
-# logging config
+# Logger: logging config   https://docs.python.org/3/howto/logging-cookbook.html
 logger = logging.getLogger()
-handler = logging.StreamHandler()
 formatter = helper_lib.MyFormatter()           # sets format of the logs. Uses cusom class
-handler.setFormatter(formatter)
-logger.addHandler(handler)
-logger.setLevel(logging.WARNING)
-logger.setLevel(logging.INFO)
-#logger.setLevel(logging.DEBUG)
+logger.setLevel(logging.DEBUG)              # This essentially sets the highest logging level
+
+# Logger: create file handler which logs even debug messages
+fh = logging.FileHandler('smartsettia.log')
+fh.setFormatter(formatter)      # set format
+fh.setLevel(logging.INFO)    # set level for file logging
+logger.addHandler(fh)           # add filehandle to logger
+
+# Logger: create console handle
+ch = logging.StreamHandler()
+ch.setFormatter(formatter)
+ch.setLevel(logging.WARNING)    # set logging level for consol
+logger.addHandler(ch)
+
 
 # https://stackoverflow.com/a/30493366
 parser = argparse.ArgumentParser()
