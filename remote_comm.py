@@ -44,7 +44,7 @@ def status_update():
         try:  # Send the request
             req = requests.post(url,headers=headers, json=payload, timeout=(3.05, 27))
         except Exception as e:
-            logging.error ("remote_comm:status_update:Error sending request")
+            logging.error ("status_update:Error sending request")
             logging.debug (e)
         try:  # log raw response to rile
             file=open(my_globals.settings["storage_dir"] +"request_status_update.log","a")
@@ -53,12 +53,12 @@ def status_update():
             file.write(str(req.status_code) + "\n")
             if req.status_code == 503:
                 file.write("Server unavailable")
-            else:
-                file.write(req.text)
+            #else:
+            #    file.write(req.text[:2000])
             file.close()
         except Exception as e:
             #raise
-            logging.error ("remote_comm:status_update:Error writing to log")
+            logging.error ("status_update:Error writing to log")
             logging.debug (e)
 
         logging.debug ("Response code: %s" % req.status_code)
@@ -96,7 +96,7 @@ def status_update():
                 # do in main?
 
             except Exception as e:
-                logging.error ("remote_comm:status_update:Error converting json")
+                logging.error ("status_update:Error converting json")
                 logging.debug (e)
         # test status code to determin if we were Successful
         if req.status_code == 201:
@@ -107,7 +107,7 @@ def status_update():
             logging.debug ("Headers: %s" % headers)              # debugger
             logging.debug ("json dmp: %s" % json.dumps(payload)) # debugger
     except:
-        logging.error ("remote_comm:status_update:General Error")
+        logging.error ("status_update:General Error")
     # END of status_update
 
 
@@ -126,7 +126,7 @@ def sensor_upload():
         try:  # Send the request
             req = requests.post(url,headers=headers, json=payload, timeout=(3.05, 27))
         except Exception as e:
-            logging.error ("remote_comm:sensor_upload:Error sending request")
+            logging.error ("sensor_upload:Error sending request")
             logging.debug (e)
         try:  # log raw response to rile
             file=open(my_globals.settings["storage_dir"] +"request_sensor_upload.log","a")
@@ -135,11 +135,11 @@ def sensor_upload():
             if req.status_code == 503:
                 file.write("Server unavailable")
             else:
-                file.write(req.text)
+                file.write(req.text[:2000])
             file.close()
         except Exception as e:
             #raise
-            logging.error ("remote_comm:sensor_upload:Error writing to log")
+            logging.error ("sensor_upload:Error writing to log")
             logging.debug (e)
 
         logging.debug ("Response code: %s" % req.status_code)
@@ -150,7 +150,7 @@ def sensor_upload():
             #print "rtndata2: ", rtndata2   # debugger
 
         except Exception as e:
-            logging.error ("remote_comm:sensor_upload:Error converting json")
+            logging.error ("sensor_upload:Error converting json")
             logging.debug (e)
         # test status code to determin if we were Successful
         if req.status_code == 200 or req.status_code == 201:
@@ -165,7 +165,7 @@ def sensor_upload():
             logging.debug ("\tHeaders: %s" % headers)              # debugger
             logging.debug ("\tjson dmp: $s" % json.dumps(payload)) # debugger
     except:
-        logging.error ("remote_comm:sensor_upload:General Error")
+        logging.error ("sensor_upload:General Error")
     #END of sensor_upload
 
 
@@ -181,7 +181,7 @@ def register():
         try:
             req = requests.post(url, headers=headers, data=json.dumps(payload), timeout=(3.05, 27))
         except:
-            logging.error ("remote_comm:register:Error sending request")
+            logging.error ("register:Error sending request")
         try:
             file=open(my_globals.settings["storage_dir"] +"request_register.log","a")
             file.write("\n\n" + str(datetime.now())[:-3] + "\n")
@@ -189,15 +189,15 @@ def register():
             if req.status_code == 503:
                 file.write("Server unavailable")
             else:
-                file.write(req.text)
+                file.write(req.text[:2000]) # truncate the supper long error trace report
             file.close()
         except Exception as e:
             #raise
-            logging.error ("remote_comm:register:Error writing to log")
+            logging.error ("register:Error writing to log")
             logging.debug (e)
 
         logging.debug ("Response code: %s" % req.status_code)
-        #print req.text
+        #print req.text[:2000]
         try:
             rtndata = req.json()
             rtndata2= rtndata["data"]
@@ -211,19 +211,19 @@ def register():
             my_globals.settings["id"] = rtndata2["id"]
 
         except Exception as e:
-            logging.error ("remote_comm:register:Error converting json")
+            logging.error ("register:Error converting json")
             logging.debug (e)
 
         if req.status_code == 200 or req.status_code == 201:
             logging.info ("Registration Successful")
         else:
-            logging.error ("Registration failed: Responce code: ", req.status_code)
+            logging.error ("Registration failed: Responce code: %r" % req.status_code)
             logging.debug ("URL:  %r" % url)                     # debugger
             logging.debug ("UUID: %r" % payload["uuid"])         # debugger
             logging.debug ("tHeaders: %r" % headers)              # debugger
             logging.debug ("json dmp: %r" % json.dumps(payload)) # debugger
     except:
-        logging.error ("remote_comm:register:General Error")
+        logging.error ("register:General Error")
     print ("--------------------------------------")
     # END of register
 
@@ -249,7 +249,7 @@ def pic_upload():
         try:  # Send the request
             req = requests.post(url,headers=headers, files=files, data=payload, timeout=(3.05, 27))
         except Exception as e:
-            logging.error ("remote_comm:webcam:Error sending request")
+            logging.error ("webcam:Error sending request")
             logging.debug (e)
         try:  # log raw response to rile
             file=open(my_globals.settings["storage_dir"] +"request_webcam.log","a")
@@ -258,11 +258,11 @@ def pic_upload():
             if req.status_code == 503:
                 file.write("Server unavailable")
             else:
-                file.write(req.text)
+                file.write(req.text[:2000])
             file.close()
         except Exception as e:
             #raise
-            logging.error ("remote_comm:webcam:Error writing to log")
+            logging.error ("webcam:Error writing to log")
             logging.debug (e)
 
         logging.debug ("Response code: %s" % req.status_code)
@@ -273,18 +273,18 @@ def pic_upload():
             #print "rtndata2: ", rtndata2   # debugger
 
         except Exception as e:
-            logging.error ("remote_comm:webcam:Error converting json")
+            logging.error ("webcam:Error converting json")
             logging.debug (e)
         # test status code to determin if we were Successful
         if req.status_code == 200 or req.status_code == 201:
             logging.info ("Webcam upload Successful")
         else:
-            logging.error ("Webcam upload failed: Responce code: ", req.status_code)
+            logging.error ("Webcam upload failed: Responce code: %r" % req.status_code)
             # Debugging Code
             logging.debug ("Image name: %r" % image)             # debugger
             logging.debug ("URL: %r" % url)                      # debugger
             logging.debug ("Headers: %r" % headers)              # debugger
             logging.debug ("json dmp: %r" % json.dumps(payload)) # debugger
     except:
-        logging.error ("remote_comm:webcam:General Error")
+        logging.error ("webcam:General Error")
     #END of pic_upload
