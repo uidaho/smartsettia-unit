@@ -2,50 +2,14 @@ import time
 import uuid
 from uuid import UUID   # for some reason UUID is not imported when importing all of uuid
 import my_globals
-
-t0 = time.time()                # program start time
-
-# usage
-# print_error("name of function", "error description")
-# print_error("remote_comm:register", "something happened")
-# This function will print the error to terminal as well as write the error to file
-def print_error(fun_name, error):
-    global t0           # time of program start
-    t1 = time.time()    # current time
-    t = t1 - t0         # run time
-    error_msg = "ERROR: %d:\t%s:\t%r" %(t,fun_name,error)
-    print (error_msg)
-
-    # also right error to file
-    try:
-        file=open(my_globals.settings["storage_dir"] + "error.log","a")
-        file.write(error_msg + "\n")
-        file.close()
-    except:
-        print ("ERROR: Helper_lib: File error")
-
-def print_log(fun_name, log_text, term=1):
-    global t0           # time of program start
-    t1 = time.time()    # current time
-    t = t1 - t0         # run time
-    error_msg = "Log: %d:\t%s:\t%s" %(t,fun_name,log_text)
-    if term == 1:
-        print (error_msg)
-
-    # also right error to file
-    try:
-        file=open(error_filename,"a")
-        file.write(log_text + "\n")
-        file.close()
-    except:
-        print ("ERROR: Helper_lib:print_log: File error")
+import logging
 
 
 def generate_uuid():
     # https://stackoverflow.com/questions/159137/getting-mac-address
     seed = uuid.getnode()       # returns 48bit value from MAC or rand number if not found
     uu = str(uuid.uuid5(uuid.NAMESPACE_URL, str(seed)))
-    print ("uuid: ", uu)
+    logging.info ("uuid: %s" % uu)
     my_globals.settings["uuid"] = uu
 
 
@@ -68,7 +32,48 @@ def is_valid_uuid(uuid_to_test, version=5):
     try:
         uuid_obj = UUID(uuid_to_test, version=version)
     except Exception as e:
-        # print ("error: ", e)
+        logging.error("error: %r" % e)
         return False
 
     return str(uuid_obj) == uuid_to_test
+
+
+
+# Custom formatter for logging
+# source: https://stackoverflow.com/a/14859558
+class MyFormatter(logging.Formatter):
+
+    err_fmt  = "%(asctime)-15s %(levelname)s: %(module)s: %(message)s"
+    war_fmt  = "%(asctime)-15s %(levelname)s: %(module)s: %(message)s"
+    dbg_fmt  = "\tDBG: %(module)s: %(lineno)d: %(msg)s"
+    info_fmt = "%(asctime)-15s %(levelname)s: %(message)s"
+    
+    def __init__(self):
+        super().__init__(fmt="%(levelno)d: %(msg)s", datefmt=None, style='%')  
+
+    def format(self, record):
+
+        # Save the original format configured by the user
+        # when the logger formatter was instantiated
+        format_orig = self._style._fmt
+
+        # Replace the original format with one customized by logging level
+        if record.levelno == logging.DEBUG:
+            self._style._fmt = MyFormatter.dbg_fmt
+
+        elif record.levelno == logging.INFO:
+            self._style._fmt = MyFormatter.info_fmt
+
+        elif record.levelno == logging.ERROR:
+            self._style._fmt = MyFormatter.err_fmt
+            
+        elif record.levelno == logging.WARNING:
+            self._style._fmt = MyFormatter.war_fmt
+
+        # Call the original formatter class to do the grunt work
+        result = logging.Formatter.format(self, record)
+
+        # Restore the original format configured by the user
+        self._style._fmt = format_orig
+
+        return result

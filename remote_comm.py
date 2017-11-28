@@ -6,7 +6,6 @@ import json
 import requests
 import my_globals   # smartsettia globals
 from my_globals import settings
-from helper_lib import print_error, print_log
 
 headers = {'Content-type': 'application/json', 'Accept': 'application/json'}
 
@@ -40,8 +39,6 @@ def status_update():
     print ("\tCover status:  %s" % payload["cover_status"])
     print ("\tError message: %r" % payload["error_msg"])
     
-    #print_log("remote:status_update", url, show_logging)
-
     try:
         try:  # Send the request
             req = requests.post(url,headers=headers, json=payload, timeout=(3.05, 27))
@@ -127,7 +124,6 @@ def sensor_upload():
     payload["token"] = my_globals.settings["token"]     # add token
     payload.update(my_globals.sensor_data)      # add in sensor_dat dictionary
 
-    #print_log("remote:sensor_upload", url, show_logging)
 
     try:
         try:  # Send the request
@@ -184,8 +180,6 @@ def register():
     payload = {}
     payload["uuid"] = my_globals.settings["uuid"]
     payload["challenge"] = my_globals.settings["challenge"]
-
-    #print_log("remote:register", url, show_logging)
 
     try:
         try:
@@ -256,8 +250,6 @@ def pic_upload():
     payload["token"] = ('', str(my_globals.settings["token"]))
     files= {"image": open(my_globals.settings["storage_dir"] + my_globals.settings["img_name"],'rb')}
 
-
-    #print_log("remote:webcam", url, show_logging)
     #print ("-------------")
 
     try:
