@@ -7,14 +7,15 @@ import my_globals
 from my_globals import sensor_data
 import time
 import datetime
+import logging
 
 # Import gpio
 if (my_globals.NOT_PI != True):
     try:
         import RPi.GPIO as GPIO
     except RuntimeError:
-        print("Error importing RPi.GPIO!  This is probably because you need superuser privileges.  You can achieve this by using 'sudo' to run your script")
-        print("\tFalling over to disable GPIO. This will lead to unexpected behaviour with the cover.")
+        logging.error("Error importing RPi.GPIO!")
+        logging.error("Falling over to disable GPIO. This will lead to unexpected behaviour with the cover.")
         my_globals.status['error_msg'] = "GPIO Library could not be loaded"
         time.sleep(3) # Allow the user time to catch this error
         my_globals.NOT_PI = "True"
@@ -32,8 +33,8 @@ if (my_globals.NOT_PI != True):
         GPIO.setup(pin_ls_open,  GPIO.IN, pull_up_down=GPIO.PUD_UP)
         GPIO.setup(pin_ls_close, GPIO.IN, pull_up_down=GPIO.PUD_UP)
     except Exception as e:
-        print ("Error setting GPIO.", e)
-        print("\tFalling over to disable GPIO. This will lead to unexpected behaviour with the cover.")
+        logging.error ("Error setting GPIO.", e)
+        logging.error("Falling over to disable GPIO. This will lead to unexpected behaviour with the cover.")
         my_globals.status['error_msg'] = "GPIO Library could not be loaded"
         time.sleep(3) # Allow the user time to catch this error
         my_globals.NOT_PI = "True"
@@ -61,12 +62,12 @@ ls_close = 0
 
 # Open close schedule
 def cover_schedule():
-    print ("\n--- Schedule -------------------------")
+    logging.info ("--- Schedule -------------------------")
     global fsm_current_state, fsm_transition_state
     
     # Test if a schedule has been set
     if (my_globals.settings["cover_time_open"] == None or my_globals.settings["cover_time_close"] == None):
-        print ("One or both cover times are null: %r, %r" % (my_globals.settings["cover_time_open"], my_globals.settings["cover_time_close"]))
+        logging.warning ("One or both cover times are null: %r, %r" % (my_globals.settings["cover_time_open"], my_globals.settings["cover_time_close"]))
         time.sleep(2)                   # debugger allows the user to spot this event
         return
     
@@ -81,7 +82,7 @@ def cover_schedule():
     # check if last check string is empty, if not parse it into datetime object
     if dt_last_checked == None:
         # null time. Update to curent time and return
-        print ("Last checked time was blank.")
+        logging.warning ("Last checked time was blank.")
         dt_last_checked = datetime.datetime.strftime(dt_now, '%Y-%m-%d %H:%M:%S')
         my_globals.settings["schedule_last_checked"] = dt_last_checked
         return      # algoritm cannot work without a last check
@@ -94,10 +95,10 @@ def cover_schedule():
     dt_close = datetime.datetime.combine( date_today, t_close )
     
     # debugging times
-    #print ("time now   : ", dt_now)
-    #print ("last check : ", dt_last_checked)
-    #print ("time open  : ", dt_open)
-    #print ("time close : ", dt_close)
+    logging.debug ("time now   : %s" % dt_now)
+    logging.debug ("last check : %s" % dt_last_checked)
+    logging.debug ("time open  : %s" % dt_open)
+    logging.debug ("time close : %s" % dt_close)
     
     close_active = False    # true if open  event is within our test
     open_active  = False    # true if close event is within our test
@@ -110,37 +111,36 @@ def cover_schedule():
         if dt_close > dt_last_checked and dt_close < dt_now:
             close_active = True
     except Exception as e:
-        print ("Schedule conditions error. ", e)
+        logging.error ("Schedule conditions error. ", e)
         return
     else:
         print ("Schedule condition events: open:%s, close:%s" % (open_active, close_active))
         if open_active and close_active:        # Both open and close events are within timeframe
             print ("   Both events happened since last checked. looking for latest")
             if dt_open > dt_close:              # checking which was the latest event
-                print ("\tSchedule opening activated")
+                logging.info ("Schedule opening activated")
                 set_transition("open", "Schedule open", True)
             else:
-                print ("\tSchedule closing activated")
+                logging.info ("Schedule closing activated")
                 set_transition("close", "Schedule close", True)
         else:                                   # only one event happened. act on whichever event that was
             if open_active:
-                print ("\tSchedule opening activated")
+                logging.info ("Schedule opening activated")
                 set_transition("open", "Schedule open", True)
             elif close_active:
-                print ("\tSchedule closing activated")
+                logging.info ("Schedule closing activated")
                 set_transition("close", "Schedule close", True)
 
     # update last checked timestamp
     dt_last_checked = datetime.datetime.strftime(dt_now, '%Y-%m-%d %H:%M:%S')   # convert datetime now to string
     my_globals.settings["schedule_last_checked"] = dt_last_checked
-    print ("--------------------------------------")
 
 
 # This function sets up the state machine to a transition state
 # like closed > opening or open > closing
 def set_transition(cmd, source="unknown", override_server= False):
     global fsm_current_state, fsm_transition_state
-    print("Entered set transition: %s, %s, %s" %(cmd, source, override_server))
+    logging.info("Entered set transition: %s, %s, %s" %(cmd, source, override_server))
     dt_now = datetime.datetime.strftime(datetime.datetime.utcnow() , '%Y-%m-%d %H:%M:%S')
     coverlog = "%s - By %s" % (dt_now, source)     # this variable contains all the text that will be printed to terminal and log file
 
@@ -175,7 +175,7 @@ def set_transition(cmd, source="unknown", override_server= False):
         coverlog += " - unknown state. only open/close are recognised"
     
     # print log output
-    print (coverlog)
+    logging.info (coverlog)
     file = open(my_globals.settings["storage_dir"] + "cover.log", "a")
     file.write(coverlog + ".\n")
     file.close
@@ -185,13 +185,13 @@ def set_transition(cmd, source="unknown", override_server= False):
 # Top most Finite State Machine function
 # Determins what is the active state and calls that function
 def fsm():
-    print ( "Cover monitor - Current state %s" % fsm_current_state)
+    logging.debug ( "Cover monitor - Current state %s" % fsm_current_state)
     global ls_open, ls_close, server_cmd
     getSwitches()
-    print ("\tCurrent sensors open/closed (%d,%d)"% (ls_open, ls_close)) #(sensor_data["limitsw_open"], sensor_data["limitsw_close"]))
+    logging.debug ("\tCurrent sensors open/closed (%d,%d)"% (ls_open, ls_close)) #(sensor_data["limitsw_open"], sensor_data["limitsw_close"]))
 
     server_cmd = my_globals.status['server_command']
-    print ("\tCurrent server command: ", server_cmd)
+    logging.debug ("\tCurrent server command: %s" % server_cmd)
     if fsm_current_state == "error":
         fsm_error()
     elif (fsm_current_state == "open"):
@@ -205,14 +205,13 @@ def fsm():
     elif (fsm_current_state == "locked"):
         fsm_locked()
     else:
-        print ("ERROR: Unknown state.")
+        logging.error ("ERROR: Unknown state.")
     
     my_globals.status["cover_status"] = fsm_current_state
-    print ( "fsm - Next state %s" % fsm_current_state)
-    print ("--------------------------------------")
+    logging.debug ( "fsm - Next state %s" % fsm_current_state)
     
 def fsm_open():
-    print ("Entered State: open")
+    logging.info ("Entered State: open")
     global ls_close, ls_close, fsm_current_state, fsm_transition_state
     # if not open. unexpected movement
     if  not (ls_open == 1 and ls_close == 0):
@@ -223,16 +222,16 @@ def fsm_open():
     elif (server_cmd == "open"):
         return                  # do nothing
     elif (server_cmd == "close"):
-        print ("Server change event: closing")
+        logging.info ("Server change event: closing")
         set_transition("close", "Server cmd", False)
     elif (server_cmd == "lock"):
-        print ("Server change event: locked")
+        logging.info ("Server change event: locked")
         fsm_current_state = "locked"
     else:
-        print ("Unknown server change")
+        logging.warning ("Unknown server change")
             
 def fsm_close():
-    print ("Entered State: closed")
+    logging.info ("Entered State: closed")
     global ls_close, ls_close, fsm_current_state, fsm_transition_state
     # if not closed. unexpected movement
     if  not (ls_open == 0 and ls_close == 1):
@@ -243,17 +242,17 @@ def fsm_close():
     elif (server_cmd == "close"):  # server says close. i'm currently in the 'closed' state
         return                  # do nothing
     elif (server_cmd == "open"):
-        print ("Server change event: opening")
+        logging.info ("Server change event: opening")
         set_transition("open", "Server cmd", False)
     elif (server_cmd == "lock"):
-        print ("Server change event: locked")
+        logging.info ("Server change event: locked")
         fsm_current_state = "locked"
     else:
-        print ("Unknown server change")
+        logging.warning ("Unknown server change")
     
             
 def fsm_opening():
-    print ("Entered State: opening\tSubstate: %s" % fsm_transition_state)
+    logging.info ("Entered State: opening\tSubstate: %s" % fsm_transition_state)
     global ls_open, ls_close, fsm_current_state, wait_time
     global fsm_transition_state
     
@@ -268,7 +267,7 @@ def fsm_opening():
     if fsm_transition_state == "ts0:RelayOn":       # turn relay on
         set_Relay("on")
         wait_time = time.time() + RELAY_WAIT  # waiting x seconds
-        print ("\tRelay -time is: %0.1f,\t wait time: %0.1f" % (time.time(), wait_time))
+        logging.debug ("\tRelay -time is: %0.1f,\t wait time: %0.1f" % (time.time(), wait_time))
         fsm_transition_state = "ts1:RelayWait"
     
     elif fsm_transition_state == "ts1:RelayWait":     # wait - relay off
@@ -280,11 +279,11 @@ def fsm_opening():
     elif fsm_transition_state == "ts3:MovingTest":
         if (ls_open == 0 and ls_close == 0):
             wait_time = time.time() + COVER_WAIT  # waiting x seconds
-            print ("\tCover -time is: %0.1f,\t timout time: %0.1f" % (time.time(), wait_time))
+            logging.debug ("\tCover -time is: %0.1f,\t timout time: %0.1f" % (time.time(), wait_time))
             fsm_transition_state = "ts4:Moving"           # test pass. its moving
         else: 
             my_globals.status["error_msg"] = "Cover did not move"
-            print("\tError: Cover did not move. Time now is: %0.1f" % time.time())
+            logging.error("\tError: Cover did not move. Time now is: %0.1f" % time.time())
             fsm_current_state = "error"         # send to error state
     
     # its moving. lets wait for it to finish
@@ -292,19 +291,19 @@ def fsm_opening():
         # did it finish and open?
         if (ls_open == 1 and ls_close == 0):
             # success
-            print("\tOpening finished")
+            logging.debug("\tOpening finished")
             fsm_current_state = "open"          # send to open state
             
         # did it somehow reverse and went back to close? dont know how
         elif (ls_open == 0 and ls_close == 1):
             my_globals.status["error_msg"] = "Cover closed itself?"
-            print("\tError: Cover closed itself")
+            logging.error("\tError: Cover closed itself")
             fsm_current_state = "error"         # send to error state
             
         # timed out
         elif (time.time() > wait_time):
             my_globals.status["error_msg"] = "Cover movement timed out. Waiting for it to resolve to open or close"
-            print("\tCover movement timed out at %0.1f. Waiting for it to resolve to open or close" % time.time())
+            logging.error("\tCover movement timed out at %0.1f. Waiting for it to resolve to open or close" % time.time())
             fsm_current_state = "error"         # send to error state
             
         # 0,0 and not timedout 
@@ -312,7 +311,7 @@ def fsm_opening():
 
     
 def fsm_closing():
-    print ("Entered State: closing\tSubstate: %s" % fsm_transition_state)
+    logging.info ("Entered State: closing\tSubstate: %s" % fsm_transition_state)
     global ls_open, ls_close, fsm_current_state, wait_time
     global fsm_transition_state
     
@@ -327,7 +326,7 @@ def fsm_closing():
     if fsm_transition_state == "ts0:RelayOn":       # turn relay on
         set_Relay("on")
         wait_time = time.time() + RELAY_WAIT  # waiting x seconds
-        print ("\tRelay -time is: %0.1f,\t wait time: %0.1f" % (time.time(), wait_time))
+        logging.debug ("\tRelay -time is: %0.1f,\t wait time: %0.1f" % (time.time(), wait_time))
         fsm_transition_state = "ts1:RelayWait"
     
     elif fsm_transition_state == "ts1:RelayWait":     # wait - relay off
@@ -339,11 +338,11 @@ def fsm_closing():
     elif fsm_transition_state == "ts3:MovingTest":
         if (ls_open == 0 and ls_close == 0):
             wait_time = time.time() + COVER_WAIT  # waiting x seconds
-            print ("\tCover -time is: %0.1f,\t timout time: %0.1f" % (time.time(), wait_time))
+            logging.debug ("\tCover -time is: %0.1f,\t timout time: %0.1f" % (time.time(), wait_time))
             fsm_transition_state = "ts4:Moving"           # test pass. its moving
         else: 
             my_globals.status["error_msg"] = "Cover did not move"
-            print("\tError: Cover did not move. Time now is: %0.1f" % time.time())
+            logging.error("\tError: Cover did not move. Time now is: %0.1f" % time.time())
             fsm_current_state = "error"         # send to error state
     
     # its moving. lets wait for it to finish
@@ -351,26 +350,26 @@ def fsm_closing():
         # did it finish and close?
         if (ls_open == 0 and ls_close == 1):
             # success
-            print("\tClosing finished")
+            logging.debug("\tClosing finished")
             fsm_current_state = "closed"          # send to open state
             
         # did it somehow reverse and went back to close? dont know how
         elif (ls_open == 1 and ls_close == 0):
             my_globals.status["error_msg"] = "Cover opened itself?"
-            print("\tError: Cover opened itself")
+            logging.error("\tError: Cover opened itself")
             fsm_current_state = "error"         # send to error state
             
         # timed out
         elif (time.time() > wait_time):
             my_globals.status["error_msg"] = "Cover movement timed out. Waiting for it to resolve to open or close"
-            print("\tCover movement timed out at %0.1f. Waiting for it to resolve to open or close" % time.time())
+            logging.error("\tCover movement timed out at %0.1f. Waiting for it to resolve to open or close" % time.time())
             fsm_current_state = "error"         # send to error state
             
         # 0,0 and not timedout 
             # do nothing. we are waiting
     
 def fsm_locked():
-    print ("Entered State: locked")
+    logging.info ("Entered State: locked")
     global fsm_current_state
     if (server_cmd != "lock"):
         fsm_current_state = "error" # to resolve
@@ -378,7 +377,7 @@ def fsm_locked():
     
 # error and resolution
 def fsm_error():
-    print ("Entered State: Error")
+    logging.warning ("Entered State: Error")
     global ls_open, ls_close, fsm_current_state
     if  (ls_open == 1 and ls_close == 0):
         fsm_current_state = "open"
@@ -391,34 +390,31 @@ def fsm_error():
     elif (ls_open == 0 and ls_close == 0):
         fsm_current_state = "error"
     else:
-        print ("Unknown error")
+        logging.error ("Unknown error")
         fsm_current_state = "error"
 
 # set relay pin to value
 def set_Relay(val):
-    print ("Setting Relay to %s" % val)
-    print ("not pi: ", my_globals.NOT_PI)
     if (my_globals.NOT_PI == True):    # this is NOT a pi and NOT usng gpio
-        print ("\tGPIO disabled")
+        logging.warning ("GPIO disabled")
     else:
         try:
             if (val == "on"):
-                print ("\tTurning relay on")
+                logging.info ("Turning relay on")
                 GPIO.output(pin_relay, GPIO.HIGH)
             else: # val == "off" or any other value. default off
-                print ("\tTurning relay off")
+                logging.info ("Turning relay off")
                 GPIO.output(pin_relay, GPIO.LOW)
         except Exception as e:
-            print ("\tError setting relay GPIO output pin", e)
+            logging.error ("\tError setting relay GPIO output pin", e)
 
 
 # read limit switches
 def getSwitches():
-    print ("Reading limit switches")
     global ls_open, ls_close
     if (my_globals.NOT_PI == True):     # this is NOT a pi and NOT usng gpio
         # Simulate switches based on current state
-        print ("\t## Simulating switches")
+        logging.warning ("## Simulating switches")
         """
         ts0:RelayOn      relay on
         ts1:RelayWait    keep relay on for set time. then turn off
@@ -451,9 +447,9 @@ def getSwitches():
         try:
             ls_open = not GPIO.input(pin_ls_open)
             ls_close = not GPIO.input(pin_ls_close)
-            print ("getSwitches: (%d, %d)" %(ls_open, ls_close))
+            logging.debug ("getSwitches: (%d, %d)" %(ls_open, ls_close))
         except Exception as e:
-            print ("\tError reading limit switch pins:", e)
+            logging.error ("Error reading limit switch pins:", e)
         
 
 # This will reset gpios back to what they were before the script started.
