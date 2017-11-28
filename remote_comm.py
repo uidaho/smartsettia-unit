@@ -158,6 +158,9 @@ def sensor_upload():
         elif req.status_code == 422:
             logging.warning ("Unprocessable Entity. Re-registering")
             register()
+        elif req.status_code == 500:
+            logging.warning ("Server error. Sleeping for 10 seconds")
+            time.sleep(10)  # to slow the program to prevent several error posts in a short time
         else:
             logging.error ("sensor_upload failed: Responce code: %s" % req.status_code)
             # Debugging Code
