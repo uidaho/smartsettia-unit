@@ -2,6 +2,7 @@ import time
 import platform         # test if pi for cpu temp
 import my_globals
 from subprocess import check_output
+import logging
 
 FAKE_SENSORS = my_globals.NOT_PI
 
@@ -15,8 +16,8 @@ def update():
     my_globals.sensor_data["sensor_data"][1]["value"] = get_light()
     my_globals.sensor_data["sensor_data"][2]["value"] = str(get_light())  # TODO add light inner
     my_globals.sensor_data["sensor_data"][3]["value"] = str(get_Temp_Hum())
-    print("Tempsensor [3]: ", my_globals.sensor_data["sensor_data"][3])
-    print ("Temp: %s\tCpu Temp: %s\tLight: %s" % (get_Temp_Hum(), get_cpu_temp(), get_light()))
+    logging.debug("Sensors: Tempsensor [3]: %r"% my_globals.sensor_data["sensor_data"][3])
+    logging.debug("Sensors: Temp: %s\tCpu Temp: %s\tLight: %s" % (get_Temp_Hum(), get_cpu_temp(), get_light()))
 
 # get temperature and humidity from sensor
 def get_Temp_Hum():
