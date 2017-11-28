@@ -11,6 +11,7 @@ import os
 from subprocess import call
 #from my_globals import settings  #import settings from my_globals
 import my_globals
+import logging
 
 
 def remove_image(filename):
@@ -25,19 +26,16 @@ def get_cat_picture(filename):
     url = "http://207.251.86.238/cctv448.jpg"       # NY trafic cam
     remove_image(filename)
     cat_pic = wget.download(url, out=filename, bar=None)
-    #print ("filename: ", cat_pic)
 
 
 def get_Picture(FAKEWEBCAM):
-    print ("\n--- Getting picture ------------------")
+    logging.info (" --- Getting picture ------------------")
     filename = my_globals.settings["storage_dir"] + my_globals.settings["img_name"]      # full path to image
-    #print ("Img Filename: ", filename)
+    logging.debug("Img Filename: "+ filename)
     remove_image(filename)
     if FAKEWEBCAM == 1:     # get fake picture
         get_cat_picture(filename)
-        #return
     else:                   # get picture from webcam
-        global filename
         # setup some metadata for fswebcam
         compression = "45"
         device      = "/dev/video0"
@@ -57,7 +55,8 @@ def get_Picture(FAKEWEBCAM):
           
         # call v4lctl to take the picture
         call(["v4lctl", "-c", device, "snap", "jpeg", resolution, filename])
-        print ("Img size: ", call(["du", "-h", filename]))    # prints size of picture
+        logging.info ("Img size: " + call(["du", "-h", filename]))    # prints size of picture
+        #check_output(["/opt/vc/bin/vcgencmd measure_temp | cut -c6-9"], shell=True)[:-1].decode('utf-8')
     
     # overlay reference
     # overlay_text = "/usr/bin/convert "+ filename + "  -pointsize 36 -fill white -annotate +40+728 '" + "hello" + "' "  
@@ -68,5 +67,5 @@ def get_Picture(FAKEWEBCAM):
     overlay_text = "convert " + filename + " -gravity North   -background YellowGreen  -splice 0x18 \
           -annotate +0+2 " + text + " " + filename
   
-    # print ("convert command: %s" % overlay_text)      # debugger to see command executed
+    #logging.debug ("Webcam: convert command: %s" % overlay_text)      # debugger to see command executed
     call ([overlay_text], shell=True)

@@ -91,3 +91,4 @@ ENV/
 
 # Project specific
 config.json
+*logs.zip

@@ -9,8 +9,19 @@ import webcam      # webcam module
 import my_globals  # global variables
 import remote_comm # server communication module
 import argparse    # argument parsing
-from helper_lib import print_error, print_log, generate_uuid, is_valid_uuid
+from helper_lib import generate_uuid, is_valid_uuid
+import helper_lib
+import logging
 
+# logging config
+logger = logging.getLogger()
+handler = logging.StreamHandler()
+formatter = helper_lib.MyFormatter()           # sets format of the logs. Uses cusom class
+handler.setFormatter(formatter)
+logger.addHandler(handler)
+logger.setLevel(logging.WARNING)
+logger.setLevel(logging.INFO)
+#logger.setLevel(logging.DEBUG)
 
 # https://stackoverflow.com/a/30493366
 parser = argparse.ArgumentParser()
@@ -38,7 +49,7 @@ def run_threaded(job_func):
 
 # If I'm running you should see this periodically
 def job_heartbeat():
-    print("I'm working. %s" % datetime.datetime.now())
+    logging.info("I'm working. %s" % datetime.datetime.now())
 
 # Save setting to file
 def job_save_settings():
@@ -52,7 +63,7 @@ def job_cover_schedule():
 
 # Read enviroment sensors
 def job_sensors():
-    print("Getting Sensors..")
+    logging.info("Getting Sensors")
     sensors.update()
     remote_comm.sensor_upload()
 
@@ -66,7 +77,7 @@ def job_webcam():
     t0 = int(round(time.time() * 1000)) # debugger
     webcam.get_Picture(FAKEWEBCAM)      # get picture function with option fake bool
     t1 = int(round(time.time() * 1000)) # debugger
-    print ("timepic: %d" % (t1-t0))      # debugger
+    logging.debug ("timepic: %d" % (t1-t0))      # debugger
     remote_comm.pic_upload()
 
 schedule.every(30).seconds.do(job_heartbeat)
@@ -114,7 +125,7 @@ def initialize():
     
     # check if /mnt/ramdisk exists else fallback to tmp directory
     if path.isdir(my_globals.settings["storage_dir"]) == 0:   # if path to directory exists
-        print ("Ramdisk does not exist. Using /tmp/smartsettia")
+        logging.warning ("Ramdisk does not exist. Using /tmp/smartsettia")
         # This is undesirable for sdcard wear and writing speed compared to a ramdisk
         if not os.path.exists("/tmp/smartsettia/"):     # test if tmp directory exists
             os.makedirs("/tmp/smartsettia/")            # create directory
@@ -146,6 +157,44 @@ if SINGLE_RUN:
     gpio_cleanup()
     exit()              # exit program
 
+# watch dog setup.
+# move to better spot later
+# https://www.freedesktop.org/software/systemd/man/sd_notify.html#
+# sdnotify: https://github.com/bb4242/sdnotify
+import sdnotify
+n = sdnotify.SystemdNotifier()
+n.notify("READY=1")
+
+# https://docs.python.org/2/library/signal.html
+import signal
+
+def signal_term_handler(signal, frame):
+    print ('Recived signal: ', str(signal))
+    #print ('got SIGTERM')
+    n.notify("STOPPING=1")
+    gpio_cleanup()
+    exit(0)
+    
 while True and not SINGLE_RUN:
     schedule.run_pending()
-    time.sleep(0.1)
+    try:
+        time.sleep(0.1)
+    except KeyboardInterrupt as e:
+        print("\nProgram exited by keyboard interrupt")
+        n.notify("STOPPING=1")
+        gpio_cleanup()
+        exit()
+    
+    # watchdog
+    try:
+        n.notify("WATCHDOG=1")
+    except Exception as e:
+        print ("Error with watchdog: ", e)
+        exit()  # debugging
+    
+    # test if program recieved a terminate command
+    signal.signal(signal.SIGHUP , signal_term_handler) # 1
+    signal.signal(signal.SIGINT , signal_term_handler) # 2
+    signal.signal(signal.SIGQUIT, signal_term_handler) # 3
+    signal.signal(signal.SIGABRT, signal_term_handler) # 6
+    signal.signal(signal.SIGTERM, signal_term_handler) # 15
