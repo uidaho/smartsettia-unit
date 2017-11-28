@@ -45,11 +45,11 @@ class MyFormatter(logging.Formatter):
 
     err_fmt  = "%(asctime)-15s %(levelname)s: %(module)s: %(message)s"
     war_fmt  = "%(asctime)-15s %(levelname)s: %(module)s: %(message)s"
-    dbg_fmt  = "\tDBG: %(module)s: %(lineno)d: %(msg)s"
+    dbg_fmt  = "\tDBG: %(module)s: %(lineno)d: %(message)s"
     info_fmt = "%(asctime)-15s %(levelname)s: %(message)s"
     
     def __init__(self):
-        super().__init__(fmt="%(levelno)d: %(msg)s", datefmt=None, style='%')  
+        super().__init__(fmt="%(levelno)d: %(message)s", datefmt=None, style='%')  
 
     def format(self, record):
 
