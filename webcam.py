@@ -29,9 +29,9 @@ def get_cat_picture(filename):
 
 
 def get_Picture(FAKEWEBCAM):
-    logging.info ("Webcam: --- Getting picture ------------------")
+    logging.info (" --- Getting picture ------------------")
     filename = my_globals.settings["storage_dir"] + my_globals.settings["img_name"]      # full path to image
-    logging.debug("Webcam: Img Filename: "+ filename)
+    logging.debug("Img Filename: "+ filename)
     remove_image(filename)
     if FAKEWEBCAM == 1:     # get fake picture
         get_cat_picture(filename)
@@ -55,7 +55,7 @@ def get_Picture(FAKEWEBCAM):
           
         # call v4lctl to take the picture
         call(["v4lctl", "-c", device, "snap", "jpeg", resolution, filename])
-        logging.info ("Webcam: Img size: " + call(["du", "-h", filename]))    # prints size of picture
+        logging.info ("Img size: " + call(["du", "-h", filename]))    # prints size of picture
         #check_output(["/opt/vc/bin/vcgencmd measure_temp | cut -c6-9"], shell=True)[:-1].decode('utf-8')
     
     # overlay reference

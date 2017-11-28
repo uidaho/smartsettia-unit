@@ -16,8 +16,8 @@ def update():
     my_globals.sensor_data["sensor_data"][1]["value"] = get_light()
     my_globals.sensor_data["sensor_data"][2]["value"] = str(get_light())  # TODO add light inner
     my_globals.sensor_data["sensor_data"][3]["value"] = str(get_Temp_Hum())
-    logging.debug("Sensors: Tempsensor [3]: %r"% my_globals.sensor_data["sensor_data"][3])
-    logging.debug("Sensors: Temp: %s\tCpu Temp: %s\tLight: %s" % (get_Temp_Hum(), get_cpu_temp(), get_light()))
+    logging.debug("Tempsensor [3]: %r"% my_globals.sensor_data["sensor_data"][3])
+    logging.debug("Temp: %s\tCpu Temp: %s\tLight: %s" % (get_Temp_Hum(), get_cpu_temp(), get_light()))
 
 # get temperature and humidity from sensor
 def get_Temp_Hum():

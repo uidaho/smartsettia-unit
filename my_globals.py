@@ -1,6 +1,7 @@
 # This file contains the global variables used in smartsettia
 import json
 from time import sleep
+import logging
 version= "1.0.1"        # program version
 
 # Note to concatonate dictionaries
@@ -65,18 +66,18 @@ settings =      {"Config_Version": 2,    ### INCREMENT THIS IF SETTING STRUCTURE
 
 
 def save_settings():
-    print ("Saving settings")
+    logging.info("Saving settings")
     global settings
     #print ("Settings dump: ",settings)         # debugger
     try:
         with open('config.json', 'w') as f:
             json.dump(settings, f)
     except Exception as e:
-        print ("Save settings error ", e)
+        logging.error ("Save settings error %r" % e)
 
 
 def load_settings():
-    print ("Loading settings")
+    logging.info ("Loading settings")
     global settings
     temp = {}
     try:
@@ -85,7 +86,7 @@ def load_settings():
     # except FileNotFoundError:
     #    print "config.json file not found. loading default settings"
     except Exception as e:
-        print ("\tLoad settings error ", e)
+        logging.warning ("\tLoad settings error %r"% e)
         sleep(3)
 
     else:       # if file was found and all is good
@@ -93,27 +94,27 @@ def load_settings():
         # test if loaded config version matches default version number
         try: 
             if temp["Config_Version"] != settings["Config_Version"]:
-                print ("\tConfig Version does not match.")
-                print ("\tUsing default settings")
+                logging.warning ("\tConfig Version does not match.")
+                logging.info ("\tUsing default settings")
                 sleep(3)
                 return
         except:
-                print ("\tConfig Version error.")   # likely means its a really old config without config_version entry
-                print ("\tUsing default settings")
+                logging.warning ("\tConfig Version error.")   # likely means its a really old config without config_version entry
+                logging.info ("\tUsing default settings")
                 sleep(3)
                 return
         
         # Test if uuid's are matching.
         if temp["uuid"] == settings["uuid"]:
-            print ("\tUUID matches loaded settings - keeping")
+            logging.info ("\tUUID matches loaded settings - keeping")
             settings = temp     # set settings to loaded values
 
             # override loaded url's to match DOMAIN_INDEX
             update_url(DOMAIN[DOMAIN_INDEX])
 
         else:
-            print ("\tUUID does not mach loaded settings - discarding")
-            print ("\tUsing default settings")
+            logging.warning ("\tUUID does not mach loaded settings - discarding")
+            logging.info ("\tUsing default settings")
             sleep(3)
 
 def update_url(domain):
@@ -124,12 +125,12 @@ def update_url(domain):
     if (domain[mlen] != '/'):
         domain = domain + '/'
     
-    print ("Using domain %s" % domain)
+    logging.info ("Using domain %s" % domain)
     settings["server_reg_addr"]    = domain + "api/register"
     settings["server_status_addr"] = domain + "api/update"
     settings["server_sensor_addr"] = domain + "api/sensor"
     settings["server_img_addr"]    = domain + "api/image"
-    print ("\tURL register: %s" % settings["server_reg_addr"])
-    print ("\tURL status:   %s" % settings["server_status_addr"])
-    print ("\tURL sensors:  %s" % settings["server_sensor_addr"])
-    print ("\tURL image:    %s" % settings["server_img_addr"])
+    logging.debug ("\tURL register: %s" % settings["server_reg_addr"])
+    logging.debug ("\tURL status:   %s" % settings["server_status_addr"])
+    logging.debug ("\tURL sensors:  %s" % settings["server_sensor_addr"])
+    logging.debug ("\tURL image:    %s" % settings["server_img_addr"])
