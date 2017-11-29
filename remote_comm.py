@@ -75,7 +75,7 @@ def status_update():
                 
             try:  # parse returned data
                 rtndata = req.json()
-                #print "rtndata: ", rtndata     # debugger
+                #logging.debug ("rtndata: %r" % rtndata)     # debugger can produce lots of logs
                 my_globals.status['server_command'] = rtndata["data"]["cover_command"]
                 logging.debug ("server command: %s" % my_globals.status['server_command'])
 
@@ -92,12 +92,28 @@ def status_update():
                     
                 logging.info ("open %s\tclose %s" % (my_globals.settings['cover_time_open'], my_globals.settings['cover_time_close']))
 
-                # TODO update job rates
-                # do in main?
+                # job rates
+                new_job_status_rate  = rtndata['data']['update_rate']
+                new_job_image_rate   = rtndata['data']['image_rate']
+                new_job_sensor_rate  = rtndata['data']['sensor_rate']
+                logging.debug("status: %r, image: %r, sensor: %r" % (new_job_status_rate, new_job_image_rate, new_job_sensor_rate))
+                
+                # test if job rates are different from stored value. Reschedule if different
+                import job_scheduling           # must be imported in this scope to avoid circular imports
+                if (new_job_status_rate != settings['job_server_status_sec']):
+                    my_globals.settings['job_server_status_sec'] = new_job_status_rate
+                    job_scheduling.schedule_job_status()
+                if (new_job_image_rate != settings['job_webcam_sec']):
+                    my_globals.settings['job_webcom_sec'] = new_job_image_rate
+                    job_scheduling.schedule_job_webcam()
+                if (new_job_sensor_rate != settings['job_server_sensors_sec']):
+                    my_globals.settings['job_server_sensors_sec'] = new_job_sensor_rate
+                    job_scheduling.schedule_job_sensors()
 
             except Exception as e:
                 logging.error ("status_update:Error converting json")
                 logging.debug (e)
+
         # test status code to determin if we were Successful
         if req.status_code == 201:
             logging.info ("Status Update Successful")
@@ -106,8 +122,9 @@ def status_update():
             logging.debug ("URL: %s" % url)                      # debugger
             logging.debug ("Headers: %s" % headers)              # debugger
             logging.debug ("json dmp: %s" % json.dumps(payload)) # debugger
-    except:
+    except Exception as e:
         logging.error ("status_update:General Error")
+        logging.debug(e)
     # END of status_update
 
 

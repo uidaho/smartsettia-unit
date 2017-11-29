@@ -33,7 +33,7 @@ if (my_globals.NOT_PI != True):
         GPIO.setup(pin_ls_open,  GPIO.IN, pull_up_down=GPIO.PUD_UP)
         GPIO.setup(pin_ls_close, GPIO.IN, pull_up_down=GPIO.PUD_UP)
     except Exception as e:
-        logging.error ("Error setting GPIO.", e)
+        logging.error ("Error setting GPIO. %r" % e)
         logging.error("Falling over to disable GPIO. This will lead to unexpected behaviour with the cover.")
         my_globals.status['error_msg'] = "GPIO Library could not be loaded"
         time.sleep(3) # Allow the user time to catch this error

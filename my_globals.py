@@ -2,7 +2,7 @@
 import json
 from time import sleep
 import logging
-version= "1.0.1"        # program version
+version= "1.1.0"        # program version
 
 # Note to concatonate dictionaries
 # z = x.copy()
@@ -16,6 +16,7 @@ DOMAIN =    ["https://smartsettia.com/",
 
 # set by arguments to disable GPIO
 NOT_PI = False
+FAKEWEBCAM = False
 
 sensor_data = {}    # declare variable. Done as dictionary so that this can be imported with dic.update()            
 sensor_data["sensor_data"] = [
@@ -39,23 +40,22 @@ status =        {"cover_status"   : "error",
                 "error_msg"       : None
                 }
 
-settings =      {"Config_Version": 2,    ### INCREMENT THIS IF SETTING STRUCTURE CHANGED ###
+settings =      {"Config_Version": 3,    ### INCREMENT THIS IF SETTING STRUCTURE CHANGED ###
                 "name":"UnNamed",                          # Name of Device
                 "uuid": "NOT_SET0-0000-0000-0000-000000000000",   # UUID V1
                 "token": "none",      # post token key
                 "id": -1,                                   # ID no. of the device
-                "challenge": "temppass",                    # challenge
+                "challenge": "TacosToTheLimit2017",                    # challenge
                 "mac_address":"00:00:00:00:00:00",          # MAC address
                 "server_reg_addr":    DOMAIN[DOMAIN_INDEX] + "api/register",
                 "server_status_addr": DOMAIN[DOMAIN_INDEX] + "api/update",
                 "server_sensor_addr": DOMAIN[DOMAIN_INDEX] + "api/sensor",
                 "server_img_addr":    DOMAIN[DOMAIN_INDEX] + "api/image",
-                "job_cover_monitor":1,                      # cover monitor run rate
+                "job_cover_monitor":2,                      # cover monitor run rate
                 "job_save_settings":60,                     # save settings to file
-                "job_sensors_sec"  :5,                      # job runs every x seconds
-                "job_webcam_sec"   :2,                      # job runs every x seconds
-                "job_server_status_sec" :1,                 # send device status job
-                "job_server_sensors_sec":20,                # send device sensors job
+                "job_webcam_sec"   :15,                      # job runs every x seconds
+                "job_server_status_sec" :2,                 # send device status job
+                "job_server_sensors_sec":60,                # send device sensors job
                                                             # other jobs
                 "cover_time_open":  None,                   # open time
                 "cover_time_close": None,                   # close time
