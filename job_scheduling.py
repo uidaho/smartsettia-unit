@@ -13,7 +13,7 @@ import webcam
 import remote_comm
 #from remote_comm import register   # importing this way to avoid circular includes
 import sensors          # TODO this may cause more timming issues
-from cover import fsm, cover_schedule
+from cover import fsm, cover_schedule, check_cover_button
 
 
 # multi thread support
@@ -80,6 +80,9 @@ def job_cover_monitor():
 def job_cover_schedule():
     cover_schedule()
 
+def job_cover_button():
+    check_cover_button()
+
 # Save setting to file
 def job_save_settings():
     my_globals.save_settings()
@@ -93,6 +96,7 @@ def job_heartbeat():
 schedule.every(30).seconds.do(job_heartbeat)
 schedule.every(15).minutes.do(remote_comm.register)   # periodic re-register device with webserver
 schedule.every(2).seconds.do(job_cover_monitor)
+schedule.every(0.5).seconds.do(job_cover_button)
 schedule.every(2).minutes.do(job_save_settings)
 schedule.every(10).seconds.do(job_cover_schedule)
 

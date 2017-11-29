@@ -23,6 +23,7 @@ if (my_globals.NOT_PI != True):
 pin_relay      = 14
 pin_ls_open    = 5      # pull up
 pin_ls_close   = 13     # pull up
+pin_button     = 1      # pull up
         
 # GPIO initialization
 if (my_globals.NOT_PI != True):
@@ -32,6 +33,7 @@ if (my_globals.NOT_PI != True):
         GPIO.output(pin_relay,   GPIO.LOW)  # set pin output to LOW
         GPIO.setup(pin_ls_open,  GPIO.IN, pull_up_down=GPIO.PUD_UP)
         GPIO.setup(pin_ls_close, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+        GPIO.setup(pin_button,   GPIO.IN, pull_up_down=GPIO.PUD_UP)
     except Exception as e:
         logging.error ("Error setting GPIO. %r" % e)
         logging.error("Falling over to disable GPIO. This will lead to unexpected behaviour with the cover.")
@@ -451,6 +453,19 @@ def getSwitches():
         except Exception as e:
             logging.error ("Error reading limit switch pins: %r" % e)
         
+# read button
+def check_cover_button():
+    global ls_open, ls_close
+    logging.debug("Checking button")
+    if (my_globals.NOT_PI == False):     # this is NOT a pi and NOT usng gpio
+        try:
+            ls_open = not GPIO.input(pin_button)
+            logging.debug ("check_cover_button: %d" %(ls_open, ls_close))
+        except Exception as e:
+            logging.error ("Error reading button pin: %r" % e)
+   # else:
+    #    logging.warning("Ignoring button check") # TODO remove later)
+
 
 # This will reset gpios back to what they were before the script started.
 # The problem is that this program exits by interruping it and so this will never get called
