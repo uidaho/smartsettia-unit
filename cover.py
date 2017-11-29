@@ -252,9 +252,9 @@ def fsm_close():
     
             
 def fsm_opening():
-    logging.info ("Entered State: opening\tSubstate: %s" % fsm_transition_state)
     global ls_open, ls_close, fsm_current_state, wait_time
     global fsm_transition_state
+    logging.info ("Entered State: opening\tSubstate: %s" % fsm_transition_state)
     
     """ Transition states
     ts0:RelayOn      relay on
@@ -311,9 +311,9 @@ def fsm_opening():
 
     
 def fsm_closing():
-    logging.info ("Entered State: closing\tSubstate: %s" % fsm_transition_state)
     global ls_open, ls_close, fsm_current_state, wait_time
     global fsm_transition_state
+    logging.info ("Entered State: closing\tSubstate: %s" % fsm_transition_state)
     
     """ Transition states
     ts0:RelayOn      relay on
