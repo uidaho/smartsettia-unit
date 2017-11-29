@@ -3,13 +3,9 @@ import time
 import datetime
 from os import path   # Used in checking webcam storage path
 import os
-import threading
 import schedule    # scheduler library
-import webcam      # webcam module
 import my_globals  # global variables
-import remote_comm # server communication module
 import argparse    # argument parsing
-from helper_lib import generate_uuid, is_valid_uuid
 import helper_lib
 import logging
 
@@ -21,13 +17,13 @@ logger.setLevel(logging.DEBUG)              # This essentially sets the highest 
 # Logger: create file handler which logs even debug messages
 fh = logging.FileHandler('smartsettia.log')
 fh.setFormatter(formatter)      # set format
-fh.setLevel(logging.INFO)    # set level for file logging
+fh.setLevel(logging.DEBUG)    # set level for file logging
 logger.addHandler(fh)           # add filehandle to logger
 
 # Logger: create console handle
 ch = logging.StreamHandler()
 ch.setFormatter(formatter)
-ch.setLevel(logging.WARNING)    # set logging level for consol
+ch.setLevel(logging.DEBUG)    # set logging level for consol
 logger.addHandler(ch)
 
 
@@ -47,58 +43,12 @@ SINGLE_RUN = args.single
 FAKEWEBCAM = args.fakewebcam     # enable or disable fake webcam
 UUID_CUSTOM = args.uuid          # custome uuid
 
-from cover import fsm, gpio_cleanup, cover_schedule   # cover monitor module. Must be imported after NOT_PI has been set
-import sensors     #sensors.py
+# Import modules that need to be imported after environment setup
+from helper_lib import generate_uuid, is_valid_uuid
+from cover import gpio_cleanup
+import remote_comm              # server communication module
+import job_scheduling
 
-# multi thread support
-def run_threaded(job_func):
-	job_thread = threading.Thread(target=job_func)
-	job_thread.start()
-
-# If I'm running you should see this periodically
-def job_heartbeat():
-    logging.info("I'm working. %s" % datetime.datetime.now())
-
-# Save setting to file
-def job_save_settings():
-    my_globals.save_settings()
-    
-def job_cover_monitor():
-    fsm()
-    
-def job_cover_schedule():
-    cover_schedule()
-
-# Read enviroment sensors
-def job_sensors():
-    logging.info("Getting Sensors")
-    sensors.update()
-    remote_comm.sensor_upload()
-
-# send status to server
-def job_upload_status():
-    #print ("Uploading status")
-    remote_comm.status_update()
-
-# take a picture
-def job_webcam():
-    t0 = int(round(time.time() * 1000)) # debugger
-    webcam.get_Picture(FAKEWEBCAM)      # get picture function with option fake bool
-    t1 = int(round(time.time() * 1000)) # debugger
-    logging.debug ("timepic: %d" % (t1-t0))      # debugger
-    remote_comm.pic_upload()
-
-schedule.every(30).seconds.do(job_heartbeat)
-schedule.every(15).minutes.do(remote_comm.register)   # periodic re-register device with webserver
-schedule.every(2).seconds.do(job_upload_status)
-schedule.every(30).seconds.do(job_sensors)
-schedule.every(7).seconds.do(job_webcam)
-schedule.every(2).seconds.do(job_cover_monitor)
-schedule.every(10).seconds.do(job_cover_schedule)
-schedule.every(2).minutes.do(job_save_settings)
-
-
-#function Deff
 
 def initialize():
     # Test if using a custom uuid and validate it. else use hardware uuid
@@ -148,8 +98,13 @@ def initialize():
     remote_comm.register()
     
     # run the cover montitor a few times to let it syncronize
-    job_cover_monitor()
-    job_cover_monitor()
+    job_scheduling.job_cover_monitor()
+    job_scheduling.job_cover_monitor()
+    
+    # Setup job schedules
+    job_scheduling.schedule_job_status()
+    job_scheduling.schedule_job_sensors()
+    job_scheduling.schedule_job_webcam()
     print ("--------------------------------------")
 
 
