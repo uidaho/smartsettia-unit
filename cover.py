@@ -111,7 +111,7 @@ def cover_schedule():
         if dt_close > dt_last_checked and dt_close < dt_now:
             close_active = True
     except Exception as e:
-        logging.error ("Schedule conditions error. ", e)
+        logging.error ("Schedule conditions error. %r" % e)
         return
     else:
         logging.debug ("Schedule condition events: open:%s, close:%s" % (open_active, close_active))
@@ -406,7 +406,7 @@ def set_Relay(val):
                 logging.info ("Turning relay off")
                 GPIO.output(pin_relay, GPIO.LOW)
         except Exception as e:
-            logging.error ("\tError setting relay GPIO output pin", e)
+            logging.error ("\tError setting relay GPIO output pin %r" % e)
 
 
 # read limit switches
@@ -449,7 +449,7 @@ def getSwitches():
             ls_close = not GPIO.input(pin_ls_close)
             logging.debug ("getSwitches: (%d, %d)" %(ls_open, ls_close))
         except Exception as e:
-            logging.error ("Error reading limit switch pins:", e)
+            logging.error ("Error reading limit switch pins: %r" % e)
         
 
 # This will reset gpios back to what they were before the script started.
