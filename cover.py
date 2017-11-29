@@ -60,6 +60,7 @@ server_cmd = None
 # later copied to my_globals sensor data
 ls_open = 1
 ls_close = 0
+button_active = 0  #  0 idle, 1 first tick, 2 2nd tick, 3 activate
 
 
 # Open close schedule
@@ -214,13 +215,17 @@ def fsm():
     
 def fsm_open():
     logging.info ("Entered State: open")
-    global ls_close, ls_close, fsm_current_state, fsm_transition_state
+    global ls_close, ls_close, fsm_current_state, fsm_transition_state, button_active
     # if not open. unexpected movement
     if  not (ls_open == 1 and ls_close == 0):
         my_globals.status["error_msg"] = "Unexpected Movement"
         fsm_current_state = "error"
     
     # check next state conditions
+    elif (button_active >= 3):
+        button_active = 0       # reset
+        logging.info ("Cover Button pressed. closing")
+        set_transition("close", "Button", True)
     elif (server_cmd == "open"):
         return                  # do nothing
     elif (server_cmd == "close"):
@@ -234,13 +239,17 @@ def fsm_open():
             
 def fsm_close():
     logging.info ("Entered State: closed")
-    global ls_close, ls_close, fsm_current_state, fsm_transition_state
+    global ls_close, ls_close, fsm_current_state, fsm_transition_state, button_active
     # if not closed. unexpected movement
     if  not (ls_open == 0 and ls_close == 1):
         my_globals.status["error_msg"] = "Unexpected Movement"
         fsm_current_state = "error"
 
     # check next state conditions
+    elif (button_active >= 3):
+        button_active = 0       # reset
+        logging.info ("Cover Button pressed. opening")
+        set_transition("open", "Button", True)
     elif (server_cmd == "close"):  # server says close. i'm currently in the 'closed' state
         return                  # do nothing
     elif (server_cmd == "open"):
@@ -455,14 +464,20 @@ def getSwitches():
         
 # read button
 def check_cover_button():
-    global ls_open, ls_close
+    global button_active, fsm_current_state
     logging.debug("Checking button")
     if (my_globals.NOT_PI == False):     # this is NOT a pi and NOT usng gpio
-        try:
-            ls_open = not GPIO.input(pin_button)
-            logging.debug ("check_cover_button: %d" %(ls_open, ls_close))
-        except Exception as e:
-            logging.error ("Error reading button pin: %r" % e)
+        # only check if we are in a resting state
+        if (fsm_current_state == "open" or fsm_current_state == "close"):
+            try:
+                button_read = not GPIO.input(pin_button)
+                if button_read:     # if pressed
+                    button_active = button_active + 1
+                else:
+                    button_active = 0   # reset if not pressed or held
+                logging.debug ("check_cover_button: %d" % button_read)
+            except Exception as e:
+                logging.error ("Error reading button pin: %r" % e)
    # else:
     #    logging.warning("Ignoring button check") # TODO remove later)
 
