@@ -53,7 +53,6 @@ def job_sensors():
 
 
 
-FAKEWEBCAM = 1
 # webcam
 def schedule_job_webcam():
     rate = my_globals.settings["job_webcam_sec"]
@@ -66,7 +65,7 @@ def schedule_job_webcam():
 # take a picture
 def job_webcam():
     t0 = int(round(time.time() * 1000)) # debugger
-    webcam.get_Picture(FAKEWEBCAM)      # get picture function with option fake bool
+    webcam.get_Picture()      # get picture function with option fake bool
     t1 = int(round(time.time() * 1000)) # debugger
     logging.debug ("timepic: %d" % (t1-t0))      # debugger
     remote_comm.pic_upload()

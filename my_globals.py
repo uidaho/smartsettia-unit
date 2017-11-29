@@ -16,6 +16,7 @@ DOMAIN =    ["https://smartsettia.com/",
 
 # set by arguments to disable GPIO
 NOT_PI = False
+FAKEWEBCAM = False
 
 sensor_data = {}    # declare variable. Done as dictionary so that this can be imported with dic.update()            
 sensor_data["sensor_data"] = [

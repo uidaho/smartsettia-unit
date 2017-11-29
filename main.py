@@ -40,7 +40,7 @@ my_globals.NOT_PI = args.notpi
 DOMAIN_INDEX = args.d
 DOMAIN_CUSTOM = args.cd
 SINGLE_RUN = args.single
-FAKEWEBCAM = args.fakewebcam     # enable or disable fake webcam
+my_globals.FAKEWEBCAM = args.fakewebcam     # enable or disable fake webcam
 UUID_CUSTOM = args.uuid          # custome uuid
 
 # Import modules that need to be imported after environment setup
@@ -66,7 +66,7 @@ def initialize():
     
     my_globals.load_settings()      # load settings from file
     
-    print ("Using fake webcam: ", FAKEWEBCAM)
+    print ("Using fake webcam: ", my_globals.FAKEWEBCAM)
     if (my_globals.NOT_PI == True):
         print("Not Pi flag set. GPIO is disabled.")
     

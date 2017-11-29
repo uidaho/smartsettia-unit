@@ -28,12 +28,12 @@ def get_cat_picture(filename):
     cat_pic = wget.download(url, out=filename, bar=None)
 
 
-def get_Picture(FAKEWEBCAM):
+def get_Picture():
     logging.info (" --- Getting picture ------------------")
     filename = my_globals.settings["storage_dir"] + my_globals.settings["img_name"]      # full path to image
     logging.debug("Img Filename: "+ filename)
     remove_image(filename)
-    if FAKEWEBCAM == 1:     # get fake picture
+    if my_globals.FAKEWEBCAM == 1:     # get fake picture
         get_cat_picture(filename)
     else:                   # get picture from webcam
         # setup some metadata for fswebcam
