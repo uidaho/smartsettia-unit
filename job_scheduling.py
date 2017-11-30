@@ -28,7 +28,7 @@ def schedule_job_status():
     rate = my_globals.settings["job_server_status_sec"]
     logging.info("Scheduling status job for every %d seconds" % rate)
     schedule.clear("status")
-    schedule.every(rate).seconds.do(job_upload_status).tag("status")
+    schedule.every(rate).seconds.do(run_threaded, job_upload_status).tag("status")
     #time.sleep(3)
 
 # send status to server
@@ -42,7 +42,7 @@ def schedule_job_sensors():
     rate = my_globals.settings["job_server_sensors_sec"]
     logging.info("Scheduling sensors job for every %d seconds" % rate)
     schedule.clear("sensors")
-    schedule.every(rate).seconds.do(job_sensors).tag("sensors")
+    schedule.every(rate).seconds.do(run_threaded, job_sensors).tag("sensors")
     #time.sleep(3)
 
 # Read enviroment sensors
@@ -58,8 +58,8 @@ def schedule_job_webcam():
     rate = my_globals.settings["job_webcam_sec"]
     logging.info("Scheduling webcam job for every %d seconds" % rate)
     schedule.clear("webcam")
-    schedule.every(rate).seconds.do(job_webcam).tag("webcam")              # non-threaded
-    #schedule.every(rate).seconds.do(run_threaded, job_webcam).tag("webcam") # threaded
+    #schedule.every(rate).seconds.do(job_webcam).tag("webcam")              # non-threaded
+    schedule.every(rate).seconds.do(run_threaded, job_webcam).tag("webcam") # threaded
     #time.sleep(3)
     
 # take a picture
@@ -96,7 +96,7 @@ def job_heartbeat():
 schedule.every(30).seconds.do(job_heartbeat)
 schedule.every(15).minutes.do(remote_comm.register)   # periodic re-register device with webserver
 schedule.every(2).seconds.do(job_cover_monitor)
-schedule.every(0.5).seconds.do(job_cover_button)
+schedule.every(0.2).seconds.do(job_cover_button)
 schedule.every(10).seconds.do(job_cover_schedule)
 schedule.every(2).minutes.do(job_save_settings)
 
