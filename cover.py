@@ -19,11 +19,12 @@ if (my_globals.NOT_PI != True):
         my_globals.status['error_msg'] = "GPIO Library could not be loaded"
         time.sleep(3) # Allow the user time to catch this error
         my_globals.NOT_PI = "True"
-        
+
+# BCM pin values
 pin_relay      = 14
 pin_ls_open    = 5      # pull up
 pin_ls_close   = 13     # pull up
-pin_button     = 1      # pull up
+pin_button     = 7      # pull up
         
 # GPIO initialization
 if (my_globals.NOT_PI != True):
@@ -466,7 +467,7 @@ def getSwitches():
 # read button
 def check_cover_button():
     global button_active, fsm_current_state
-    logging.debug("Checking button")
+    logging.debug("Checking cover button")
     if (my_globals.NOT_PI == False):     # this is NOT a pi and NOT usng gpio
         # only check if we are in a resting state
         if (fsm_current_state == "open" or fsm_current_state == "close"):
@@ -476,9 +477,9 @@ def check_cover_button():
                     button_active = button_active + 1
                 else:
                     button_active = 0   # reset if not pressed or held
-                logging.debug ("check_cover_button: %d" % button_read)
+                logging.debug ("check_cover_button val: %d" % button_read)
             except Exception as e:
-                logging.error ("Error reading button pin: %r" % e)
+                logging.error ("Error reading cover button pin: %r" % e)
    # else:
     #    logging.warning("Ignoring button check") # TODO remove later)
 
