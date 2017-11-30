@@ -55,7 +55,7 @@ def get_Picture():
           
         # call v4lctl to take the picture
         call(["v4lctl", "-c", device, "snap", "jpeg", resolution, filename])
-        logging.info ("Img size: " + call(["du", "-h", filename]))    # prints size of picture
+        logging.info ("Img size: " + str(call(["du", "-h", filename])))    # prints size of picture
         #check_output(["/opt/vc/bin/vcgencmd measure_temp | cut -c6-9"], shell=True)[:-1].decode('utf-8')
     
     # overlay reference
