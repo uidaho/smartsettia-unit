@@ -62,7 +62,8 @@ server_cmd = None
 # later copied to my_globals sensor data
 ls_open = 1
 ls_close = 0
-button_active = 0  #  0 idle, 1 first tick, 2 2nd tick, 3 activate
+button_debounce = 0  #  debounce count
+button_event = False
 
 
 # Open close schedule
@@ -217,15 +218,15 @@ def fsm():
     
 def fsm_open():
     logging.info ("Entered State: open")
-    global ls_close, ls_close, fsm_current_state, fsm_transition_state, button_active
+    global ls_close, ls_close, fsm_current_state, fsm_transition_state, button_event
     # if not open. unexpected movement
     if  not (ls_open == 1 and ls_close == 0):
         my_globals.status["error_msg"] = "Unexpected Movement"
         fsm_current_state = "error"
     
     # check next state conditions
-    elif (button_active >= 3):
-        button_active = 0       # reset
+    elif (button_event == True):
+        button_event = False
         logging.info ("Cover Button pressed. closing")
         set_transition("close", "Button", True)
     elif (server_cmd == "open"):
@@ -241,15 +242,15 @@ def fsm_open():
             
 def fsm_close():
     logging.info ("Entered State: closed")
-    global ls_close, ls_close, fsm_current_state, fsm_transition_state, button_active
+    global ls_close, ls_close, fsm_current_state, fsm_transition_state, button_event
     # if not closed. unexpected movement
     if  not (ls_open == 0 and ls_close == 1):
         my_globals.status["error_msg"] = "Unexpected Movement"
         fsm_current_state = "error"
 
     # check next state conditions
-    elif (button_active >= 3):
-        button_active = 0       # reset
+    elif (button_event  == True):
+        button_event = False
         logging.info ("Cover Button pressed. opening")
         set_transition("open", "Button", True)
     elif (server_cmd == "close"):  # server says close. i'm currently in the 'closed' state
@@ -425,7 +426,8 @@ def set_Relay(val):
 # read limit switches
 def getSwitches():
     global ls_open, ls_close
-    if (my_globals.NOT_PI == True):     # this is NOT a pi and NOT usng gpio
+    logging.error ("TODO remove true")
+    if (my_globals.NOT_PI == True or True):     # this is NOT a pi and NOT usng gpio
         # Simulate switches based on current state
         logging.warning ("## Simulating switches")
         """
@@ -466,22 +468,30 @@ def getSwitches():
         
 # read button
 def check_cover_button():
-    global button_active, fsm_current_state
-    logging.debug("Checking cover button")
-    if (my_globals.NOT_PI == False):     # this is NOT a pi and NOT usng gpio
+    global button_event, button_debounce, fsm_current_state
+    #logging.debug("Checking cover button")
+    if (my_globals.NOT_PI == False):
         # only check if we are in a resting state
-        if (fsm_current_state == "open" or fsm_current_state == "close"):
+        if (fsm_current_state == "open" or fsm_current_state == "closed"):
             try:
                 button_read = not GPIO.input(pin_button)
-                if button_read:     # if pressed
-                    button_active = button_active + 1
+                #logging.debug ("Button value: %d, Button_debounce: %d, Button_event %s" % (button_read, button_debounce, button_event))
+                if (button_read and button_event == False):     # if pressed
+                    button_debounce = button_debounce + 1
                 else:
-                    button_active = 0   # reset if not pressed or held
-                logging.debug ("check_cover_button val: %d" % button_read)
+                    button_debounce = 0   # reset if not pressed or held
+                
+                #check if debounce value is high enough to trigger
+                # Reference: button check job is every 0.2 seconds. Making 4 ticks a 0.8 second hold time
+                if (button_debounce >= 4):
+                    button_debounce = 0
+                    button_event = True
             except Exception as e:
                 logging.error ("Error reading cover button pin: %r" % e)
-   # else:
-    #    logging.warning("Ignoring button check") # TODO remove later)
+  #      else: 
+  #          logging.warning("Ignoring button check - not in idle state")
+  #  else:
+  #      logging.warning("Ignoring button check") # TODO remove later)
 
 
 # This will reset gpios back to what they were before the script started.

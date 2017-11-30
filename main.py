@@ -33,7 +33,7 @@ parser.add_argument('-s',  '--single',     action='store_true', help='Runs the p
 parser.add_argument('-fw', '--fakewebcam', action='store_true', help='Use Fake webcam')
 parser.add_argument('-d',   type=int,      action='store',      help='Specify Domain. 0 prod, 1 brandon c9, 2 nick c9. Default 0', default="0")
 parser.add_argument('-cd',  type=str,      action='store',      help='Specify custom Domain. This overrides all other domain settings', default=None)
-parser.add_argument('-npi', '--notpi',     action='store_true', help='Run as if this was not a raspberry pi. Disables GPIO reading', default="False")
+parser.add_argument('-npi', '--notpi',     action='store_true', help='Run as if this was not a raspberry pi. Disables GPIO reading', default=False)
 parser.add_argument('-u', '--uuid',     action='store', help='Use supplied UUID5 instead of generated uuid', default=None)
 args = parser.parse_args() # parse args
 my_globals.NOT_PI = args.notpi
@@ -42,6 +42,7 @@ DOMAIN_CUSTOM = args.cd
 SINGLE_RUN = args.single
 my_globals.FAKEWEBCAM = args.fakewebcam     # enable or disable fake webcam
 UUID_CUSTOM = args.uuid          # custome uuid
+
 
 # Import modules that need to be imported after environment setup
 from helper_lib import generate_uuid, is_valid_uuid
@@ -67,8 +68,7 @@ def initialize():
     my_globals.load_settings()      # load settings from file
     
     print ("Using fake webcam: ", my_globals.FAKEWEBCAM)
-    if (my_globals.NOT_PI == True):
-        print("Not Pi flag set. GPIO is disabled.")
+    print ("Not Pi flag: %s" % my_globals.NOT_PI)
     
     # Validate args.d (domain index) with possible domain indexes
     if (DOMAIN_INDEX >= 0 and DOMAIN_INDEX < len(my_globals.DOMAIN) and DOMAIN_CUSTOM == None):
