@@ -426,8 +426,7 @@ def set_Relay(val):
 # read limit switches
 def getSwitches():
     global ls_open, ls_close
-    logging.error ("TODO remove true")
-    if (my_globals.NOT_PI == True or True):     # this is NOT a pi and NOT usng gpio
+    if (my_globals.NOT_PI == True):     # this is NOT a pi and NOT usng gpio
         # Simulate switches based on current state
         logging.warning ("## Simulating switches")
         """
@@ -491,7 +490,7 @@ def check_cover_button():
   #      else: 
   #          logging.warning("Ignoring button check - not in idle state")
   #  else:
-  #      logging.warning("Ignoring button check") # TODO remove later)
+  #      logging.warning("Ignoring button check")
 
 
 # This will reset gpios back to what they were before the script started.
