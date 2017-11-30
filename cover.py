@@ -28,6 +28,7 @@ pin_button     = 1      # pull up
 # GPIO initialization
 if (my_globals.NOT_PI != True):
     try: 
+        GPIO.setwarnings(False)     # hids "channel already in use" warnings when script is restarted.
         GPIO.setmode(GPIO.BCM)
         GPIO.setup(pin_relay,    GPIO.OUT)
         GPIO.output(pin_relay,   GPIO.LOW)  # set pin output to LOW
@@ -85,7 +86,7 @@ def cover_schedule():
     # check if last check string is empty, if not parse it into datetime object
     if dt_last_checked == None:
         # null time. Update to curent time and return
-        logging.warning ("Last checked time was blank.")
+        logging.warning ("Schedule: Last checked time was blank.")
         dt_last_checked = datetime.datetime.strftime(dt_now, '%Y-%m-%d %H:%M:%S')
         my_globals.settings["schedule_last_checked"] = dt_last_checked
         return      # algoritm cannot work without a last check
@@ -407,7 +408,7 @@ def fsm_error():
 # set relay pin to value
 def set_Relay(val):
     if (my_globals.NOT_PI == True):    # this is NOT a pi and NOT usng gpio
-        logging.warning ("GPIO disabled")
+        logging.warning ("Relay: GPIO disabled")
     else:
         try:
             if (val == "on"):

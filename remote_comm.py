@@ -10,7 +10,7 @@ import logging
 
 headers = {'Content-type': 'application/json', 'Accept': 'application/json'}
 
-show_logging = 0        # flag if logs are shown in terminal
+logging.basicConfig(level=logging.DEBUG)
 
 
 def status_update():
@@ -93,20 +93,23 @@ def status_update():
                 logging.info ("open %s\tclose %s" % (my_globals.settings['cover_time_open'], my_globals.settings['cover_time_close']))
 
                 # job rates
+                logging.debug("old update rate %d, type: %s" % (settings['job_server_status_sec'], type(settings['job_server_status_sec'])))
                 new_job_status_rate  = rtndata['data']['update_rate']
                 new_job_image_rate   = rtndata['data']['image_rate']
                 new_job_sensor_rate  = rtndata['data']['sensor_rate']
                 logging.debug("status: %r, image: %r, sensor: %r" % (new_job_status_rate, new_job_image_rate, new_job_sensor_rate))
+                logging.debug("new update rate %d, type: %s" % (new_job_status_rate, type(new_job_status_rate)))
                 
                 # test if job rates are different from stored value. Reschedule if different
                 import job_scheduling           # must be imported in this scope to avoid circular imports
-                if (new_job_status_rate != settings['job_server_status_sec']):
+                if (new_job_status_rate != my_globals.settings['job_server_status_sec']):
                     my_globals.settings['job_server_status_sec'] = new_job_status_rate
                     job_scheduling.schedule_job_status()
-                if (new_job_image_rate != settings['job_webcam_sec']):
-                    my_globals.settings['job_webcom_sec'] = new_job_image_rate
+                    logging.debug("## post settings for status %d, type %s" % (my_globals.settings['job_server_status_sec'], type(my_globals.settings['job_server_status_sec'])))
+                if (new_job_image_rate != my_globals.settings['job_webcam_sec']):
+                    my_globals.settings['job_webcam_sec'] = new_job_image_rate
                     job_scheduling.schedule_job_webcam()
-                if (new_job_sensor_rate != settings['job_server_sensors_sec']):
+                if (new_job_sensor_rate != my_globals.settings['job_server_sensors_sec']):
                     my_globals.settings['job_server_sensors_sec'] = new_job_sensor_rate
                     job_scheduling.schedule_job_sensors()
 
