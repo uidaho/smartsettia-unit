@@ -179,6 +179,7 @@ def set_transition(cmd, source="unknown", override_server= False):
             coverlog += " - can't open cover if cover is not in closed state"
     else:
         coverlog += " - unknown state. only open/close are recognised"
+        logging.error("Transition: unknown state. only open/close are recognised")
     
     # print log output
     logging.info (coverlog)
@@ -221,7 +222,7 @@ def fsm_open():
     global ls_close, ls_close, fsm_current_state, fsm_transition_state, button_event
     # if not open. unexpected movement
     if  not (ls_open == 1 and ls_close == 0):
-        my_globals.status["error_msg"] = "Unexpected Movement"
+        my_globals.status["error_msg"] = "Unexpected Movement. Expected open, now reading closed."
         fsm_current_state = "error"
     
     # check next state conditions
@@ -245,7 +246,7 @@ def fsm_close():
     global ls_close, ls_close, fsm_current_state, fsm_transition_state, button_event
     # if not closed. unexpected movement
     if  not (ls_open == 0 and ls_close == 1):
-        my_globals.status["error_msg"] = "Unexpected Movement"
+        my_globals.status["error_msg"] = "Unexpected Movement. Expected closed, now reading open."
         fsm_current_state = "error"
 
     # check next state conditions
@@ -372,12 +373,15 @@ def fsm_closing():
             my_globals.status["error_msg"] = "Cover opened itself?"
             logging.error("\tError: Cover opened itself")
             fsm_current_state = "error"         # send to error state
+            fsm_error()                         # run immediatly to resolve state if possible before the next status update
             
         # timed out
         elif (time.time() > wait_time):
             my_globals.status["error_msg"] = "Cover movement timed out. Waiting for it to resolve to open or close"
             logging.error("\tCover movement timed out at %0.1f. Waiting for it to resolve to open or close" % time.time())
             fsm_current_state = "error"         # send to error state
+            fsm_error()                         # run immediatly to resolve state if possible before the next status update
+            
             
         # 0,0 and not timedout 
             # do nothing. we are waiting
