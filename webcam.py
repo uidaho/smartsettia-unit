@@ -1,9 +1,11 @@
-# cv compare: https://stackoverflow.com/questions/11094481/capturing-a-single-image-from-my-webcam-in-java-or-python
-# cv settings: https://stackoverflow.com/questions/32943227/python-opencv-capture-images-from-webcam
 # another compareg: https://softwarerecs.stackexchange.com/questions/18134/python-library-for-taking-camera-images
 # Timestamp: http://startgrid.blogspot.com/2012/08/tutorial-creating-timestamp-on.html
-# fswebcam: https://www.raspberrypi.org/documentation/usage/webcams/
-# fswebcam doc: https://www.systutorials.com/docs/linux/man/1-fswebcam/
+
+# short note on camera software
+# started with opencv but it is such a large library
+# used fswebcam for a while but it produced intermitant black frames. However it had build in boarders
+# now using v4lctl for taking pictures and imagemagick for banners
+
 import time
 import datetime
 import wget
@@ -41,7 +43,7 @@ def get_Picture():
         device      = "/dev/video0"
         resolution  = "1280x720"
         #resolution  = "1024x600
-        #resolution = "640x480"     # Brandon's res choice
+        #resolution = "640x480"
         textcolor   = "#0000cc00"
         font        = "luxisr:14"
         title       = str(my_globals.settings["name"])
@@ -55,8 +57,7 @@ def get_Picture():
           
         # call v4lctl to take the picture
         call(["v4lctl", "-c", device, "snap", "jpeg", resolution, filename])
-        logging.info ("Img size: " + str(call(["du", "-h", filename])))    # prints size of picture
-        #check_output(["/opt/vc/bin/vcgencmd measure_temp | cut -c6-9"], shell=True)[:-1].decode('utf-8')
+        #logging.debug ("Img size: " + str(call(["du", "-h", filename])))    # prints size of picture.
     
     # overlay reference
     # overlay_text = "/usr/bin/convert "+ filename + "  -pointsize 36 -fill white -annotate +40+728 '" + "hello" + "' "  
@@ -66,6 +67,5 @@ def get_Picture():
     text = '"Smartsettia - %s UTC"' % datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     overlay_text = "convert " + filename + " -gravity North   -background YellowGreen  -splice 0x18 \
           -annotate +0+2 " + text + " " + filename
-  
     #logging.debug ("Webcam: convert command: %s" % overlay_text)      # debugger to see command executed
     call ([overlay_text], shell=True)

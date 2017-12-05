@@ -17,13 +17,13 @@ logger.setLevel(logging.DEBUG)              # This essentially sets the highest 
 # Logger: create file handler which logs even debug messages
 fh = logging.FileHandler('smartsettia.log')
 fh.setFormatter(formatter)      # set format
-fh.setLevel(logging.DEBUG)    # set level for file logging
+fh.setLevel(logging.WARNING)    # set level for file logging
 logger.addHandler(fh)           # add filehandle to logger
 
 # Logger: create console handle
 ch = logging.StreamHandler()
 ch.setFormatter(formatter)
-ch.setLevel(logging.DEBUG)    # set logging level for consol
+ch.setLevel(logging.INFO)    # set logging level for consol
 logger.addHandler(ch)
 
 

@@ -10,7 +10,9 @@ import logging
 
 headers = {'Content-type': 'application/json', 'Accept': 'application/json'}
 
-logging.basicConfig(level=logging.DEBUG)
+# switch to enable/disable file logging of post requests
+# logs are stored to global storage location which is located on the ramdisk
+enable_file_logging = False
 
 
 def status_update():
@@ -46,20 +48,21 @@ def status_update():
         except Exception as e:
             logging.error ("status_update:Error sending request")
             logging.debug (e)
-        try:  # log raw response to rile
-            file=open(my_globals.settings["storage_dir"] +"request_status_update.log","a")
-            # The [:-3] truncates the last 3 characters of the string which is used cut out some microsecond digits
-            file.write("\n\n" + str(datetime.now())[:-3] + "\n")
-            file.write(str(req.status_code) + "\n")
-            if req.status_code == 503:
-                file.write("Server unavailable")
-            #else:
-            #    file.write(req.text[:2000])
-            file.close()
-        except Exception as e:
-            #raise
-            logging.error ("status_update:Error writing to log")
-            logging.debug (e)
+        if enable_file_logging:
+            try:  # log raw response to rile
+                file=open(my_globals.settings["storage_dir"] +"request_status_update.log","a")
+                # The [:-3] truncates the last 3 characters of the string which is used cut out some microsecond digits
+                file.write("\n\n" + str(datetime.now())[:-3] + "\n")
+                file.write(str(req.status_code) + "\n")
+                if req.status_code == 503:
+                    file.write("Server unavailable")
+                #else:
+                #    file.write(req.text[:2000])
+                file.close()
+            except Exception as e:
+                #raise
+                logging.error ("status_update:Error writing to log")
+                logging.debug (e)
 
         logging.debug ("Response code: %s" % req.status_code)
 
@@ -148,19 +151,20 @@ def sensor_upload():
         except Exception as e:
             logging.error ("sensor_upload:Error sending request")
             logging.debug (e)
-        try:  # log raw response to rile
-            file=open(my_globals.settings["storage_dir"] +"request_sensor_upload.log","a")
-            file.write("\n\n" + str(datetime.now())[:-3] + "\n")
-            file.write(str(req.status_code) + "\n")
-            if req.status_code == 503:
-                file.write("Server unavailable")
-            else:
-                file.write(req.text[:2000])
-            file.close()
-        except Exception as e:
-            #raise
-            logging.error ("sensor_upload:Error writing to log")
-            logging.debug (e)
+        if enable_file_logging:
+            try:  # log raw response to rile
+                file=open(my_globals.settings["storage_dir"] +"request_sensor_upload.log","a")
+                file.write("\n\n" + str(datetime.now())[:-3] + "\n")
+                file.write(str(req.status_code) + "\n")
+                if req.status_code == 503:
+                    file.write("Server unavailable")
+                else:
+                    file.write(req.text[:2000])
+                file.close()
+            except Exception as e:
+                #raise
+                logging.error ("sensor_upload:Error writing to log")
+                logging.debug (e)
 
         logging.debug ("Response code: %s" % req.status_code)
         try:  # parse returned datea
@@ -205,19 +209,20 @@ def register():
             req = requests.post(url, headers=headers, data=json.dumps(payload), timeout=(3.05, 27))
         except:
             logging.error ("register:Error sending request")
-        try:
-            file=open(my_globals.settings["storage_dir"] +"request_register.log","a")
-            file.write("\n\n" + str(datetime.now())[:-3] + "\n")
-            file.write(str(req.status_code) + "\n")
-            if req.status_code == 503:
-                file.write("Server unavailable")
-            else:
-                file.write(req.text[:2000]) # truncate the supper long error trace report
-            file.close()
-        except Exception as e:
-            #raise
-            logging.error ("register:Error writing to log")
-            logging.debug (e)
+        if enable_file_logging:
+            try:
+                file=open(my_globals.settings["storage_dir"] +"request_register.log","a")
+                file.write("\n\n" + str(datetime.now())[:-3] + "\n")
+                file.write(str(req.status_code) + "\n")
+                if req.status_code == 503:
+                    file.write("Server unavailable")
+                else:
+                    file.write(req.text[:2000]) # truncate the supper long error trace report
+                file.close()
+            except Exception as e:
+                #raise
+                logging.error ("register:Error writing to log")
+                logging.debug (e)
 
         logging.debug ("Response code: %s" % req.status_code)
         #print req.text[:2000]
