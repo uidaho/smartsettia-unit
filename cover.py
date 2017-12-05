@@ -222,8 +222,10 @@ def fsm_open():
     global ls_close, ls_close, fsm_current_state, fsm_transition_state, button_event
     # if not open. unexpected movement
     if  not (ls_open == 1 and ls_close == 0):
-        my_globals.status["error_msg"] = "Unexpected Movement. Expected open, now reading closed."
+        #my_globals.status["error_msg"] = "Unexpected Movement. Expected open, now reading closed."
         fsm_current_state = "error"
+        time.sleep(2)                       # wait a few seconds
+        fsm_error()                         # run immediatly to resolve state if possible before the next status update
     
     # check next state conditions
     elif (button_event == True):
@@ -246,8 +248,10 @@ def fsm_close():
     global ls_close, ls_close, fsm_current_state, fsm_transition_state, button_event
     # if not closed. unexpected movement
     if  not (ls_open == 0 and ls_close == 1):
-        my_globals.status["error_msg"] = "Unexpected Movement. Expected closed, now reading open."
+        #my_globals.status["error_msg"] = "Unexpected Movement. Expected closed, now reading open."
         fsm_current_state = "error"
+        time.sleep(2)                       # wait a few seconds
+        fsm_error()                         # run immediatly to resolve state if possible before the next status update
 
     # check next state conditions
     elif (button_event  == True):
@@ -311,7 +315,7 @@ def fsm_opening():
             
         # did it somehow reverse and went back to close? dont know how
         elif (ls_open == 0 and ls_close == 1):
-            my_globals.status["error_msg"] = "Cover closed itself?"
+            my_globals.status["error_msg"] = "Cover failed to open"
             logging.error("\tError: Cover closed itself")
             fsm_current_state = "error"         # send to error state
             
@@ -370,9 +374,10 @@ def fsm_closing():
             
         # did it somehow reverse and went back to close? dont know how
         elif (ls_open == 1 and ls_close == 0):
-            my_globals.status["error_msg"] = "Cover opened itself?"
+            my_globals.status["error_msg"] = "Cover failed to close"
             logging.error("\tError: Cover opened itself")
             fsm_current_state = "error"         # send to error state
+            time.sleep(1)
             fsm_error()                         # run immediatly to resolve state if possible before the next status update
             
         # timed out
