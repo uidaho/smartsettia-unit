@@ -12,7 +12,7 @@ import logging
 # Logger: logging config   https://docs.python.org/3/howto/logging-cookbook.html
 logger = logging.getLogger()
 formatter = helper_lib.MyFormatter()           # sets format of the logs. Uses cusom class
-logger.setLevel(logging.DEBUG)              # This essentially sets the highest logging level
+logger.setLevel(logging.DEBUG)              # This essentially sets the highest global logging level
 
 # Logger: create file handler which logs even debug messages
 fh = logging.FileHandler('smartsettia.log')
@@ -23,8 +23,13 @@ logger.addHandler(fh)           # add filehandle to logger
 # Logger: create console handle
 ch = logging.StreamHandler()
 ch.setFormatter(formatter)
-ch.setLevel(logging.INFO)    # set logging level for consol
+ch.setLevel(logging.WARNING)    # set logging level for consol
 logger.addHandler(ch)
+
+# reduce logging level of libraries
+logging.getLogger("schedule").setLevel(logging.WARNING)
+logging.getLogger("requests").setLevel(logging.WARNING)
+logging.getLogger("urllib3").setLevel(logging.WARNING)   # used by requests. cuts out 'connectionpool' logs
 
 
 # https://stackoverflow.com/a/30493366
