@@ -371,6 +371,8 @@ def fsm_closing():
     
 def fsm_locked():
     print ("Entered State: locked")
+    print ("crash test for watchdog. exiting program")
+    exit()
     global fsm_current_state
     if (server_cmd != "lock"):
         fsm_current_state = "error" # to resolve
