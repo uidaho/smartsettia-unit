@@ -28,7 +28,7 @@ def schedule_job_status():
     rate = my_globals.settings["job_server_status_sec"]
     logging.info("Scheduling status job for every %d seconds" % rate)
     schedule.clear("status")
-    schedule.every(rate).seconds.do(run_threaded, job_upload_status).tag("status")
+    schedule.every(rate).seconds.do(job_upload_status).tag("status")
     #time.sleep(3)
 
 # send status to server
@@ -93,7 +93,7 @@ def job_heartbeat():
 
 
 # Schedule jobs that are hard coded times
-schedule.every(30).seconds.do(job_heartbeat)
+schedule.every(60).seconds.do(job_heartbeat)
 schedule.every(15).minutes.do(remote_comm.register)   # periodic re-register device with webserver
 schedule.every(2).seconds.do(job_cover_monitor)
 schedule.every(0.2).seconds.do(job_cover_button)
