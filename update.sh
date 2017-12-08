@@ -8,7 +8,7 @@ if [[ $* == *-d* ]]; then
     BRANCH="development"
 fi
 
-echo "Updating smartsettia"
+echo "Updating smartsettia - $BRANCH"
 
 git status
 sudo systemctl stop smartsettia.service \
