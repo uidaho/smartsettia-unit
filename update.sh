@@ -1,11 +1,5 @@
 #!/bin/bash
 
-# get root permission
-if [ $EUID != 0 ]; then
-    sudo "$0" "$@"
-    exit $?
-fi
-
 BRANCH="master"
 
 # if -d flag given then switch and pull development branch
@@ -16,11 +10,16 @@ fi
 
 echo "Updating smartsettia - $BRANCH"
 
-git status
-sudo systemctl stop smartsettia.service || exit
+echo -e "\n--- Stopping smartsettia service ---"
+sudo -H systemctl stop smartsettia.service
+#sudo -H systemctl status smartsettia.service
 sleep 1
-git checkout $BRANCH || exit
+echo -e "\n--- Pulling changes ---"
+git checkout $BRANCH
 git pull
-sudo systemctl start smartsettia.service
+echo -e "\n--- Starting smartsettia service ---"
+sudo -H systemctl start smartsettia.service
+sleep 1
+sudo -H systemctl status smartsettia.service
 
-echo "Done"
+echo "--- Done ---"
