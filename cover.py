@@ -182,7 +182,7 @@ def set_transition(cmd, source="unknown", override_server= False):
         logging.error("Transition: unknown state. only open/close are recognised")
     
     # print log output
-    logging.info (coverlog)
+    logging.warning (coverlog) # warning so that this important event shows up 
     file = open(my_globals.settings["storage_dir"] + "cover.log", "a")
     file.write(coverlog + ".\n")
     file.close
