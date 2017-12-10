@@ -1,0 +1,17 @@
+# https://www.freedesktop.org/software/systemd/man/systemd.service.html
+# tutorial: http://www.diegoacuna.me/how-to-run-a-script-as-a-service-in-raspberry-pi-raspbian-jessie/
+
+[Unit]
+Description=Smartsettia client
+After=multi-user.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/python3 /home/pi/smartsettia-unit/main.py
+Restart=always
+RestartSec=1        # prevents StartLimitBurst limit being hit
+WatchdogSec=62s
+TimeoutStopSec=20s      # time to wait for program to stop on its own
+
+[Install]
+WantedBy=multi-user.target

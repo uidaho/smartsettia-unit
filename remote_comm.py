@@ -6,15 +6,17 @@ import json
 import requests
 import my_globals   # smartsettia globals
 from my_globals import settings
-from helper_lib import print_error, print_log
+import logging
 
 headers = {'Content-type': 'application/json', 'Accept': 'application/json'}
 
-show_logging = 0        # flag if logs are shown in terminal
+# switch to enable/disable file logging of post requests
+# logs are stored to global storage location which is located on the ramdisk
+enable_file_logging = False
 
 
 def status_update():
-    print ("\n--- Uploading Status -----------------")
+    logging.info("--- Uploading Status -----------------")
     global headers
     # setup the data
     url = my_globals.settings["server_status_addr"]
@@ -27,98 +29,110 @@ def status_update():
     # server_override if true will not delete 
     # server_command is the local variable, cover_command is the server variable
     if (my_globals.status["server_override"] == True):
-        print ("Overriding server command to %s" % payload["server_command"])
+        logging.debug ("Overriding server command to %s" % payload["server_command"])
         payload["cover_command"] = payload["server_command"]
         my_globals.status["server_override"] = False   # reset back to false
     else:
         del payload["server_command"]       # only deleting this entry from payload. my_globals will still exist
     
-    print ("\tjson dmp: ", json.dumps(payload)) # debugger
+    logging.debug ("json dmp: %r" % json.dumps(payload)) # debugger
 
     # Debugging Code
-    print ("Device ID: %d" % my_globals.settings["id"])    # because I'm tired of scrolling up to registration output for id
-    print ("\tCover status:  %s" % payload["cover_status"])
-    print ("\tError message: %r" % payload["error_msg"])
+    logging.debug ("Device ID: %d" % my_globals.settings["id"])    # because I'm tired of scrolling up to registration output for id
+    logging.debug ("Cover status:  %s" % payload["cover_status"])
+    logging.debug ("Error message: %r" % payload["error_msg"])
     
-    #print_log("remote:status_update", url, show_logging)
-
     try:
         try:  # Send the request
             req = requests.post(url,headers=headers, json=payload, timeout=(3.05, 27))
         except Exception as e:
-            print ("remote_comm:status_update:Error sending request")
-            print ("\t", e)
-        try:  # log raw response to rile
-            file=open(my_globals.settings["storage_dir"] +"request_status_update.log","a")
-            # The [:-3] truncates the last 3 characters of the string which is used cut out some microsecond digits
-            file.write("\n\n" + str(datetime.now())[:-3] + "\n")
-            file.write(str(req.status_code) + "\n")
-            if req.status_code == 503:
-                file.write("Server unavailable")
-            else:
-                file.write(req.text)
-            file.close()
-        except Exception as e:
-            #raise
-            print ("remote_comm:status_update:Error writing to log")
-            print (e)
-
-        print ("Response code: ", req.status_code)
-
-        # parse returned data if successful post
-        if req.status_code == 201:
-            # clear error_msg
-            my_globals.status["error_msg"] = None
-            
-            # remove server_command from status if exists
-            if ("server_command" in my_globals.status):
-                #print ("server_command exists and was sent. removing")
-                del my_globals.status["server_command"]
-                
-            try:  # parse returned data
-                rtndata = req.json()
-                #print "rtndata: ", rtndata     # debugger
-                my_globals.status['server_command'] = rtndata["data"]["cover_command"]
-                print ("server command: ", my_globals.status['server_command'])
-
-                # Convert the time string from server into a time object for HH:MM
-                #new_cover_time_open  = datetime.strptime(rtndata["data"]["open_time"],  '%H:%M').time()
-                #new_cover_time_close = datetime.strptime(rtndata["data"]["close_time"], '%H:%M').time()
-                new_cover_time_open  = rtndata["data"]["open_time"]
-                new_cover_time_close = rtndata["data"]["close_time"]
-                # test if values changed
-                if (new_cover_time_open != settings['cover_time_open']):
-                    my_globals.settings['cover_time_open']  = new_cover_time_open
-                    print ("\tCover time open changed to %s." % my_globals.settings["cover_time_open"])
-                    
-                if (new_cover_time_close != settings['cover_time_close']):
-                    my_globals.settings['cover_time_close'] = new_cover_time_close
-                    print ("\tCover time close changed to %s." % my_globals.settings["cover_time_close"])
-                    
-                print ("open %s\tclose %s" % (my_globals.settings['cover_time_open'], my_globals.settings['cover_time_close']))
-
-                # update job rates
-                # do in main?
-
-            except Exception as e:
-                print ("remote_comm:status_update:Error converting json")
-                print (e)
-        # test status code to determin if we were Successful
-        if req.status_code == 201:
-            print ("Status Update Successful")
+            logging.error ("status_update:Error sending request")
+            logging.debug (e)
         else:
-            print ("\tstatus_update failed: Responce code: ", req.status_code)
-            print ("\tURL: ", url)                      # debugger
-            print ("\tHeaders: ", headers)              # debugger
-            print ("\tjson dmp: ", json.dumps(payload)) # debugger
-    except:
-        print ("remote_comm:status_update:General Error")
-    print ("--------------------------------------")
+            if enable_file_logging:
+                try:  # log raw response to rile
+                    file=open(my_globals.settings["storage_dir"] +"request_status_update.log","a")
+                    # The [:-3] truncates the last 3 characters of the string which is used cut out some microsecond digits
+                    file.write("\n\n" + str(datetime.now())[:-3] + "\n")
+                    file.write(str(req.status_code) + "\n")
+                    if req.status_code == 503:
+                        file.write("Server unavailable")
+                    #else:
+                    #    file.write(req.text[:2000])
+                    file.close()
+                except Exception as e:
+                    #raise
+                    logging.error ("status_update:Error writing to log")
+                    logging.debug (e)
+    
+            logging.debug ("Response code: %s" % req.status_code)
+    
+            # parse returned data if successful post
+            if req.status_code == 201:
+                # clear error_msg
+                my_globals.status["error_msg"] = None
+                
+                # remove server_command from status if exists
+                if ("server_command" in my_globals.status):
+                    #print ("server_command exists and was sent. removing")
+                    del my_globals.status["server_command"]
+                    
+                try:  # parse returned data
+                    rtndata = req.json()
+                    #logging.debug ("rtndata: %r" % rtndata)     # debugger can produce lots of logs
+                    my_globals.status['server_command'] = rtndata["data"]["cover_command"]
+                    logging.debug ("server command: %s" % my_globals.status['server_command'])
+    
+                    new_cover_time_open  = rtndata["data"]["open_time"]
+                    new_cover_time_close = rtndata["data"]["close_time"]
+                    # test if values changed
+                    if (new_cover_time_open != settings['cover_time_open']):
+                        my_globals.settings['cover_time_open']  = new_cover_time_open
+                        logging.info ("Cover time open changed to %s." % my_globals.settings["cover_time_open"])
+                        
+                    if (new_cover_time_close != settings['cover_time_close']):
+                        my_globals.settings['cover_time_close'] = new_cover_time_close
+                        logging.info ("Cover time close changed to %s." % my_globals.settings["cover_time_close"])
+                        
+                    logging.info ("open %s\tclose %s" % (my_globals.settings['cover_time_open'], my_globals.settings['cover_time_close']))
+    
+                    # job rates
+                    new_job_status_rate  = rtndata['data']['update_rate']
+                    new_job_image_rate   = rtndata['data']['image_rate']
+                    new_job_sensor_rate  = rtndata['data']['sensor_rate']
+                    
+                    # test if job rates are different from stored value. Reschedule if different
+                    import job_scheduling           # must be imported in this scope to avoid circular imports
+                    if (new_job_status_rate != my_globals.settings['job_server_status_sec']):
+                        my_globals.settings['job_server_status_sec'] = new_job_status_rate
+                        job_scheduling.schedule_job_status()
+                    if (new_job_image_rate != my_globals.settings['job_webcam_sec']):
+                        my_globals.settings['job_webcam_sec'] = new_job_image_rate
+                        job_scheduling.schedule_job_webcam()
+                    if (new_job_sensor_rate != my_globals.settings['job_server_sensors_sec']):
+                        my_globals.settings['job_server_sensors_sec'] = new_job_sensor_rate
+                        job_scheduling.schedule_job_sensors()
+    
+                except Exception as e:
+                    logging.error ("status_update:Error converting json")
+                    logging.debug (e)
+    
+            # test status code to determin if we were Successful
+            if req.status_code == 201:
+                logging.info ("Status Update Successful")
+            else:
+                logging.error ("status_update failed: Responce code: %s" % req.status_code)
+                logging.debug ("URL: %s" % url)                      # debugger
+                logging.debug ("Headers: %s" % headers)              # debugger
+                logging.debug ("json dmp: %s" % json.dumps(payload)) # debugger
+    except Exception as e:
+        logging.error ("status_update:General Error")
+        logging.debug(e)
     # END of status_update
 
 
 def sensor_upload():
-    print ("\n--- Uploading Sensor Data-------------")
+    logging.info ("--- Uploading Sensor Data-------------")
     global headers
     # setup the data
     url = my_globals.settings["server_sensor_addr"]
@@ -127,124 +141,126 @@ def sensor_upload():
     payload["token"] = my_globals.settings["token"]     # add token
     payload.update(my_globals.sensor_data)      # add in sensor_dat dictionary
 
-    #print_log("remote:sensor_upload", url, show_logging)
 
     try:
         try:  # Send the request
             req = requests.post(url,headers=headers, json=payload, timeout=(3.05, 27))
         except Exception as e:
-            print ("remote_comm:sensor_upload:Error sending request")
-            print ("\t", e)
-        try:  # log raw response to rile
-            file=open(my_globals.settings["storage_dir"] +"request_sensor_upload.log","a")
-            file.write("\n\n" + str(datetime.now())[:-3] + "\n")
-            file.write(str(req.status_code) + "\n")
-            if req.status_code == 503:
-                file.write("Server unavailable")
-            else:
-                file.write(req.text)
-            file.close()
-        except Exception as e:
-            #raise
-            print ("remote_comm:sensor_upload:Error writing to log")
-            print (e)
-
-        print ("Response code: ", req.status_code)
-        try:  # parse returned datea
-            rtndata = req.json()
-            rtndata2= rtndata["data"]
-            #print "rtndata: ", rtndata     # debugger
-            #print "rtndata2: ", rtndata2   # debugger
-
-        except Exception as e:
-            print ("remote_comm:sensor_upload:Error converting json")
-            print (e)
-        # test status code to determin if we were Successful
-        if req.status_code == 200 or req.status_code == 201:
-            print ("Sensor Upload Successful")
-        elif req.status_code == 422:
-            print ("Unprocessable Entity. Re-registering")
-            register()
+            logging.error ("sensor_upload:Error sending request")
+            logging.debug (e)
         else:
-            print ("sensor_upload failed: Responce code: ", req.status_code)
-            # Debugging Code
-            print ("\tURL: ", url)                      # debugger
-            print ("\tHeaders: ", headers)              # debugger
-            print ("\tjson dmp: ", json.dumps(payload)) # debugger
+            if enable_file_logging:
+                try:  # log raw response to rile
+                    file=open(my_globals.settings["storage_dir"] +"request_sensor_upload.log","a")
+                    file.write("\n\n" + str(datetime.now())[:-3] + "\n")
+                    file.write(str(req.status_code) + "\n")
+                    if req.status_code == 503:
+                        file.write("Server unavailable")
+                    else:
+                        file.write(req.text[:2000])
+                    file.close()
+                except Exception as e:
+                    #raise
+                    logging.error ("sensor_upload:Error writing to log")
+                    logging.debug (e)
+    
+            logging.debug ("Response code: %s" % req.status_code)
+            try:  # parse returned datea
+                rtndata = req.json()
+                rtndata2= rtndata["data"]
+                #print "rtndata: ", rtndata     # debugger
+                #print "rtndata2: ", rtndata2   # debugger
+    
+            except Exception as e:
+                logging.error ("sensor_upload:Error converting json")
+                logging.debug (e)
+            # test status code to determin if we were Successful
+            if req.status_code == 200 or req.status_code == 201:
+                logging.info ("Sensor Upload Successful")
+            elif req.status_code == 422:
+                logging.warning ("Unprocessable Entity. Re-registering")
+                register()
+            elif req.status_code == 500:
+                logging.warning ("Server error. Sleeping for 10 seconds")
+                time.sleep(10)  # to slow the program to prevent several error posts in a short time
+            else:
+                logging.error ("sensor_upload failed: Responce code: %s" % req.status_code)
+                # Debugging Code
+                logging.debug ("\tURL: %s" % url)                      # debugger
+                logging.debug ("\tHeaders: %s" % headers)              # debugger
+                logging.debug ("\tjson dmp: $s" % json.dumps(payload)) # debugger
     except:
-        print ("remote_comm:sensor_upload:General Error")
-    print ("--------------------------------------")
+        logging.error ("sensor_upload:General Error")
     #END of sensor_upload
 
 
 def register():
-    print ("\n--- Registering Device ---------------")
+    logging.info ("--- Registering Device ---------------")
     global headers
     url = my_globals.settings["server_reg_addr"]
     payload = {}
     payload["uuid"] = my_globals.settings["uuid"]
     payload["challenge"] = my_globals.settings["challenge"]
 
-    #print_log("remote:register", url, show_logging)
-
     try:
         try:
             req = requests.post(url, headers=headers, data=json.dumps(payload), timeout=(3.05, 27))
         except:
-            print ("remote_comm:register:Error sending request")
-        try:
-            file=open(my_globals.settings["storage_dir"] +"request_register.log","a")
-            file.write("\n\n" + str(datetime.now())[:-3] + "\n")
-            file.write(str(req.status_code) + "\n")
-            if req.status_code == 503:
-                file.write("Server unavailable")
-            else:
-                file.write(req.text)
-            file.close()
-        except Exception as e:
-            #raise
-            print ("remote_comm:register:Error writing to log")
-            print (e)
-
-        print ("Response code: ", req.status_code)
-        #print req.text
-        try:
-            rtndata = req.json()
-            rtndata2= rtndata["data"]
-            #print "rtndata: ", rtndata     # debugger
-            #print ("rtndata2: ", rtndata2)   # debugger
-            print ("Token: ", rtndata2["token"])
-            my_globals.settings["token"] = rtndata2["token"]  # set token to response token
-            print ("Name:  ", rtndata2["name"])
-            my_globals.settings["name"] = rtndata2["name"]  # set token to response token
-            print ("ID:    ", rtndata2["id"])
-            my_globals.settings["id"] = rtndata2["id"]
-
-        except Exception as e:
-            print ("remote_comm:register:Error converting json")
-            print (e)
-
-        if req.status_code == 200 or req.status_code == 201:
-            print ("Registration Successful")
+            logging.error ("register:Error sending request")
         else:
-            print ("Registration failed: Responce code: ", req.status_code)
-            print ("\tURL:  ", url)                     # debugger
-            print ("\tUUID: ", payload["uuid"])         # debugger
-            print ("\tHeaders: ", headers)              # debugger
-            print ("\tjson dmp: ", json.dumps(payload)) # debugger
+            if enable_file_logging:
+                try:
+                    file=open(my_globals.settings["storage_dir"] +"request_register.log","a")
+                    file.write("\n\n" + str(datetime.now())[:-3] + "\n")
+                    file.write(str(req.status_code) + "\n")
+                    if req.status_code == 503:
+                        file.write("Server unavailable")
+                    else:
+                        file.write(req.text[:2000]) # truncate the supper long error trace report
+                    file.close()
+                except Exception as e:
+                    #raise
+                    logging.error ("register:Error writing to log")
+                    logging.debug (e)
+    
+            logging.debug ("Response code: %s" % req.status_code)
+            #print req.text[:2000]
+            try:
+                rtndata = req.json()
+                rtndata2= rtndata["data"]
+                #print "rtndata: ", rtndata     # debugger
+                #print ("rtndata2: ", rtndata2)   # debugger
+                logging.info ("Token: %s" % rtndata2["token"])
+                my_globals.settings["token"] = rtndata2["token"]  # set token to response token
+                logging.info ("Name:  %s" % rtndata2["name"])
+                my_globals.settings["name"] = rtndata2["name"]  # set token to response token
+                logging.info ("ID:    %s" % rtndata2["id"])
+                my_globals.settings["id"] = rtndata2["id"]
+    
+            except Exception as e:
+                logging.error ("register:Error converting json")
+                logging.debug (e)
+    
+            if req.status_code == 200 or req.status_code == 201:
+                logging.info ("Registration Successful")
+            else:
+                logging.error ("Registration failed: Responce code: %r" % req.status_code)
+                logging.debug ("URL:  %r" % url)                     # debugger
+                logging.debug ("UUID: %r" % payload["uuid"])         # debugger
+                logging.debug ("tHeaders: %r" % headers)              # debugger
+                logging.debug ("json dmp: %r" % json.dumps(payload)) # debugger
     except:
-        print ("remote_comm:register:General Error")
+        logging.error ("register:General Error")
     print ("--------------------------------------")
     # END of register
 
 
 def pic_upload():
-    print ("--- Uploading Picture ----------------")
+    logging.info ("--- Uploading Picture ----------------")
     # first check if file exists
     image = my_globals.settings["storage_dir"] + my_globals.settings["img_name"]
     if os.path.isfile(image) == 0:           # if path to file exists
-        print ("Image does not exist. Skipping upload")
-        print ("--------------------------------------")
+        logging.warning ("Image does not exist. Skipping upload")
         return
 
     ## upload picture
@@ -256,51 +272,47 @@ def pic_upload():
     payload["token"] = ('', str(my_globals.settings["token"]))
     files= {"image": open(my_globals.settings["storage_dir"] + my_globals.settings["img_name"],'rb')}
 
-
-    #print_log("remote:webcam", url, show_logging)
-    #print ("-------------")
-
     try:
         try:  # Send the request
             req = requests.post(url,headers=headers, files=files, data=payload, timeout=(3.05, 27))
         except Exception as e:
-            print ("remote_comm:webcam:Error sending request")
-            print ("\t", e)
-        try:  # log raw response to rile
-            file=open(my_globals.settings["storage_dir"] +"request_webcam.log","a")
-            file.write("\n\n" + str(datetime.now())[:-3] + "\n")
-            file.write(str(req.status_code) + "\n")
-            if req.status_code == 503:
-                file.write("Server unavailable")
-            else:
-                file.write(req.text)
-            file.close()
-        except Exception as e:
-            #raise
-            print ("remote_comm:webcam:Error writing to log")
-            print (e)
-
-        print ("Response code: ", req.status_code)
-        try:  # parse returned datea
-            rtndata = req.json()
-            rtndata2= rtndata["data"]
-            #print "rtndata: ", rtndata     # debugger
-            #print "rtndata2: ", rtndata2   # debugger
-
-        except Exception as e:
-            print ("remote_comm:webcam:Error converting json")
-            print (e)
-        # test status code to determin if we were Successful
-        if req.status_code == 200 or req.status_code == 201:
-            print ("Webcam upload Successful")
+            logging.error ("webcam:Error sending request")
+            logging.debug (e)
         else:
-            print ("Webcam upload failed: Responce code: ", req.status_code)
-            # Debugging Code
-            print ("\tImage name: ", image)             # debugger
-            print ("\tURL: ", url)                      # debugger
-            print ("\tHeaders: ", headers)              # debugger
-            print ("\tjson dmp: ", json.dumps(payload)) # debugger
+            try:  # log raw response to rile
+                file=open(my_globals.settings["storage_dir"] +"request_webcam.log","a")
+                file.write("\n\n" + str(datetime.now())[:-3] + "\n")
+                file.write(str(req.status_code) + "\n")
+                if req.status_code == 503:
+                    file.write("Server unavailable")
+                else:
+                    file.write(req.text[:2000])
+                file.close()
+            except Exception as e:
+                #raise
+                logging.error ("webcam:Error writing to log")
+                logging.debug (e)
+    
+            logging.debug ("Response code: %s" % req.status_code)
+            try:  # parse returned datea
+                rtndata = req.json()
+                rtndata2= rtndata["data"]
+                #print "rtndata: ", rtndata     # debugger
+                #print "rtndata2: ", rtndata2   # debugger
+    
+            except Exception as e:
+                logging.error ("webcam:Error converting json")
+                logging.debug (e)
+            # test status code to determin if we were Successful
+            if req.status_code == 200 or req.status_code == 201:
+                logging.info ("Webcam upload Successful")
+            else:
+                logging.error ("Webcam upload failed: Responce code: %r" % req.status_code)
+                # Debugging Code
+                logging.debug ("Image name: %r" % image)             # debugger
+                logging.debug ("URL: %r" % url)                      # debugger
+                logging.debug ("Headers: %r" % headers)              # debugger
+                logging.debug ("json dmp: %r" % json.dumps(payload)) # debugger
     except:
-        print ("remote_comm:webcam:General Error")
-    print ("--------------------------------------")
+        logging.error ("webcam:General Error")
     #END of pic_upload
