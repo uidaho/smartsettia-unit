@@ -2,7 +2,7 @@
 import json
 from time import sleep
 import logging
-version= "1.1.0"        # program version
+version= "1.2.0"        # program version
 
 # Note to concatonate dictionaries
 # z = x.copy()
