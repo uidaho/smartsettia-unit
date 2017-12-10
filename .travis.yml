@@ -8,7 +8,7 @@ python:
   - 2.7
 
 install:
-  ./smartsettia_unit_setup.sh --y
+  ./setup.sh --y
   - pip install codecov
 script:
   - ./main.py --single --fakewebcam --notpi --uuid "fdf9626a-65da-52ef-b43b-aed368471aa1"
