@@ -15,7 +15,14 @@ sudo -H systemctl stop smartsettia.service
 #sudo -H systemctl status smartsettia.service
 sleep 1
 echo -e "\n--- Pulling changes ---"
-git checkout $BRANCH
+
+
+# check to stay on current branch
+if [[ $* != *-c* ]]; then
+    git checkout $BRANCH
+else
+    echo "--- Staying on current branch ---"
+fi
 git pull
 echo -e "\n--- Starting smartsettia service ---"
 sudo -H systemctl start smartsettia.service
