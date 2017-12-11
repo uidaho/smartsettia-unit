@@ -1,15 +1,8 @@
 #!/bin/bash
 
-# only clean and exit
-if [[ $* == *-C* ]]; then
-  echo "Removing .logs & .pyc files then exiting"
-  rm -f *.log *.pyc
-  exit
-fi
-
 # get root permission
 if [ $EUID != 0 ]; then
-    sudo "$0" "$@"
+    sudo -H "$0" "$@"
     exit $?
 fi
 
@@ -41,25 +34,25 @@ fi
 echo -e "\nSetting up smartsettia"
 echo -e   "----------------------"
 
-#apt -qq update
-##https://www.saltycrane.com/blog/2010/02/how-install-pip-ubuntu/
-#apt install -y python3 python3-pip
-##pip install --upgrade pip
-##pip install --upgrade virtualenv
-## apt install -y fswebcam   # old webcam implementation
-#apt install -y xawtv        # webcam
-#apt install -y imagemagick  # Adds overlay to photos
-#
-#
-#echo -e "\nInstalling python dependencies"
-#echo      "-----------------------"
-#pip3 install --upgrade schedule
-#pip3 install --upgrade requests
-#pip3 install --upgrade wget     # webcam replacement if no webcam
-#pip3 install --upgrade call
-#pip3 install --upgrade uuid     # is this really needed?
-#pip3 install --upgrade RPI.GPIO # gpio
-#pip3 install --upgrade sdnotify # systemd watchdog support
+apt -qq update
+apt -q -y upgrade
+apt install -y python3 python3-pip
+#pip install --upgrade pip
+#pip install --upgrade virtualenv
+# apt install -y fswebcam   # old webcam implementation
+apt install -y xawtv        # webcam
+apt install -y imagemagick  # Adds overlay to photos
+
+
+echo -e "\nInstalling python dependencies"
+echo      "-----------------------"
+pip3 install --upgrade schedule
+pip3 install --upgrade requests
+pip3 install --upgrade wget     # webcam replacement if no webcam
+pip3 install --upgrade call
+pip3 install --upgrade uuid     # is this really needed?
+pip3 install --upgrade RPI.GPIO # gpio
+pip3 install --upgrade sdnotify # systemd watchdog support
 
 
 echo -e "\nSetting up Environment"
@@ -74,7 +67,7 @@ if [ -f $SERVICE_PATH ]; then
   echo -e "\n Removing $SERVICE_NAME and replacing with new service"
   sudo rm -v $SERVICE_PATH
 fi
-sudo cp -v $SERVICE_NAME $SERVICE_PATH       # copy serice to systemd directory
+sudo cp -v $SERVICE_NAME $SERVICE_PATH       # copy service to systemd directory
 sudo chmod 644 $SERVICE_PATH
 chmod +x $SERVICE_PATH
 sudo systemctl daemon-reload

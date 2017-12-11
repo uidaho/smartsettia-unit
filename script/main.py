@@ -9,13 +9,14 @@ import argparse    # argument parsing
 import helper_lib
 import logging
 
+
 # Logger: logging config   https://docs.python.org/3/howto/logging-cookbook.html
 logger = logging.getLogger()
 formatter = helper_lib.MyFormatter()           # sets format of the logs. Uses cusom class
 logger.setLevel(logging.DEBUG)              # This essentially sets the highest global logging level
 
 # Logger: create file handler which logs even debug messages
-fh = logging.FileHandler('smartsettia.log')
+fh = logging.FileHandler('/home/pi/smartsettia-unit/smartsettia.log')
 fh.setFormatter(formatter)      # set format
 fh.setLevel(logging.WARNING)    # set level for file logging
 logger.addHandler(fh)           # add filehandle to logger

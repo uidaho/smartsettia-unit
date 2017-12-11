@@ -40,7 +40,7 @@ status =        {"cover_status"   : "error",
                 "error_msg"       : None
                 }
 
-settings =      {"Config_Version": 3,    ### INCREMENT THIS IF SETTING STRUCTURE CHANGED ###
+settings =      {"Config_Version": 4,    ### INCREMENT THIS IF SETTING STRUCTURE CHANGED ###
                 "name":"UnNamed",                          # Name of Device
                 "uuid": "NOT_SET0-0000-0000-0000-000000000000",   # UUID V1
                 "token": "none",      # post token key
@@ -61,7 +61,8 @@ settings =      {"Config_Version": 3,    ### INCREMENT THIS IF SETTING STRUCTURE
                 "cover_time_close": None,                   # close time
                 "schedule_last_checked": None,              # last time we checked the schedual
                 "storage_dir": "/mnt/ramdisk/",             # directory where picture & logs are saved do
-                "img_name": "webcam_img.jpg"                # name of webcam picture
+                "img_name": "webcam_img.jpg",               # name of webcam picture
+                "config_dir": "/home/pi/smartsettia-unit/config.json"  # dir and filename for config file
                 }
 
 
@@ -70,7 +71,7 @@ def save_settings():
     global settings
     #print ("Settings dump: ",settings)         # debugger
     try:
-        with open('config.json', 'w') as f:
+        with open(settings['config_dir'], 'w') as f:
             json.dump(settings, f)
     except Exception as e:
         logging.error ("Save settings error %r" % e)
@@ -81,7 +82,7 @@ def load_settings():
     global settings
     temp = {}
     try:
-        with open('config.json', 'r') as f:
+        with open(settings['config_dir'], 'r') as f:
             temp = json.load(f)
     # except FileNotFoundError:
     #    print "config.json file not found. loading default settings"

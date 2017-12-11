@@ -7,9 +7,9 @@ After=multi-user.target
 
 [Service]
 Type=simple
-ExecStart=/usr/bin/python3 /home/pi/smartsettia-unit/main.py
+ExecStart=/usr/bin/python3 /home/pi/smartsettia-unit/script/main.py
 Restart=always
-RestartSec=1        # prevents StartLimitBurst limit being hit
+RestartSec=5s           # prevents StartLimitBurst limit being hit
 WatchdogSec=62s
 TimeoutStopSec=20s      # time to wait for program to stop on its own
 
