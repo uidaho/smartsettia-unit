@@ -2,7 +2,7 @@
 
 # get root permission
 if [ $EUID != 0 ]; then
-    sudo "$0" "$@"
+    sudo -H "$0" "$@"
     exit $?
 fi
 
