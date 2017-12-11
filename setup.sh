@@ -41,25 +41,26 @@ fi
 echo -e "\nSetting up smartsettia"
 echo -e   "----------------------"
 
-#apt -qq update
-##https://www.saltycrane.com/blog/2010/02/how-install-pip-ubuntu/
-#apt install -y python3 python3-pip
-##pip install --upgrade pip
-##pip install --upgrade virtualenv
-## apt install -y fswebcam   # old webcam implementation
-#apt install -y xawtv        # webcam
-#apt install -y imagemagick  # Adds overlay to photos
-#
-#
-#echo -e "\nInstalling python dependencies"
-#echo      "-----------------------"
-#pip3 install --upgrade schedule
-#pip3 install --upgrade requests
-#pip3 install --upgrade wget     # webcam replacement if no webcam
-#pip3 install --upgrade call
-#pip3 install --upgrade uuid     # is this really needed?
-#pip3 install --upgrade RPI.GPIO # gpio
-#pip3 install --upgrade sdnotify # systemd watchdog support
+apt -qq update
+apt -q -y upgrade
+#https://www.saltycrane.com/blog/2010/02/how-install-pip-ubuntu/
+apt install -y python3 python3-pip
+#pip install --upgrade pip
+#pip install --upgrade virtualenv
+# apt install -y fswebcam   # old webcam implementation
+apt install -y xawtv        # webcam
+apt install -y imagemagick  # Adds overlay to photos
+
+
+echo -e "\nInstalling python dependencies"
+echo      "-----------------------"
+pip3 install --upgrade schedule
+pip3 install --upgrade requests
+pip3 install --upgrade wget     # webcam replacement if no webcam
+pip3 install --upgrade call
+pip3 install --upgrade uuid     # is this really needed?
+pip3 install --upgrade RPI.GPIO # gpio
+pip3 install --upgrade sdnotify # systemd watchdog support
 
 
 echo -e "\nSetting up Environment"
