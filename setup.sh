@@ -1,12 +1,5 @@
 #!/bin/bash
 
-# only clean and exit
-if [[ $* == *-C* ]]; then
-  echo "Removing .logs & .pyc files then exiting"
-  rm -f *.log *.pyc
-  exit
-fi
-
 # get root permission
 if [ $EUID != 0 ]; then
     sudo "$0" "$@"
@@ -43,7 +36,6 @@ echo -e   "----------------------"
 
 apt -qq update
 apt -q -y upgrade
-#https://www.saltycrane.com/blog/2010/02/how-install-pip-ubuntu/
 apt install -y python3 python3-pip
 #pip install --upgrade pip
 #pip install --upgrade virtualenv
@@ -75,7 +67,7 @@ if [ -f $SERVICE_PATH ]; then
   echo -e "\n Removing $SERVICE_NAME and replacing with new service"
   sudo rm -v $SERVICE_PATH
 fi
-sudo cp -v $SERVICE_NAME $SERVICE_PATH       # copy serice to systemd directory
+sudo cp -v $SERVICE_NAME $SERVICE_PATH       # copy service to systemd directory
 sudo chmod 644 $SERVICE_PATH
 chmod +x $SERVICE_PATH
 sudo systemctl daemon-reload
