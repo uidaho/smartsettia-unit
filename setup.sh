@@ -7,6 +7,7 @@ if [ $EUID != 0 ]; then
 fi
 
 FLAG_RAMDISK=0;
+CLEAN_BLOAT=0;
 
 # cleaning
 if [[ $* == *-c* ]]; then
@@ -21,6 +22,7 @@ fi
 if [[ $* == *--y* ]]; then
   FLAG_RAMDISK=1;
 else
+  # ramdisk
   while true; do
       read -p "Do you wish to setup the ramdisk? " yn
       case $yn in
@@ -29,13 +31,36 @@ else
           * ) echo "Please answer yes or no.";;
       esac
   done
+  
+  # clean bloat
+  while true; do
+    read -p "Do you wish to remove unneeded programs such as libreoffice, wolfram, scratch and some games? " yn
+    case $yn in
+        [Yy]* ) CLEAN_BLOAT=1; break;;
+        [Nn]* ) break;;
+        * ) echo "Please answer yes or no.";;
+    esac
+  done
 fi
+
+
+# remove unneeded programs if enabled
+if [ $CLEAN_BLOAT -eq "1" ]; then
+  echo -e "\nRemoving unneeded programs"
+  echo      "-------------------------------"
+  sudo apt -y purge libreoffice* wolfram-engine sonic-pi scratch scratch2 minecraft-pi sense-hat
+  sudo apt -y autoremove
+fi
+
 
 echo -e "\nSetting up smartsettia"
 echo -e   "----------------------"
-
 apt -qq update
-apt -q -y upgrade
+
+# skip upgrades if -f flag is given
+if [[ $* != *--f* ]]; then
+  apt -q -y upgrade
+fi
 apt install -y python3 python3-pip
 #pip install --upgrade pip
 #pip install --upgrade virtualenv
@@ -59,6 +84,7 @@ echo -e "\nSetting up Environment"
 echo      "-----------------------"
 sudo timedatectl set-timezone Etc/UTC  # may not work on other platforms
 
+
 echo -e "\nSetting up system service"
 SERVICE_NAME=smartsettia.service
 SERVICE_PATH="/lib/systemd/system/$SERVICE_NAME"
@@ -75,6 +101,7 @@ sudo systemctl enable $SERVICE_NAME
 sudo systemctl start $SERVICE_NAME
 
 
+# Setup Ramdisk if enabled
 if [ $FLAG_RAMDISK -eq "1" ]; then
   echo -e "\nSetting up ramdisk for pictures & logs"
   echo      "-------------------------------"

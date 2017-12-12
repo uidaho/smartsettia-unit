@@ -5,7 +5,6 @@ import os.path
 import json
 import requests
 import my_globals   # smartsettia globals
-from my_globals import settings
 import logging
 
 headers = {'Content-type': 'application/json', 'Accept': 'application/json'}
@@ -86,11 +85,11 @@ def status_update():
                     new_cover_time_open  = rtndata["data"]["open_time"]
                     new_cover_time_close = rtndata["data"]["close_time"]
                     # test if values changed
-                    if (new_cover_time_open != settings['cover_time_open']):
+                    if (new_cover_time_open != my_globals.settings['cover_time_open']):
                         my_globals.settings['cover_time_open']  = new_cover_time_open
                         logging.info ("Cover time open changed to %s." % my_globals.settings["cover_time_open"])
                         
-                    if (new_cover_time_close != settings['cover_time_close']):
+                    if (new_cover_time_close != my_globals.settings['cover_time_close']):
                         my_globals.settings['cover_time_close'] = new_cover_time_close
                         logging.info ("Cover time close changed to %s." % my_globals.settings["cover_time_close"])
                         
