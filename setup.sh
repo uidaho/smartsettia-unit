@@ -56,7 +56,11 @@ fi
 echo -e "\nSetting up smartsettia"
 echo -e   "----------------------"
 apt -qq update
-apt -q -y upgrade
+
+# skip upgrades if -f flag is given
+if [[ $* != *--f* ]]; then
+  apt -q -y upgrade
+fi
 apt install -y python3 python3-pip
 #pip install --upgrade pip
 #pip install --upgrade virtualenv

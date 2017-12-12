@@ -8,7 +8,7 @@ python:
   - 2.7
 
 install:
-  ./setup.sh --y
+  ./setup.sh --y --f
   - pip install codecov
 script:
   - ./script/main.py --single --fakewebcam --notpi --uuid "fdf9626a-65da-52ef-b43b-aed368471aa1"
