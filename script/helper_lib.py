@@ -1,14 +1,15 @@
 import time
 import uuid
+import subprocess
 from uuid import UUID   # for some reason UUID is not imported when importing all of uuid
 import my_globals
 import logging
 
 
 def generate_uuid():
-    # https://stackoverflow.com/questions/159137/getting-mac-address
-    seed = uuid.getnode()       # returns 48bit value from MAC or rand number if not found
-    uu = str(uuid.uuid5(uuid.NAMESPACE_URL, str(seed)))
+    MAC_ADDRESS = subprocess.check_output(["cat /sys/class/net/eth0/address"], shell=True)[:-1].decode('utf8').replace(":", "")
+    my_globals.settings["mac_address"] = MAC_ADDRESS         # save MAC address to global settings
+    uu = str(uuid.uuid5(uuid.NAMESPACE_URL, MAC_ADDRESS))
     logging.info ("uuid: %s" % uu)
     my_globals.settings["uuid"] = uu
 
