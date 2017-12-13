@@ -11,9 +11,9 @@ Group=smartsettia
 Type=simple
 ExecStart=/usr/bin/python3 /home/pi/smartsettia-unit/script/main.py
 Restart=always
-RestartSec=5s           # prevents StartLimitBurst limit being hit
+RestartSec=5s
 WatchdogSec=62s
-TimeoutStopSec=20s      # time to wait for program to stop on its own
+TimeoutStopSec=20s
 
 [Install]
 WantedBy=multi-user.target
