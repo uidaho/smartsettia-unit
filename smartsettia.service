@@ -6,6 +6,8 @@ Description=Smartsettia client
 After=multi-user.target
 
 [Service]
+User=smartsettia
+Group=smartsettia
 Type=simple
 ExecStart=/usr/bin/python3 /home/pi/smartsettia-unit/script/main.py
 Restart=always

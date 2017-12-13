@@ -53,6 +53,15 @@ if [ $CLEAN_BLOAT -eq "1" ]; then
 fi
 
 
+echo -e "\nSetting up smartsettia user and group"
+echo -e   "----------------------"
+SCRIPTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+# test if user exits already, if not create user
+id -u smartsettia &>/dev/null || sudo useradd -M -r -U smartsettia
+sudo chgrp -R smartsettia $SCRIPTDIR/*
+#sudo usermod -aG smartsettia <user>
+
+
 echo -e "\nSetting up smartsettia"
 echo -e   "----------------------"
 apt -qq update
@@ -87,6 +96,7 @@ sudo timedatectl set-timezone Etc/UTC  # may not work on other platforms
 
 echo -e "\nSetting up system service"
 mkdir -p /var/log/smartsettia
+chown smartsettia:smartsettia /var/log/smartsettia
 SERVICE_NAME=smartsettia.service
 SERVICE_PATH="/lib/systemd/system/$SERVICE_NAME"
 # check if a service file already exists and delete if so.
@@ -107,6 +117,7 @@ if [ $FLAG_RAMDISK -eq "1" ]; then
   echo -e "\nSetting up ramdisk for pictures & logs"
   echo      "-------------------------------"
   mkdir -p /mnt/ramdisk   #make the mount directory
+  chown smartsettia:smartsettia /mnt/ramdisk
   MOUNTCODE="tmpfs       /mnt/ramdisk tmpfs   nodev,nosuid,noexec,nodiratime,size=100M   0 0"
   #check if fstab already has this line. if not add it.
   grep -q -F "$MOUNTCODE" /etc/fstab || echo "$MOUNTCODE" >> /etc/fstab
