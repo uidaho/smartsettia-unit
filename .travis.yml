@@ -9,8 +9,10 @@ python:
 
 install:
   ./setup.sh --y --f
+  - THISUSER=`whoami`
+  - sudo usermod -aG smartsettia $THISUSER
   - pip install codecov
 script:
-  - ./script/main.py --single --fakewebcam --notpi --uuid "fdf9626a-65da-52ef-b43b-aed368471aa1"
+  - sudo ./script/main.py --single --fakewebcam --notpi --uuid "fdf9626a-65da-52ef-b43b-aed368471aa1"
 after_success:
 - codecov
