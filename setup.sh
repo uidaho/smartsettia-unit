@@ -58,6 +58,7 @@ echo -e   "----------------------"
 SCRIPTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 # test if user exits already, if not create user
 id -u smartsettia &>/dev/null || sudo useradd -M -r -U smartsettia
+sudo usermod -aG pi,adm,dialout,cdrom,audio,video,plugdev,input,netdev,gpio,i2c,spi smartsettia    # pi group reverence: https://raspberrypi.stackexchange.com/a/75681
 sudo chgrp -R smartsettia $SCRIPTDIR/*
 #sudo usermod -aG smartsettia <user>
 
@@ -95,8 +96,8 @@ sudo timedatectl set-timezone Etc/UTC  # may not work on other platforms
 
 
 echo -e "\nSetting up system service"
-mkdir -p /var/log/smartsettia
-chown smartsettia:smartsettia /var/log/smartsettia
+sudo mkdir -p /var/log/smartsettia
+sudo chown -R smartsettia:smartsettia /var/log/smartsettia
 SERVICE_NAME=smartsettia.service
 SERVICE_PATH="/lib/systemd/system/$SERVICE_NAME"
 # check if a service file already exists and delete if so.
@@ -107,9 +108,6 @@ fi
 sudo cp -v $SERVICE_NAME $SERVICE_PATH       # copy service to systemd directory
 sudo chmod 644 $SERVICE_PATH
 chmod +x $SERVICE_PATH
-sudo systemctl daemon-reload
-sudo systemctl enable $SERVICE_NAME
-sudo systemctl start $SERVICE_NAME
 
 
 # Setup Ramdisk if enabled
@@ -117,12 +115,17 @@ if [ $FLAG_RAMDISK -eq "1" ]; then
   echo -e "\nSetting up ramdisk for pictures & logs"
   echo      "-------------------------------"
   mkdir -p /mnt/ramdisk   #make the mount directory
-  chown smartsettia:smartsettia /mnt/ramdisk
+  sudo chown smartsettia:smartsettia /mnt/ramdisk
   MOUNTCODE="tmpfs       /mnt/ramdisk tmpfs   nodev,nosuid,noexec,nodiratime,size=100M   0 0"
   #check if fstab already has this line. if not add it.
   grep -q -F "$MOUNTCODE" /etc/fstab || echo "$MOUNTCODE" >> /etc/fstab
   mount -a               # mount the ramdisk
 fi
+
+
+sudo systemctl daemon-reload
+sudo systemctl enable $SERVICE_NAME
+sudo systemctl restart $SERVICE_NAME
 
 
 echo -e "\nSmartsettia setup done"
