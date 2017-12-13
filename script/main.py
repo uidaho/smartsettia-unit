@@ -16,7 +16,7 @@ formatter = helper_lib.MyFormatter()           # sets format of the logs. Uses c
 logger.setLevel(logging.DEBUG)              # This essentially sets the highest global logging level
 
 # Logger: create file handler which logs even debug messages
-fh = logging.FileHandler('/home/pi/smartsettia-unit/smartsettia.log')
+fh = logging.FileHandler('/var/log/smartsettia/smartsettia.log')
 fh.setFormatter(formatter)      # set format
 fh.setLevel(logging.WARNING)    # set level for file logging
 logger.addHandler(fh)           # add filehandle to logger
@@ -139,7 +139,6 @@ import signal
 
 def signal_term_handler(signal, frame):
     print ('Recived signal: ', str(signal))
-    #print ('got SIGTERM')
     n.notify("STOPPING=1")
     gpio_cleanup()
     exit(0)

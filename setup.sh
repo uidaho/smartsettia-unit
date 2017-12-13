@@ -86,6 +86,7 @@ sudo timedatectl set-timezone Etc/UTC  # may not work on other platforms
 
 
 echo -e "\nSetting up system service"
+mkdir -p /var/log/smartsettia
 SERVICE_NAME=smartsettia.service
 SERVICE_PATH="/lib/systemd/system/$SERVICE_NAME"
 # check if a service file already exists and delete if so.
